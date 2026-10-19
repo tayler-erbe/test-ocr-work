@@ -22,17 +22,36 @@ class ServiceError(RuntimeError):
 
 
 class Client:
-    def __init__(self, base, key='', model=None):
+    def __init__(self, base, key='', model=None, allow_http=False, thinking=None, max_tokens=None):
         parsed = urllib.parse.urlsplit(base)
         if parsed.scheme not in ('https', 'http') or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
             raise ValueError('Use an HTTP(S) base URL without credentials, query, or fragment')
-        if parsed.scheme != 'https' and parsed.hostname not in ('localhost', '127.0.0.1', '::1'):
+        if parsed.scheme != 'https' and parsed.hostname not in ('localhost', '127.0.0.1', '::1') and not allow_http:
             raise ValueError('Use HTTPS for a remote API')
         self.base = base.rstrip('/')
         if not self.base.endswith('/v1'):
             self.base += '/v1'
         self.key, self.model = key, model
         self.identity = digest(self.base)
+        self.thinking, self.max_tokens = thinking, max_tokens
+        if max_tokens is not None and (not isinstance(max_tokens, int) or max_tokens < 1):
+            raise ValueError('max_tokens must be a positive integer')
+
+    @property
+    def generation_profile(self):
+        result = {}
+        if self.thinking is not None:
+            result['enable_thinking'] = self.thinking
+        if self.max_tokens is not None:
+            result['max_tokens_override'] = self.max_tokens
+        return result
+
+    @property
+    def label(self):
+        suffix = ''
+        if self.generation_profile:
+            suffix = ' [' + ', '.join(f'{k}={v}' for k, v in self.generation_profile.items()) + ']'
+        return 'nim/' + self.model + suffix
 
     def request(self, path, payload=None):
         headers = {'Content-Type': 'application/json'}
@@ -66,17 +85,27 @@ class Client:
                 metadata[path] = self.request(path)
             except ServiceError as exc:
                 metadata[path] = {'unavailable': str(exc)}
-        self.revision = digest(json.dumps({'model': self.model, 'metadata': metadata, 'endpoint_sha256': self.identity}, sort_keys=True))
+        identity = {'model': self.model, 'metadata': metadata, 'endpoint_sha256': self.identity}
+        if self.generation_profile:
+            identity['generation_profile'] = self.generation_profile
+        self.revision = digest(json.dumps(identity, sort_keys=True))
         return {'models': models, 'deployment': metadata, 'selected_model': self.model, 'deployment_snapshot_sha256': self.revision,
+                'generation_profile': self.generation_profile,
                 'warning': 'Snapshot hash is not a cryptographic model-weight revision; backend may change'}
 
     def chat(self, payload):
         body = {'model': self.model, 'messages': payload['messages'], 'temperature': 0,
-                'max_tokens': payload['options']['num_predict'], 'stream': False,
+                'max_tokens': self.max_tokens or payload['options']['num_predict'], 'stream': False,
                 'response_format': {'type': 'json_schema', 'json_schema': {'name': 'evidence', 'strict': True, 'schema': payload['format']}}}
+        if self.thinking is not None:
+            body['chat_template_kwargs'] = {'enable_thinking': self.thinking}
         started = time.perf_counter()
         raw = self.request('/chat/completions', body)
         choice = raw['choices'][0]
+        message = choice.get('message', {})
+        self.last_response_info = {'finish_reason': choice.get('finish_reason'), 'usage': raw.get('usage', {}),
+                                   'returned_reasoning_present': bool(message.get('reasoning_content') or message.get('reasoning')),
+                                   'requested_generation_profile': self.generation_profile}
         if choice.get('finish_reason') != 'stop':
             raise ValueError('Non-stop generation: ' + str(choice.get('finish_reason')))
         if choice.get('message', {}).get('refusal'):
@@ -108,7 +137,7 @@ class Transport:
     def urlopen(self, request, timeout=None):
         url = request if isinstance(request, str) else request.full_url
         if url.endswith('/api/tags'):
-            value = {'models': [{'name': 'nim/' + self.client.model, 'digest': self.client.revision}]}
+            value = {'models': [{'name': self.client.label, 'digest': self.client.revision}]}
         elif url.endswith('/api/chat'):
             value = self.client.chat(json.loads(request.data))
         else:
@@ -128,14 +157,17 @@ def public(root, client, manifest, limit=None):
         raise ValueError('Manifest case missing from local library')
     if limit:
         cases = cases[:limit]
-    model = 'nim/' + client.model
+    model = client.label
     config = {'protocol': 'nim-api-comparison-v1', 'scoring_protocol_sha256': PROTOCOL_SHA,
               'manifest_sha256': digest(manifest.read_bytes()), 'cases': len(cases),
               'deployment_snapshot_sha256': client.revision, 'endpoint_sha256': client.identity,
-              'temperature': 0, 'num_predict': 600, 'retrieval': 'retrieved',
+              'temperature': 0, 'num_predict': client.max_tokens or 600, 'retrieval': 'retrieved',
               'evaluation_role': 'api_comparison_same_public_holdout',
               'source_hashes': {c['doc_id']: db.execute('SELECT sha256 FROM documents WHERE id=?', (c['doc_id'],)).fetchone()[0] for c in cases},
               'limitations': 'Previously exposed public holdout; server context is not forced to 32768; backend reasoning/defaults may differ. No hardware inference from latency.'}
+    if client.generation_profile:
+        config['generation_profile'] = client.generation_profile
+        config['adapter_source_sha256'] = digest(Path(__file__).read_bytes())
     run_id = digest(json.dumps(config, sort_keys=True))[:24]
     db.execute('INSERT OR IGNORE INTO runs VALUES (?,?,?,?,?)', (run_id, model, now(), json.dumps(config), 'running')); db.commit()
     try:
@@ -150,12 +182,14 @@ def public(root, client, manifest, limit=None):
                 evidence = protocol.validate_response(prediction, visible, case['task'])
                 metrics = protocol.score(case, prediction, evidence, visible)
                 metrics.update(timing)
+                metrics['api_generation_info'] = getattr(client, 'last_response_info', {})
                 prediction = {'response': prediction, 'evidence': evidence, 'visible_ids': [s['id'] for s in visible]}
                 status, error = 'complete', None
             except ServiceError:
                 raise  # Stop on service errors rather than generating hundreds of bad attempts.
-            except (ValueError, KeyError, TypeError, IndexError) as exc:
+            except Exception as exc:
                 prediction, metrics, status, error = {}, {'correct': False, 'evidence_f1': 0}, 'failed', str(exc)
+                metrics['api_generation_info'] = getattr(client, 'last_response_info', {})
             db.execute('INSERT INTO results VALUES (?,?,?,?,?,?,?,?)', (run_id, case['id'], model, status, json.dumps(prediction), json.dumps(metrics), time.perf_counter() - started, error)); db.commit()
             print(json.dumps({'run_id': run_id, 'progress': index + 1, 'total': len(cases), 'status': status}), flush=True)
         db.execute("UPDATE runs SET status='complete' WHERE id=?", (run_id,)); db.commit()
@@ -181,7 +215,7 @@ def private(root, client):
                 raise AbortPrivate(str(exc)) from None
     transport = PrivateTransport(client)
     module.urllib = SimpleNamespace(request=transport)
-    model = 'nim/' + client.model
+    model = client.label
     try:
         module.extract(root, model)
     except AbortPrivate as exc:
@@ -189,6 +223,12 @@ def private(root, client):
     # Retain explicit records for every field of documents with unread pages.
     from local_demo import FIELDS
     db = connect(root)
+    for row in db.execute('SELECT * FROM findings WHERE model=?', (model,)).fetchall():
+        metadata = json.loads(row['metadata'])
+        metadata.update({'provider': 'nim', 'requested_generation_profile': client.generation_profile,
+                         'output_token_budget': client.max_tokens or 1500})
+        db.execute('UPDATE findings SET metadata=? WHERE run_id=? AND doc_id=? AND field=?',
+                   (json.dumps(metadata), row['run_id'], row['doc_id'], row['field']))
     for doc in db.execute("SELECT * FROM documents WHERE dataset='private' AND status!='needs_review'").fetchall():
         run_id = digest(doc['sha256'] + client.revision + 'nim-blocked-incomplete-v1')[:24]
         metadata = {'protocol': 'nim-private-comparison-v1', 'gold_status': 'unlabeled', 'reason': 'Incomplete source; no model request made'}
@@ -202,17 +242,22 @@ def main():
     parser.add_argument('--root', type=Path, default=DEFAULT_ROOT)
     parser.add_argument('--stage', choices=['discover', 'public', 'private', 'all'], default='discover')
     parser.add_argument('--limit', type=int, help='Public smoke-test subset only; omit for the full 200-case manifest')
+    parser.add_argument('--allow-http', action='store_true', help='Use an explicitly supplied institutional HTTP endpoint')
+    parser.add_argument('--disable-thinking', action='store_true', help='Explicitly set chat_template_kwargs.enable_thinking=false; creates a separately labeled configuration')
+    parser.add_argument('--max-tokens', type=int, help='Override each stage output budget; creates a separately labeled configuration')
     args = parser.parse_args()
     if args.limit is not None and args.limit < 1:
         parser.error('--limit must be positive')
     base = os.getenv('NIM_BASE_URL')
     if not base:
         parser.error('Set NIM_BASE_URL locally; do not paste credentials into chat')
-    client = Client(base, os.getenv('NIM_API_KEY', ''), os.getenv('NIM_MODEL'))
+    client = Client(base, os.getenv('NIM_API_KEY', ''), os.getenv('NIM_MODEL'), args.allow_http,
+                    thinking=False if args.disable_thinking else None, max_tokens=args.max_tokens)
     snapshot = client.discover()
     report = args.root / 'reports/nim'; report.mkdir(parents=True, exist_ok=True)
     # Local only: deployment metadata can contain internal infrastructure details.
     (report / 'deployment.json').write_text(json.dumps(snapshot, indent=2), encoding='utf8')
+    (report / ('deployment-' + client.revision[:16] + '.json')).write_text(json.dumps(snapshot, indent=2), encoding='utf8')
     print(json.dumps({'model': client.model, 'metadata_saved_locally': True}), flush=True)
     if args.stage in ['public', 'all']:
         public(args.root, client, args.root / 'evaluation/frozen_public_holdout.json', args.limit)

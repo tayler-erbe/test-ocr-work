@@ -437,8 +437,10 @@ def summary(root):
             absent = [m for m in ms if m.get("predicted_absent")]
             metrics = {"model": run["model"], "run_id": run["id"], "dataset": dataset, "attempted": len(rows), "documents": len({r["doc_id"] for r in rows}), "accuracy": sum(m["correct"] for m in ms) / len(rows), "evidence_f1": statistics.mean(m["evidence_f1"] for m in ms), "failure_rate": sum(r["status"] != "complete" for r in rows) / len(rows), "p50_seconds": statistics.median(latencies), "p95_seconds": latencies[math.ceil(.95 * len(latencies)) - 1], "total_seconds": sum(latencies), "abstention_precision": sum(m["gold_absent"] for m in absent) / len(absent) if absent else None, "retrieval_recall": statistics.mean([m["retrieval_recall"] for m in ms if m.get("retrieval_recall") is not None]) if any(m.get("retrieval_recall") is not None for m in ms) else None, "config": json.loads(run["config"])}
             metrics["gate"] = {"status": "diagnostic_only", "reasons": ["Reference evidence supplied; not end-to-end evaluation"]} if metrics["config"].get("retrieval") == "gold_window" else gates(metrics, policy)
+            metrics["run_status"] = run["status"]
+            metrics["truncation_count"] = sum(bool(r["error"]) and ("Truncated generation" in r["error"] or "generation: length" in r["error"]) for r in rows)
             audit_path = root / 'reports/context-recall-audit.json'
-            if metrics['config'].get('evaluation_role') == 'fresh_public_holdout' and audit_path.exists():
+            if metrics['config'].get('evaluation_role') in ('fresh_public_holdout', 'api_comparison_same_public_holdout') and audit_path.exists():
                 audit = json.loads(audit_path.read_text(encoding='utf-8'))
                 recalls = [audit['cases'][r['case_id']]['recall'] for r in rows if r['case_id'] in audit['cases'] and audit['cases'][r['case_id']]['recall'] is not None]
                 metrics['original_archived_context_recall'] = metrics['retrieval_recall']
@@ -446,6 +448,8 @@ def summary(root):
                 metrics['context_recall_method'] = audit['method']
             if metrics["config"].get("evaluation_role") != "fresh_public_holdout":
                 metrics["gate"] = {"status": "development_only", "reasons": ["Exploratory protocol/prompt diagnostics; not the frozen promotion holdout"]}
+            if metrics["config"].get("evaluation_role") == "api_comparison_same_public_holdout":
+                metrics["gate"] = {"status": "comparison_only", "reasons": ["Same previously used public cases; server deployment differs; human institutional holdout still required"]}
             grouped = {}
             for row, metric in zip(rows, ms):
                 grouped.setdefault(row["doc_id"], []).append(int(metric["correct"]))
@@ -482,6 +486,12 @@ def summary(root):
         if report_path.exists():
             report = json.loads(report_path.read_text(encoding="utf-8"))
             stage_reports[name] = {k: v for k, v in report.items() if k != "cases"}
+    nim_diagnostics = root / "reports/nim/additional-summary.json"
+    if nim_diagnostics.exists():
+        stage_reports["nim-diagnostics"] = json.loads(nim_diagnostics.read_text(encoding="utf8"))
+    local_vision = root / "reports/local-models/vision-summary.json"
+    if local_vision.exists():
+        stage_reports["local-vision"] = json.loads(local_vision.read_text(encoding="utf8"))
     return {"generated_at": now(), "runs": runs, "documents": docs, "pages": pages, "datasets": datasets, "policy": policy, "stage_reports": stage_reports}
 
 def serve(root, port):

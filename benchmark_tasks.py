@@ -140,7 +140,11 @@ def coverage(root):
         if key in ["cuad", "contractnli"]: state = "text_tasks_scored_see_runs"
         if key == "acord": state = "lexical_retrieval_baseline"
         if key == "omnidocbench": state = "cropped_ocr_diagnostic_full_layout_not_scored"
-        if key in ["chartqa", "chartqapro"]: state = "blocked_no_installed_vision_model"
+        if key == "chartqa":
+            state = "vision_adapter_ready_diagnostic_pending_or_running" if Path(__file__).with_name('local_model_evaluation.py').exists() else "blocked_no_vision_adapter"
+            if (root / 'reports/local-models/vision-summary.json').exists():
+                state = "small_paired_chart_image_diagnostic_not_full_population"
+        if key == "chartqapro": state = "downloaded_not_scored"
         if key in ["pubtables1m", "fintabnet", "doclaynet"]: state = "blocked_no_structure_or_layout_adapter"
         if key == "niaid": state = "unlabeled_educational_use_only_not_scored"
         rows.append({"dataset": key, "present_files": len(files), "bytes": sum(f.stat().st_size for f in files), "evaluation_status": state, "coverage": dataset["coverage"]})
@@ -162,7 +166,8 @@ def coverage(root):
             if report["mean_recall_at_20"] < rules["min_recall_at_20"]: reasons.append("Recall at 20 below threshold")
             if report["hit_at_20"] < rules["min_hit_at_20"]: reasons.append("Hit rate at 20 below threshold")
         stage_gates.append({"stage": stage, "status": "failed" if reasons else "requires_holdout_review", "reasons": reasons, "thresholds": rules, "measurements": {k:v for k,v in report.items() if k not in ["cases", "created_at"]}})
-    stage_gates += [{"stage": "chart_qa", "status": "not_tested", "reasons": ["No installed vision-language model adapter"]}, {"stage": "table_structure", "status": "not_tested", "reasons": ["No table-structure adapter evaluated"]}, {"stage": "classification", "status": "not_tested", "reasons": ["No task-specific labeled classifier evaluation"]}]
+    vision_report = root / 'reports/local-models/vision-summary.json'
+    stage_gates += [{"stage": "chart_qa", "status": "diagnostic_only" if vision_report.exists() else "pending", "reasons": ["Small paired chart-image diagnostic; no full-population or institutional holdout approval"]}, {"stage": "table_structure", "status": "not_tested", "reasons": ["No table-structure adapter evaluated"]}, {"stage": "classification", "status": "not_tested", "reasons": ["Clause-query routing diagnostics do not validate institutional document-type classification"]}]
     additional = root / "reports/additional-task-summary.json"
     output(root, "task-coverage", {"created_at": now(), "datasets": rows, "stage_gates": stage_gates, "additional_tasks": json.loads(additional.read_text(encoding="utf-8")) if additional.exists() else None, "note": "A stored dataset is not an evaluated task. Unsupported modalities cannot pass a gate."})
 
