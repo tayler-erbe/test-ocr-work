@@ -368,11 +368,46 @@ def save_eval_crop(root, case, image):
 
 # ---------- running one case ----------
 
+# ---------- controlled tuning experiment ----------
+# Each variant changes ONE factor against the baseline, identically for every model. Cases, temperature 0,
+# schema forcing and token budgets stay fixed, so a score change is attributable to that one factor.
+VARIANTS = {
+    "baseline": "Settings used for the first comparison",
+    "hires": "Cap raised to 2048 px on the long side instead of 1600 (no effect in practice: almost every test image is already under 1600 px, so the input did not change)",
+    "upscale": "Small images enlarged so the long side is 1600 px (the resolution test that actually changes the input)",
+    "expert": "Task-specific instructions that spell out how to read the image (axes, legend, units, every row and column)",
+    "selfcheck": "Structured self-check: short notes (chart questions) or a row and column count (tables) before the answer",
+}
+EXPERT_PROMPTS = {
+    "chart_qa": ("You are reading a chart to answer one question. First locate the title, axis labels, units, legend and every "
+                 "data label printed on the chart. Use printed data labels when they exist; otherwise estimate from the gridlines. "
+                 "If the question asks for a difference, sum, ratio or average, compute it from the values you read. "
+                 "Reply with only the final answer: a number without units or a short word or phrase, matching the chart's wording."
+                 "\nQuestion: "),
+    "table": ("Transcribe this table exactly. Keep the same number of rows and columns as printed. Copy every cell's text and "
+              "number exactly, including signs, decimals, percent signs and footnote marks. Keep empty cells as empty strings. "
+              "When a header spans several columns, repeat its text in each column it covers. Never summarise or skip rows."),
+    "chart_table": ("Extract the full data table behind this chart. Always return at least one row. The first column is the category "
+                    "or x value exactly as labelled; add one column per series named as in the legend (or 'value' if there is one "
+                    "series). Include every category shown, in order. Use printed data labels when present; otherwise estimate from "
+                    "the gridlines as precisely as possible. Put the chart title in title and the units in notes."),
+}
+CHART_CHECK_SCHEMA = {"type": "object", "properties": {"notes": {"type": "string", "maxLength": 400}, "answer": {"type": "string"}},
+                      "required": ["notes", "answer"], "additionalProperties": False}
+
+
+def table_schema_with_check():
+    schema = json.loads(json.dumps(regions.TABLE_SCHEMA))
+    schema["properties"] = {"row_count": {"type": "integer"}, "column_count": {"type": "integer"}, **schema["properties"]}
+    schema["required"] = ["row_count", "column_count"] + schema["required"]
+    return schema
+
+
 TEXT_SCHEMA = {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"], "additionalProperties": False}
 ANSWER_SCHEMA = {"type": "object", "properties": {"answer": {"type": "string"}}, "required": ["answer"], "additionalProperties": False}
 
 
-def run_case(root, model, case):
+def run_case(root, model, case, variant="baseline"):
     task = case["task"]
     if task == "layout":
         image = load_image(root, case)
@@ -381,7 +416,11 @@ def run_case(root, model, case):
         return {"regions": found}, score_layout(case["gold"], found)
     image = load_image(root, case)
     save_eval_crop(root, case, image)
-    png = vlm_client.png_bytes(image, 1600)
+    if variant == "upscale" and max(image.size) < 1600:
+        from PIL import Image as _Image
+        factor = 1600 / max(image.size)
+        image = image.resize((round(image.width * factor), round(image.height * factor)), _Image.LANCZOS)
+    png = vlm_client.png_bytes(image, 2048 if variant == "hires" else 1600)
     if task == "ocr_crop":
         out, _ = vlm_client.chat(model, "Transcribe all text in this image exactly as printed, in reading order. Do not correct or summarise.",
                                  TEXT_SCHEMA, [png], max_tokens=1200)
@@ -397,14 +436,31 @@ def run_case(root, model, case):
         _, nr, _ = f1(numbers(case["gold"]), numbers(out["text"]))
         return out, {"word_precision": p, "word_recall": r, "word_f1": f, "numeric_recall": nr}
     if task == "table":
-        out, _ = vlm_client.chat(model, regions.READ_PROMPTS["table"], regions.TABLE_SCHEMA, [png], max_tokens=6000)
+        prompt = EXPERT_PROMPTS["table"] if variant == "expert" else regions.READ_PROMPTS["table"]
+        schema = regions.TABLE_SCHEMA
+        if variant == "selfcheck":
+            prompt += " First count the table's rows and columns, then transcribe it with exactly that many."
+            schema = table_schema_with_check()
+        out, _ = vlm_client.chat(model, prompt, schema, [png], max_tokens=6000)
         return out, score_table(case["gold"], out)
     if task == "chart_qa":
-        out, _ = vlm_client.chat(model, "Answer the question about this chart. Reply with only the answer: a number without units, "
-                                 "or a short word or phrase.\nQuestion: " + case["question"], ANSWER_SCHEMA, [png], max_tokens=300)
+        if variant == "expert":
+            out, _ = vlm_client.chat(model, EXPERT_PROMPTS["chart_qa"] + case["question"], ANSWER_SCHEMA, [png], max_tokens=300)
+        elif variant == "selfcheck":
+            out, _ = vlm_client.chat(model, "In notes, briefly (under 60 words) list the values you read from the chart that the question "
+                                     "needs and any calculation. Then give the answer: a number without units, or a short word or phrase."
+                                     "\nQuestion: " + case["question"], CHART_CHECK_SCHEMA, [png], max_tokens=600)
+        else:
+            out, _ = vlm_client.chat(model, "Answer the question about this chart. Reply with only the answer: a number without units, "
+                                     "or a short word or phrase.\nQuestion: " + case["question"], ANSWER_SCHEMA, [png], max_tokens=300)
         return out, {"correct": relaxed_match(out["answer"], case["gold"])}
     if task == "chart_table":
-        out, _ = vlm_client.chat(model, regions.READ_PROMPTS["chart"], regions.TABLE_SCHEMA, [png], max_tokens=3000)
+        prompt = EXPERT_PROMPTS["chart_table"] if variant == "expert" else regions.READ_PROMPTS["chart"]
+        schema = regions.TABLE_SCHEMA
+        if variant == "selfcheck":
+            prompt += " First count the categories and series, then fill the table with exactly that many rows and columns."
+            schema = table_schema_with_check()
+        out, _ = vlm_client.chat(model, prompt, schema, [png], max_tokens=3000)
         return out, score_chart_table(case["gold"], out)
     raise ValueError(task)
 
@@ -475,7 +531,7 @@ def score_chart_table(gold_rows, out, tolerance=0.05):
 
 # ---------- run and report ----------
 
-def run(root, model, tasks, limit=None, table_only=False):
+def run(root, model, tasks, limit=None, table_only=False, variant="baseline"):
     manifest = load_cases(root)
     db = connect(root)
     db.execute(RESULT_SCHEMA)
@@ -485,6 +541,8 @@ def run(root, model, tasks, limit=None, table_only=False):
     for task in tasks:
         mode = "table_only" if table_only else "image"
         config = {"protocol": PROTOCOL, "cases_sha256": manifest["cases_sha256"], "task": task, "model": model, "weights": weights, "mode": mode}
+        if variant != "baseline":
+            config["variant"] = variant  # baseline keeps its original config hash, so earlier results stay valid
         run_id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:24]
         db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)", (run_id, model, now(), json.dumps(config), "running"))
         done = {c for (c,) in db.execute("SELECT case_id FROM vision_results WHERE run_id=?", (run_id,))}
@@ -492,12 +550,12 @@ def run(root, model, tasks, limit=None, table_only=False):
         for n, case in enumerate(cases, 1):
             started = time.perf_counter()
             try:
-                prediction, metrics = (run_table_only if table_only else run_case)(root, model, case)
+                prediction, metrics = run_table_only(root, model, case) if table_only else run_case(root, model, case, variant)
                 status, error = "complete", None
             except Exception as exc:  # failures stay in the denominator
                 prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
             db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
-                       (run_id, case["id"], task, model + ("" if mode == "image" else " [table only]"), status,
+                       (run_id, case["id"], task, model + ("" if mode == "image" else " [table only]") + ("" if variant == "baseline" else f" [{variant}]"), status,
                         json.dumps(prediction), json.dumps(metrics), time.perf_counter() - started, error, now()))
             db.commit()
             if n % 10 == 0 or n == len(cases):
@@ -556,6 +614,49 @@ def report(root):
     print(out)
 
 
+PRIMARY = {"chart_qa": "correct", "chart_table": "value_recall", "table": "teds"}
+
+
+def compare(root, draws=2000, seed=20261019):
+    """Paired comparison: the same cases under baseline and under each variant, per model and task.
+
+    Reports mean change, cases that got better or worse, and a 95% paired bootstrap interval. A failed
+    case scores 0. Temperature is 0, so a repeated run gives the same answers; case-level resampling is
+    what measures uncertainty here.
+    """
+    import random
+    db = connect(root)
+    scores = {}
+    for model, task, case, status, metrics in db.execute("SELECT model, task, case_id, status, metrics FROM vision_results"):
+        if task not in PRIMARY or "[table only]" in model:
+            continue
+        base, _, rest = model.partition(" [")
+        variant = rest.rstrip("]") or "baseline"
+        m = json.loads(metrics) if metrics else None
+        scores.setdefault((base, task, variant), {})[case] = float((m or {}).get(PRIMARY[task]) or 0) if status == "complete" else 0.0
+    rng = random.Random(seed)
+    out = []
+    for (model, task, variant), cases in sorted(scores.items()):
+        if variant == "baseline" or (model, task, "baseline") not in scores:
+            continue
+        base = scores[(model, task, "baseline")]
+        shared = sorted(set(base) & set(cases))
+        diffs = [cases[c] - base[c] for c in shared]
+        if not diffs:
+            continue
+        boot = sorted(sum(rng.choice(diffs) for _ in diffs) / len(diffs) for _ in range(draws))
+        row = {"model": model, "task": task, "variant": variant, "metric": PRIMARY[task], "cases": len(diffs),
+               "baseline": round(sum(base[c] for c in shared) / len(shared), 4), "variant_score": round(sum(cases[c] for c in shared) / len(shared), 4),
+               "change": round(sum(diffs) / len(diffs), 4), "ci95": [round(boot[int(.025 * draws)], 4), round(boot[int(.975 * draws)], 4)],
+               "better": sum(d > 1e-9 for d in diffs), "worse": sum(d < -1e-9 for d in diffs)}
+        row["verdict"] = "better" if row["ci95"][0] > 0 else "worse" if row["ci95"][1] < 0 else "no clear change"
+        out.append(row)
+        print(json.dumps(row))
+    path = root / "reports" / "vision-variant-comparison.json"
+    path.write_text(json.dumps({"protocol": PROTOCOL, "variants": VARIANTS, "created": now(), "results": out}, indent=1), encoding="utf-8")
+    print(path)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
@@ -567,13 +668,17 @@ def main():
     r.add_argument("--task", action="append", choices=TASKS)
     r.add_argument("--limit", type=int)
     r.add_argument("--table-only", action="store_true", help="chart_qa from the gold CSV instead of the image")
+    r.add_argument("--variant", default="baseline", choices=sorted(VARIANTS))
     sub.add_parser("report")
+    sub.add_parser("compare", help="each variant against baseline on the same cases, with paired bootstrap intervals")
     args = parser.parse_args()
     if args.command == "build":
         build(args.root, args.force)
     elif args.command == "run":
         tasks = tuple(args.task or (("layout",) if args.model == "yolo" else TASKS))
-        run(args.root, args.model, tasks, args.limit, args.table_only)
+        run(args.root, args.model, tasks, args.limit, args.table_only, args.variant)
+    elif args.command == "compare":
+        compare(args.root)
     else:
         report(args.root)
 
