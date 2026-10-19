@@ -1,0 +1,21 @@
+name: Evidence and evaluation invariants
+on:
+  push:
+  pull_request:
+jobs:
+  provider-free-checks:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile application and evaluation modules
+        run: python -m compileall -q local_demo.py document_lab.py acquire_datasets.py benchmark_tasks.py quality_check.py private_extraction.py additional_evaluations.py gold_annotations.py build_lab_reports.py freeze_holdout.py resume_large_downloads.py supplement_datasets.py audit_context_recall.py protocols
+      - name: Check evidence, scoring, storage and download invariants
+        run: python -m unittest discover -p "test_*.py" -v
+      - name: Validate quality policy
+        run: python quality_check.py --policy-only

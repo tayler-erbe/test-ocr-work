@@ -1,0 +1,27 @@
+{
+  "version": "2026-10-15-v2",
+  "status": "initial_policy_requires_domain_owner_review",
+  "model_promotion": {
+    "min_documents": 30,
+    "min_cases": 100,
+    "max_failure_rate": 0.02,
+    "min_accuracy": 0.9,
+    "min_evidence_f1": 0.9
+  },
+  "stage_policies": {
+    "ocr": {"min_pages": 50, "max_cer": 0.01, "min_numeric_token_recall": 0.99, "min_numeric_token_precision": 0.99, "full_page_holdout_required": true},
+    "retrieval": {"min_scored_queries": 50, "min_recall_at_20": 0.95, "min_hit_at_20": 0.95},
+    "chart_qa": {"unsupported_model_may_pass": false},
+    "table_structure": {"no_adapter_may_pass": false}
+  },
+  "release_requirements": {
+    "source_hashes_present": true,
+    "unknown_evidence_ids_allowed": 0,
+    "silent_page_omissions_allowed": 0,
+    "real_documents_in_git_allowed": 0,
+    "unscored_tasks_may_pass": false,
+    "human_holdout_review_required": true,
+    "ocr_numeric_fidelity_must_be_measured": true,
+    "no_model_winner_without_paired_heldout_evidence": true
+  }
+}
