@@ -24,6 +24,7 @@ import hashlib
 import html
 import io
 import json
+import math
 from pathlib import Path
 import re
 import statistics
@@ -332,9 +333,51 @@ def build(root, force=False):
     print(json.dumps({"frozen": str(path), "counts": manifest["counts"], "cases_sha256": manifest["cases_sha256"]}))
 
 
-def load_cases(root):
-    manifest = json.loads((root / "evaluation" / "vision_cases_v1.json").read_text(encoding="utf-8"))
+CASE_FILES = {"v1": "vision_cases_v1.json", "confirm": "vision_confirm_v1.json"}
+
+
+def load_cases(root, which="v1"):
+    manifest = json.loads((root / "evaluation" / CASE_FILES[which]).read_text(encoding="utf-8"))
     return manifest
+
+
+def build_confirm(root):
+    """Held-out confirmation cases, frozen separately and never used while choosing variants.
+
+    Variants were chosen on the 200 ChartQA and 60 table cases in vision_cases_v1. Confirming on those same
+    cases would overstate the gain (selection bias), so this set contains every ChartQA test question whose
+    chart is not in v1, and every eligible English OmniDocBench table not in v1.
+    """
+    path = root / "evaluation" / CASE_FILES["confirm"]
+    if path.exists():
+        raise SystemExit(f"{path} already frozen")
+    dev = load_cases(root)["cases"]
+    dev_images = {c["image"] for c in dev if c["task"] in ("chart_qa", "chart_table")}
+    dev_tables = {c["id"] for c in dev if c["task"] == "table"}
+    cases = []
+    with zipfile.ZipFile(root / CHARTQA_ZIP) as z:
+        prefix = chartqa_members(z)
+        for split in ("human", "augmented"):
+            for r in json.loads(z.read(f"{prefix}test/test_{split}.json")):
+                image = f"{prefix}test/png/{r['imgname']}"
+                if image in dev_images:
+                    continue
+                cases.append({"id": f"cqc:{split}:" + digest(r["imgname"] + r["query"])[:12], "task": "chart_qa_confirm", "score_as": "chart_qa",
+                              "split": split, "image": image, "question": r["query"], "gold": str(r["label"])})
+    for c in build_table(root, omni_pages(root), 10_000):
+        if c["id"] not in dev_tables:
+            cases.append({**c, "id": "tc:" + c["id"].split(":", 1)[1], "task": "table_confirm", "score_as": "table"})
+    seen, unique = set(), []
+    for c in cases:  # ChartQA repeats a few identical question/chart pairs; keep one
+        if c["id"] not in seen:
+            seen.add(c["id"])
+            unique.append(c)
+    body = json.dumps(unique, sort_keys=True)
+    manifest = {"protocol": PROTOCOL + "-confirm", "created": now(), "counts": Counter(c["task"] for c in unique),
+                "cases_sha256": hashlib.sha256(body.encode()).hexdigest(), "excludes": "every chart and table used in vision_cases_v1",
+                "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "cases": unique}
+    path.write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    print(json.dumps({"frozen": str(path), "counts": manifest["counts"], "cases_sha256": manifest["cases_sha256"]}))
 
 
 # ---------- images ----------
@@ -375,6 +418,7 @@ VARIANTS = {
     "baseline": "Settings used for the first comparison",
     "hires": "Cap raised to 2048 px on the long side instead of 1600 (no effect in practice: almost every test image is already under 1600 px, so the input did not change)",
     "upscale": "Small images enlarged so the long side is 1600 px (the resolution test that actually changes the input)",
+    "tuned": "The per-task winners combined: selfcheck for chart questions, expert prompt for tables",
     "expert": "Task-specific instructions that spell out how to read the image (axes, legend, units, every row and column)",
     "selfcheck": "Structured self-check: short notes (chart questions) or a row and column count (tables) before the answer",
 }
@@ -408,7 +452,9 @@ ANSWER_SCHEMA = {"type": "object", "properties": {"answer": {"type": "string"}},
 
 
 def run_case(root, model, case, variant="baseline"):
-    task = case["task"]
+    task = case.get("score_as", case["task"])
+    if variant == "tuned":  # the per-task winners from the v1 experiment
+        variant = {"chart_qa": "selfcheck", "table": "expert"}.get(task, "baseline")
     if task == "layout":
         image = load_image(root, case)
         save_eval_crop(root, case, image)
@@ -531,8 +577,8 @@ def score_chart_table(gold_rows, out, tolerance=0.05):
 
 # ---------- run and report ----------
 
-def run(root, model, tasks, limit=None, table_only=False, variant="baseline"):
-    manifest = load_cases(root)
+def run(root, model, tasks, limit=None, table_only=False, variant="baseline", which="v1"):
+    manifest = load_cases(root, which)
     db = connect(root)
     db.execute(RESULT_SCHEMA)
     weights = "yolo:" + "/".join(regions.YOLO_WEIGHTS) if model == "yolo" else vlm_client.model_digest(model)
@@ -585,7 +631,7 @@ def aggregate(task, rows):
         out["numeric_precision"] = nm / np_ if np_ else None
     else:
         keys = {"table": ("teds", "teds_structure", "cell_f1", "numeric_recall"), "page_text": ("word_f1", "numeric_recall"),
-                "chart_qa": ("correct",), "chart_table": ("value_recall", "value_precision", "label_recall")}[task]
+                "chart_qa": ("correct",), "chart_table": ("value_recall", "value_precision", "label_recall")}[task.replace("_confirm", "")]
         for k in keys:
             values = [float(m.get(k) or 0) for m, _ in ok] + [0.0] * (n - len(ok))
             out[k] = sum(values) / n if n else None
@@ -600,9 +646,11 @@ def report(root):
         groups.setdefault((task, model), []).append((status, json.loads(metrics) if metrics else None, seconds))
     summary = [{"task": t, "model": m, **aggregate(t, rows)} for (t, m), rows in sorted(groups.items())]
     split_of = {c["id"]: c.get("split") for c in load_cases(root)["cases"] if c["task"] == "chart_qa"}
+    if (root / "evaluation" / CASE_FILES["confirm"]).exists():
+        split_of.update({c["id"]: c.get("split") for c in load_cases(root, "confirm")["cases"] if c["task"] == "chart_qa_confirm"})
     for r in summary:
-        if r["task"] == "chart_qa":
-            rows = db.execute("SELECT case_id, status, metrics FROM vision_results WHERE task='chart_qa' AND model=?", (r["model"],)).fetchall()
+        if r["task"] in ("chart_qa", "chart_qa_confirm"):
+            rows = db.execute("SELECT case_id, status, metrics FROM vision_results WHERE task=? AND model=?", (r["task"], r["model"])).fetchall()
             for split in ("human", "augmented"):
                 chosen = [json.loads(m or "null") for c, s, m in rows if split_of.get(c) == split]
                 r["correct_" + split] = sum(bool(m and m.get("correct")) for m in chosen) / len(chosen) if chosen else None
@@ -614,7 +662,7 @@ def report(root):
     print(out)
 
 
-PRIMARY = {"chart_qa": "correct", "chart_table": "value_recall", "table": "teds"}
+PRIMARY = {"chart_qa": "correct", "chart_table": "value_recall", "table": "teds", "chart_qa_confirm": "correct", "table_confirm": "teds"}
 
 
 def compare(root, draws=2000, seed=20261019):
@@ -650,7 +698,23 @@ def compare(root, draws=2000, seed=20261019):
                "change": round(sum(diffs) / len(diffs), 4), "ci95": [round(boot[int(.025 * draws)], 4), round(boot[int(.975 * draws)], 4)],
                "better": sum(d > 1e-9 for d in diffs), "worse": sum(d < -1e-9 for d in diffs)}
         row["verdict"] = "better" if row["ci95"][0] > 0 else "worse" if row["ci95"][1] < 0 else "no clear change"
+        if task.startswith("chart_qa"):  # right/wrong per case: exact McNemar test on the discordant cases
+            k, n = min(row["better"], row["worse"]), row["better"] + row["worse"]
+            row["p_value"] = min(1.0, 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n) if n else 1.0
+            row["test"] = "exact McNemar"
+        else:  # continuous score: two-sided paired bootstrap p-value
+            row["p_value"] = min(1.0, 2 * min(sum(x <= 0 for x in boot), sum(x >= 0 for x in boot)) / draws)
+            row["test"] = "paired bootstrap"
         out.append(row)
+    # Holm correction: many model x task x variant comparisons were made, so some would look significant by chance
+    order = sorted(range(len(out)), key=lambda i: out[i]["p_value"])
+    running = 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (len(out) - rank) * out[i]["p_value"]))
+        out[i]["p_holm"] = round(running, 4)
+        out[i]["p_value"] = round(out[i]["p_value"], 4)
+        out[i]["verdict_after_correction"] = ("better" if out[i]["change"] > 0 else "worse") if running < 0.05 else "not significant"
+    for row in out:
         print(json.dumps(row))
     path = root / "reports" / "vision-variant-comparison.json"
     path.write_text(json.dumps({"protocol": PROTOCOL, "variants": VARIANTS, "created": now(), "results": out}, indent=1), encoding="utf-8")
@@ -665,10 +729,12 @@ def main():
     b.add_argument("--force", action="store_true")
     r = sub.add_parser("run")
     r.add_argument("--model", required=True, help="ollama:<name>, openai:<name>, or yolo (layout only)")
-    r.add_argument("--task", action="append", choices=TASKS)
+    r.add_argument("--task", action="append", choices=TASKS + ("chart_qa_confirm", "table_confirm"))
     r.add_argument("--limit", type=int)
     r.add_argument("--table-only", action="store_true", help="chart_qa from the gold CSV instead of the image")
     r.add_argument("--variant", default="baseline", choices=sorted(VARIANTS))
+    r.add_argument("--cases", default="v1", choices=sorted(CASE_FILES), help="v1 (development) or confirm (held out)")
+    sub.add_parser("build-confirm", help="freeze the held-out confirmation cases")
     sub.add_parser("report")
     sub.add_parser("compare", help="each variant against baseline on the same cases, with paired bootstrap intervals")
     args = parser.parse_args()
@@ -676,7 +742,9 @@ def main():
         build(args.root, args.force)
     elif args.command == "run":
         tasks = tuple(args.task or (("layout",) if args.model == "yolo" else TASKS))
-        run(args.root, args.model, tasks, args.limit, args.table_only, args.variant)
+        run(args.root, args.model, tasks, args.limit, args.table_only, args.variant, args.cases)
+    elif args.command == "build-confirm":
+        build_confirm(args.root)
     elif args.command == "compare":
         compare(args.root)
     else:
