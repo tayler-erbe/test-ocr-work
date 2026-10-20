@@ -44,6 +44,13 @@ def export(root: Path, side: str, out: Path, run: int = 1, round2: bool = False)
     if fp["method_sha256"] != contract["method_sha256"]:
         raise SystemExit("REFUSED: this checkout's prompts or scorers differ from tools/contract.json; "
                          "run tools/check_conformance.py and fix that first")
+    r2_hash = None
+    if round2:
+        import eval_contract_r2
+        r2_hash = eval_contract_r2.fingerprints()["method_sha256"]
+        if r2_hash != json.loads((REPO / "tools" / "contract_r2.json").read_text(encoding="utf-8"))["method_sha256"]:
+            raise SystemExit("REFUSED: this checkout's round-2 code differs from tools/contract_r2.json; "
+                             "run tools/check_conformance.py --round2 and fix that first")
     set_of = {spec["cases_sha256"]: name for name, spec in eval_contract.FROZEN.items()}
     out.parent.mkdir(parents=True, exist_ok=True)
     n = skipped = 0
@@ -66,6 +73,8 @@ def export(root: Path, side: str, out: Path, run: int = 1, round2: bool = False)
                    "run_id": run_id, "case_id": case_id, "task": task, "model": base, "variant": variant, "mode": mode, "run": run,
                    "weights": cfg.get("weights"), "status": status, "prediction": json.loads(prediction) if prediction else None,
                    "metrics": json.loads(metrics) if metrics else None, "seconds": float(seconds or 0), "error": error, "created": created}
+            if case_set == "v2" or variant not in eval_contract.V1_VARIANTS:
+                row["r2_method_sha256"] = r2_hash
             f.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
             n += 1
     print(json.dumps({"exported": n, "skipped_round2_or_other": skipped, "out": str(out), **fp}))

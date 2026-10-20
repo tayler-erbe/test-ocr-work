@@ -156,6 +156,9 @@ ROW_FIELDS = {"schema": str, "side": str, "protocol": str, "case_set": str, "cas
               "prompts_sha256": str, "scorers_sha256": str, "run_id": str, "case_id": str, "task": str, "model": str,
               "variant": str, "mode": str, "run": int, "weights": (str, type(None)), "status": str, "prediction": object,
               "metrics": (dict, type(None)), "seconds": (float, int), "error": (str, type(None)), "created": str}
+OPTIONAL_FIELDS = {"r2_method_sha256": str}  # round-2 rows only (tools/eval_contract_r2.py)
+CONTRACT_R2 = REPO / "tools" / "contract_r2.json"
+GOLDEN_R2 = REPO / "tools" / "golden_r2.json"
 VARIANTS = set(eval_contract.V1_VARIANTS)
 STATUSES = {"complete", "failed"}
 
@@ -174,13 +177,17 @@ def check_results(path: Path, contract: dict, allow_round2: bool = False) -> lis
                     problems.append(f"line {n}: missing {k}")
                 elif t is not object and not isinstance(row[k], t):
                     problems.append(f"line {n}: {k} has type {type(row[k]).__name__}")
-            if set(row) - set(ROW_FIELDS):
-                problems.append(f"line {n}: unexpected fields {sorted(set(row) - set(ROW_FIELDS))}")
+            if set(row) - set(ROW_FIELDS) - set(OPTIONAL_FIELDS):
+                problems.append(f"line {n}: unexpected fields {sorted(set(row) - set(ROW_FIELDS) - set(OPTIONAL_FIELDS))}")
             if problems and len(problems) > 50:
                 return problems + ["(stopped after 50 problems)"]
             round2 = row.get("case_set") == "v2" or row.get("variant") not in VARIANTS
             if round2 and not allow_round2:
                 problems.append(f"line {n}: round-2 row (case set {row.get('case_set')}, variant {row.get('variant')}); pass --round2 to allow")
+            elif round2:
+                want = json.loads(CONTRACT_R2.read_text(encoding="utf-8"))["method_sha256"]
+                if row.get("r2_method_sha256") != want:
+                    problems.append(f"line {n}: round-2 row without the round-2 contract hash (r2_method_sha256 must be {want[:16]})")
             if row.get("status") not in STATUSES or row.get("mode") not in ("image", "table_only"):
                 problems.append(f"line {n}: bad status/mode {row.get('status')}/{row.get('mode')}")
             if row.get("status") == "complete" and row.get("metrics") is None:
@@ -204,7 +211,7 @@ def main():
     ap.add_argument("--root", type=Path, help="the lab folder holding evaluation/ and datasets/ (e.g. C:/dev/ocr-lab)")
     ap.add_argument("--data", action="store_true", help="also check that every case's image is present (and its hash, with a pack receipt)")
     ap.add_argument("--results", type=Path, action="append", default=[], help="an export from tools/export_results.py to validate")
-    ap.add_argument("--round2", action="store_true", help="allow round-2 rows (v2 cases, round-2 variants) in result files")
+    ap.add_argument("--round2", action="store_true", help="also check the round-2 addendum (tools/contract_r2.json) and allow round-2 rows in result files")
     ap.add_argument("--freeze-golden", action="store_true", help=argparse.SUPPRESS)
     a = ap.parse_args()
 
@@ -285,6 +292,18 @@ def main():
     report("scorers on golden predictions", same(run_scorers(), golden["scorers"]))
     report("statistics on golden table", same(run_stats(), golden["stats"]))
 
+    if a.round2:
+        import eval_contract_r2 as r2
+        c2 = json.loads(CONTRACT_R2.read_text(encoding="utf-8"))
+        live2 = r2.fingerprints()
+        report("round 2: code fingerprints", [f"{k}: live {str(live2[k])[:16]} != contract {str(c2[k])[:16]}" for k in live2 if live2[k] != c2[k]])
+        g2 = json.loads(GOLDEN_R2.read_text(encoding="utf-8"))
+        report("round 2: requests and stand-in scoring", same(r2.recorded_requests(), g2["requests"]))
+        report("round 2: vote3 majority rule", same(r2.run_vote(), g2["vote"]))
+        report("round 2: statistics and Holm families", same(r2.run_stats(), g2["stats"]))
+        if a.root and not (a.root / eval_contract.FROZEN["v2"]["file"]).exists():
+            report("round 2: v2 manifest", [f"{a.root / eval_contract.FROZEN['v2']['file']} missing (it is in case_pack/evaluation/)"])
+
     for path in a.results:
         report(f"result file {path.name}", check_results(path, contract, a.round2))
 
@@ -292,6 +311,8 @@ def main():
         print(("PASS " if r["pass"] else "FAIL ") + r["check"])
         for p in r["problems"]:
             print("     - " + p)
+    if a.round2 and not failed:
+        print("Round-2 variant status: " + "; ".join(f"{k} = {v.split(':')[0]}" for k, v in json.loads(CONTRACT_R2.read_text(encoding="utf-8"))["status"].items()))
     print("CONFORMANT" if not failed else "NOT CONFORMANT: do not run or merge until every check passes")
     return 1 if failed else 0
 

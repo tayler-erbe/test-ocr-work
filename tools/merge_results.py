@@ -61,6 +61,11 @@ def refuse_mismatches(rows, allow_round2=False):
     r2 = sum(1 for r in rows if r["case_set"] == "v2" or r["variant"] not in eval_contract.V1_VARIANTS)
     if r2 and not allow_round2:
         problems.append(f"{r2} round-2 rows (v2 cases or round-2 variants); pass --round2 to include them")
+    elif r2:
+        want = json.loads((REPO / "tools" / "contract_r2.json").read_text(encoding="utf-8"))["method_sha256"]
+        bad2 = sum(1 for r in rows if (r["case_set"] == "v2" or r["variant"] not in eval_contract.V1_VARIANTS) and r.get("r2_method_sha256") != want)
+        if bad2:
+            problems.append(f"{bad2} round-2 rows not produced under tools/contract_r2.json (r2_method_sha256 missing or different)")
     keys = {}
     for r in rows:
         k = (r["side"], r["case_id"], r["model"], r["variant"], r["mode"], r["run"])
@@ -76,7 +81,11 @@ def case_score(task, metrics):
     """One per-case number for agreement checks (higher is better except ocr_crop, where it is the error rate)."""
     if metrics is None:
         return 0.0
-    t = task.replace("_confirm", "")
+    t = task
+    for suffix in ("_confirm2", "_dev2", "_confirm"):  # round-2 task names (chart_qa_dev2, page_text_confirm2, ...)
+        if t.endswith(suffix):
+            t = t[: -len(suffix)]
+            break
     if t == "chart_qa":
         return float(bool(metrics.get("correct")))
     if t == "table":

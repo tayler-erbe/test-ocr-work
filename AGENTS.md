@@ -29,3 +29,10 @@ The frozen case pack is in this repo at `case_pack/` (datasets stored with Git L
 (results databases are written under `--root`, so keep them out of the repo). Verify with:
 `python -X utf8 tools\check_conformance.py --root C:\dev\ocr-lab --data` -> must print CONFORMANT.
 The desktop ran this exact check against `case_pack/` itself before pushing: CONFORMANT.
+
+## Round 2 addendum (added 20 Oct 2026)
+Round 2 (vote3 confirmed, selfcheck supporting, layoutmask experimental) has its own contract: `tools/contract_r2.json`,
+`tools/golden_r2.json`, `tools/eval_contract_r2.py`. Read `docs/handoff/CODEX_HANDOFF_ADDENDUM_R2.md` before any round-2 run.
+Run `python -X utf8 tools\check_conformance.py --root C:\dev\ocr-lab --data --round2` first; it must print CONFORMANT.
+Never run `docs/research/vision-eval/improvements/run_round2.py` on the laptop (it rewrites selection.json and breaks the contract).
+Export round-2 rows with `--round2`; merge with `--round2`.
