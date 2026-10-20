@@ -4,5 +4,6 @@
   "frozen_evaluation_v3.py": "43f78d7f122a6c1c0df5a484a49569ff20858ad72f0fac784b86615ca1e0d27f",
   "document_lab.py": "22cd4530d354270f28b84e6a0b0a0bccb1c2237c83cb77197951a37f95ff42a8",
   "README.md": "14a5e6f01dd50c89adcf5fb4e3f5ba0e2fe6d9153966ceab7f951d121e582e6e",
-  "verify_pack.py": "cdf094af3a2c2ed75f37fe34a734d263ae36ccd7323fd4c89ea1543bcc18b62f"
+  "verify_pack.py": "e8fad877d1dde5d3077e2e1bc76adb2c1199b2bcec832ff8ad573fc2de1faa9f",
+  ".gitattributes": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
 }

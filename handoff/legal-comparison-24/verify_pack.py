@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 def main():
     checksums = json.loads((ROOT / 'SHA256.json').read_text(encoding='utf8'))
-    expected = {'requests.json', 'references.DO_NOT_SEND_TO_MODEL.json', 'frozen_evaluation_v3.py', 'document_lab.py', 'README.md', 'verify_pack.py'}
+    expected = {'requests.json', 'references.DO_NOT_SEND_TO_MODEL.json', 'frozen_evaluation_v3.py', 'document_lab.py', 'README.md', 'verify_pack.py', '.gitattributes'}
     assert set(checksums) == expected, 'Unexpected pack file list'
     for name, expected_hash in checksums.items():
         assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == expected_hash, name + ': checksum mismatch'
