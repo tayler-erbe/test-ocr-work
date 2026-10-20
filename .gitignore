@@ -57,3 +57,7 @@ Document Intelligence_contract_review-oldv1.py
 # Evaluation exports and merges (row-level model outputs stay local)
 exports/
 merged/
+
+# Codex case pack (frozen inputs for the vision-v1 handoff; private repo only)
+!case_pack/
+!case_pack/**

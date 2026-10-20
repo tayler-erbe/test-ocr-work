@@ -22,3 +22,10 @@ It must print `CONFORMANT`. If it doesn't, stop and fix the cause; never edit `t
 ## Data and git
 - Only aggregates go to GitHub. Never commit datasets, crops, `*.sqlite3`, `exports/`, `merged/`, model outputs, private PDFs or credentials.
 - Use `python -X utf8` on Windows.
+
+## Case pack location (added 20 Oct 2026)
+The frozen case pack is in this repo at `case_pack/` (datasets stored with Git LFS). After cloning or checking out
+`handoff-codex`, run `git lfs install` and `git lfs pull`, then copy `case_pack\` to `C:\dev\ocr-lab` and use that as `--root`
+(results databases are written under `--root`, so keep them out of the repo). Verify with:
+`python -X utf8 tools\check_conformance.py --root C:\dev\ocr-lab --data` -> must print CONFORMANT.
+The desktop ran this exact check against `case_pack/` itself before pushing: CONFORMANT.

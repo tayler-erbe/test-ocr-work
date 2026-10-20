@@ -1,9 +1,2 @@
-*.py text eol=lf
-*.js text eol=lf
-*.css text eol=lf
-*.html text eol=lf
-*.json text eol=lf
-*.md text eol=lf
-*.yml text eol=lf
-*.ps1 text eol=lf
-*.cmd text eol=crlf
+case_pack/datasets/** filter=lfs diff=lfs merge=lfs -text
+case_pack/** -text
