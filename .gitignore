@@ -41,7 +41,10 @@ datasets/
 private_samples/
 reports/
 evaluation/
-tools/
+tools/*
+!tools/*.py
+!tools/contract.json
+!tools/golden_scores.json
 *.sqlite3*
 .ocr-venv/
 *.part
@@ -50,3 +53,7 @@ tools/
 Document Intelligence_contract_review_oldv2debug.py
 Document Intelligence_contract_review_oldv2.py
 Document Intelligence_contract_review-oldv1.py
+
+# Evaluation exports and merges (row-level model outputs stay local)
+exports/
+merged/

@@ -1,0 +1,280 @@
+{
+ "scorers": {
+  "relaxed_match": [
+   true,
+   false,
+   true,
+   true,
+   true,
+   false,
+   true,
+   true,
+   false,
+   true,
+   true,
+   true,
+   true,
+   false
+  ],
+  "edit_distance": [
+   3,
+   3,
+   0,
+   2
+  ],
+  "norm": [
+   "a b c d",
+   "fine flow",
+   "Full width"
+  ],
+  "numbers": [
+   {
+    "1,204": 1,
+    "12.5%": 1,
+    "2024": 1
+   },
+   {},
+   {
+    "007": 1,
+    "3.14.15": 1
+   }
+  ],
+  "words_f1": [
+   [
+    0.7142857142857143,
+    0.8333333333333334,
+    0.7692307692307692
+   ],
+   [
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    0.0
+   ]
+  ],
+  "parse_html_table": [
+   [
+    [
+     "Region totals",
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     "North",
+     1,
+     1
+    ],
+    [
+     "1,204",
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     "South",
+     1,
+     1
+    ],
+    [
+     "98.5%",
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     "East",
+     1,
+     1
+    ],
+    [
+     "-3.2",
+     1,
+     1
+    ]
+   ]
+  ],
+  "score_table": [
+   {
+    "teds": 0.8461538461538461,
+    "teds_structure": 0.8461538461538461,
+    "cell_f1": 0.9333333333333333,
+    "numeric_recall": 1.0,
+    "numeric_precision": 1.0,
+    "gold_rows": 4,
+    "pred_rows": 4
+   },
+   {
+    "teds": 0.55,
+    "teds_structure": 0.5833333333333333,
+    "cell_f1": 0.36363636363636365,
+    "numeric_recall": 0.0,
+    "numeric_precision": 0.0,
+    "gold_rows": 4,
+    "pred_rows": 2
+   },
+   {
+    "teds": 0.0,
+    "teds_structure": 0.0,
+    "cell_f1": 0.0,
+    "numeric_recall": 0.0,
+    "numeric_precision": 0.0,
+    "gold_rows": 4,
+    "pred_rows": 0
+   }
+  ],
+  "score_chart_table": [
+   {
+    "gold_values": 5,
+    "pred_values": 6,
+    "matched": 5,
+    "value_recall": 1.0,
+    "value_precision": 0.8333333333333334,
+    "label_recall": 0.6666666666666666
+   },
+   {
+    "gold_values": 1,
+    "pred_values": 0,
+    "matched": 0,
+    "value_recall": 0.0,
+    "value_precision": null,
+    "label_recall": 0.0
+   }
+  ],
+  "score_layout": [
+   {
+    "figure": {
+     "gold": 1,
+     "predicted": 1,
+     "matched": 1,
+     "iou_sum": 0.7431192660550459
+    },
+    "table": {
+     "gold": 1,
+     "predicted": 2,
+     "matched": 1,
+     "iou_sum": 0.867579908675799
+    }
+   },
+   {
+    "figure": {
+     "gold": 0,
+     "predicted": 1,
+     "matched": 0,
+     "iou_sum": 0
+    },
+    "table": {
+     "gold": 0,
+     "predicted": 0,
+     "matched": 0,
+     "iou_sum": 0
+    }
+   }
+  ],
+  "aggregate_chart_qa": {
+   "cases": 4,
+   "failed": 1,
+   "median_seconds": 2.0,
+   "correct": 0.5
+  },
+  "aggregate_ocr_crop": {
+   "cases": 2,
+   "failed": 0,
+   "median_seconds": 1.0,
+   "cer_completed": 0.08666666666666667,
+   "numeric_recall": 0.75,
+   "numeric_precision": 0.5
+  },
+  "aggregate_layout": {
+   "cases": 2,
+   "failed": 0,
+   "median_seconds": 1.0,
+   "figure": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6666666666666666,
+    "mean_iou": 0.7431192660550459,
+    "gold": 1
+   },
+   "table": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6666666666666666,
+    "mean_iou": 0.867579908675799,
+    "gold": 1
+   }
+  }
+ },
+ "stats": [
+  {
+   "model": "m",
+   "task": "chart_qa",
+   "variant": "selfcheck",
+   "cases": 40,
+   "baseline": 0.725,
+   "variant_score": 0.8,
+   "change": 0.075,
+   "ci95": [
+    0.0,
+    0.175
+   ],
+   "better": 3,
+   "worse": 0,
+   "test": "exact McNemar",
+   "p_value": 0.25,
+   "family": "exploratory",
+   "p_holm": 0.25,
+   "verdict": "no clear change",
+   "verdict_after_correction": "not significant"
+  },
+  {
+   "model": "m",
+   "task": "chart_qa_confirm",
+   "variant": "tuned",
+   "cases": 30,
+   "baseline": 0.6,
+   "variant_score": 0.6667,
+   "change": 0.0667,
+   "ci95": [
+    0.0,
+    0.1667
+   ],
+   "better": 2,
+   "worse": 0,
+   "test": "exact McNemar",
+   "p_value": 0.5,
+   "family": "confirmatory",
+   "p_holm": 0.5,
+   "verdict": "no clear change",
+   "verdict_after_correction": "not significant"
+  },
+  {
+   "model": "m",
+   "task": "table",
+   "variant": "expert",
+   "cases": 25,
+   "baseline": 0.4521,
+   "variant_score": 0.4824,
+   "change": 0.0304,
+   "ci95": [
+    0.0062,
+    0.0542
+   ],
+   "better": 15,
+   "worse": 9,
+   "test": "paired bootstrap",
+   "p_value": 0.008,
+   "family": "exploratory",
+   "p_holm": 0.016,
+   "verdict": "better",
+   "verdict_after_correction": "better"
+  }
+ ]
+}
