@@ -706,14 +706,19 @@ def compare(root, draws=2000, seed=20261019):
             row["p_value"] = min(1.0, 2 * min(sum(x <= 0 for x in boot), sum(x >= 0 for x in boot)) / draws)
             row["test"] = "paired bootstrap"
         out.append(row)
-    # Holm correction: many model x task x variant comparisons were made, so some would look significant by chance
-    order = sorted(range(len(out)), key=lambda i: out[i]["p_value"])
-    running = 0.0
-    for rank, i in enumerate(order):
-        running = max(running, min(1.0, (len(out) - rank) * out[i]["p_value"]))
-        out[i]["p_holm"] = round(running, 4)
-        out[i]["p_value"] = round(out[i]["p_value"], 4)
-        out[i]["verdict_after_correction"] = ("better" if out[i]["change"] > 0 else "worse") if running < 0.05 else "not significant"
+    # Holm correction within each family. Exploratory: every model x task x variant tried on the development
+    # cases. Confirmatory: the pre-specified held-out tests of the variant chosen from the exploratory family.
+    for family in ("exploratory", "confirmatory"):
+        members = [r for r in out if (r["task"].endswith("_confirm")) == (family == "confirmatory")]
+        order = sorted(members, key=lambda r: r["p_value"])
+        running = 0.0
+        for rank, r in enumerate(order):
+            running = max(running, min(1.0, (len(order) - rank) * r["p_value"]))
+            r["family"] = family
+            r["p_holm"] = round(running, 4)
+            r["verdict_after_correction"] = ("better" if r["change"] > 0 else "worse") if running < 0.05 else "not significant"
+    for r in out:
+        r["p_value"] = round(r["p_value"], 4)
     for row in out:
         print(json.dumps(row))
     path = root / "reports" / "vision-variant-comparison.json"
