@@ -1,0 +1,14 @@
+{
+ "v2": {
+  "protocol": "vision-v1-v2",
+  "created": "2026-10-20T15:35:35.666347+00:00",
+  "counts": {
+   "chart_qa_dev2": 586,
+   "chart_qa_confirm2": 1322,
+   "page_text_confirm2": 80
+  },
+  "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+  "excludes": "ChartQA test (all used in round 1); every OmniDocBench page image used by any v1 or confirm case",
+  "source_sha256": "a2779421ea4560740376a859b182b707481733e577cc875618d1a814d4fdd40e"
+ }
+}
