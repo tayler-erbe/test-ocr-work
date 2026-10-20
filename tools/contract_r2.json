@@ -1,0 +1,29 @@
+{
+ "protocol": "vision-v1-r2",
+ "base_method_sha256": "1d53d2b0692b224feff5f5214abef8ac2822a186c97c31818587585dc74dfb02",
+ "requests_sha256": "21386326c9209092dc38eabb870f2eb4e948f8af3b044ad9bda8bacdd286af02",
+ "layout_sha256": "f4e011f818c49ec130277a2a277647c8a0a75fe18946acbfbfd7eb40921e538c",
+ "vote_sha256": "f8d60a7ba7d19ba333d2214709580ade7aeb298054683012428613acb3b9919a",
+ "stats_sha256": "d1ed7620a35db7479c33e8c408b4edf795eb91ff722cc0d044ed205b4c00cac4",
+ "selection_sha256": "015129d9ff9b50d980ee9e7fc10362baf616bfd1067f16c522565e6841aa0716",
+ "cases_v2_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+ "method_sha256": "2a64100df0d83a02bccca676e56601e626001b27dabd26b1c11a46b48a3a3a97",
+ "status": {
+  "vote3": "confirmed: the pre-selected confirmatory test on chart_qa_confirm2 (Holm-corrected); higher-cost option",
+  "selfcheck": "supporting comparison on chart_qa_confirm2, not confirmatory; the cheaper chart candidate",
+  "upscale": "vote3 member; supporting comparison only",
+  "layoutmask": "experimental: word F1 rose but numeric recall fell 87.2% -> 69.4%; not for budgets, contracts or other number-critical text",
+  "readfirst": "dropped on development data (interval crossed zero); kept for reproducibility only"
+ },
+ "frozen_case_set": {
+  "file": "evaluation/vision_cases_v2.json",
+  "protocol": "vision-v1-v2",
+  "required": false,
+  "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+  "counts": {
+   "chart_qa_dev2": 586,
+   "chart_qa_confirm2": 1322,
+   "page_text_confirm2": 80
+  }
+ }
+}

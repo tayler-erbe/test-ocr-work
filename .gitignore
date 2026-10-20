@@ -45,6 +45,8 @@ tools/*
 !tools/*.py
 !tools/contract.json
 !tools/golden_scores.json
+!tools/contract_r2.json
+!tools/golden_r2.json
 *.sqlite3*
 .ocr-venv/
 *.part
