@@ -1,0 +1,26 @@
+{
+ "chart_qa_dev2": {
+  "selfcheck": [
+   0.8651877133105802,
+   586
+  ],
+  "vote3": [
+   0.8668941979522184,
+   586
+  ],
+  "readfirst": [
+   0.856655290102389,
+   586
+  ],
+  "baseline": [
+   0.8378839590443686,
+   586
+  ]
+ },
+ "chart_choice": "vote3",
+ "page_text_dev": {
+  "baseline": 0.8093519212077466,
+  "layoutmask": 0.8951484733319683
+ },
+ "page_text_confirm": true
+}

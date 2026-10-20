@@ -73,6 +73,15 @@ def yolo_detect(image):
     return found
 
 
+def yolo_all(image, conf=MIN_SCORE):
+    """Every DocLayout-YOLO box with its raw class name (title, plain text, figure, table, isolate_formula, abandon, ...)."""
+    yolo_detect(image)  # loads the model once
+    with _yolo_lock:
+        result = _yolo.predict(image, imgsz=1024, conf=conf, device="cpu", verbose=False)[0]
+    return [{"label": result.names[int(c)], "bbox": [round(v, 1) for v in b], "score": round(s, 4)}
+            for b, c, s in zip(result.boxes.xyxy.tolist(), result.boxes.cls.tolist(), result.boxes.conf.tolist())]
+
+
 VLM_BOX_SCHEMA = {"type": "object", "properties": {"regions": {"type": "array", "maxItems": 30, "items": {
     "type": "object", "properties": {"kind": {"type": "string", "enum": list(KINDS)},
                                      "bbox": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4}},

@@ -333,7 +333,9 @@ def build(root, force=False):
     print(json.dumps({"frozen": str(path), "counts": manifest["counts"], "cases_sha256": manifest["cases_sha256"]}))
 
 
-CASE_FILES = {"v1": "vision_cases_v1.json", "confirm": "vision_confirm_v1.json"}
+CASE_FILES = {"v1": "vision_cases_v1.json", "confirm": "vision_confirm_v1.json", "v2": "vision_cases_v2.json"}
+V2_TASKS = ("chart_qa_dev2", "chart_qa_confirm2", "page_text_confirm2")
+PAGE_TEXT_CONFIRM2 = 80
 
 
 def load_cases(root, which="v1"):
@@ -380,9 +382,47 @@ def build_confirm(root):
     print(json.dumps({"frozen": str(path), "counts": manifest["counts"], "cases_sha256": manifest["cases_sha256"]}))
 
 
+def build_v2(root):
+    """Round-2 cases, frozen before any round-2 run (docs/research/vision-eval/improvements/PLAN.md).
+
+    Round 1 used every ChartQA *test* question (v1 + confirm) and every eligible OmniDocBench table, so fresh data comes
+    from the ChartQA *val* split, split by chart into a development third and a confirmation two thirds, plus OmniDocBench
+    pages that appear in no earlier case of any task.
+    """
+    path = root / "evaluation" / CASE_FILES["v2"]
+    if path.exists():
+        raise SystemExit(f"{path} already frozen")
+    cases = []
+    with zipfile.ZipFile(root / CHARTQA_ZIP) as z:
+        prefix = chartqa_members(z)
+        for split in ("human", "augmented"):
+            for r in json.loads(z.read(f"{prefix}val/val_{split}.json")):
+                dev = int(digest("v2split:" + r["imgname"])[:8], 16) % 3 == 0
+                task = "chart_qa_dev2" if dev else "chart_qa_confirm2"
+                cases.append({"id": f"cq2:{split}:" + digest(r["imgname"] + r["query"])[:12], "task": task, "score_as": "chart_qa",
+                              "split": split, "image": f"{prefix}val/png/{r['imgname']}", "question": r["query"], "gold": str(r["label"])})
+    used = {c["image"] for which in ("v1", "confirm") for c in load_cases(root, which)["cases"]}
+    pages = [c for c in build_page_text(root, omni_pages(root), 10_000) if c["image"] not in used][:PAGE_TEXT_CONFIRM2]
+    cases += [{**c, "id": "pt2:" + c["id"].split(":", 1)[1], "task": "page_text_confirm2", "score_as": "page_text"} for c in pages]
+    seen, unique = set(), []
+    for c in cases:
+        if c["id"] not in seen:
+            seen.add(c["id"])
+            unique.append(c)
+    body = json.dumps(unique, sort_keys=True)
+    manifest = {"protocol": PROTOCOL + "-v2", "created": now(), "counts": Counter(c["task"] for c in unique),
+                "cases_sha256": hashlib.sha256(body.encode()).hexdigest(),
+                "excludes": "ChartQA test (all used in round 1); every OmniDocBench page image used by any v1 or confirm case",
+                "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "cases": unique}
+    path.write_text(json.dumps(manifest, indent=1), encoding="utf-8")
+    print(json.dumps({"frozen": str(path), "counts": manifest["counts"], "cases_sha256": manifest["cases_sha256"]}))
+
+
 # ---------- images ----------
 
 _zip = {}
+import threading
+_zip_lock = threading.Lock()
 
 
 def load_image(root, case, key="image"):
@@ -391,8 +431,11 @@ def load_image(root, case, key="image"):
     if name.startswith(OMNI):
         image = Image.open(root / name)
     else:
-        z = _zip.setdefault(CHARTQA_ZIP, zipfile.ZipFile(root / CHARTQA_ZIP))
-        image = Image.open(io.BytesIO(z.read(name)))
+        with _zip_lock:  # ZipFile reads are not thread-safe
+            if CHARTQA_ZIP not in _zip:
+                _zip[CHARTQA_ZIP] = zipfile.ZipFile(root / CHARTQA_ZIP)
+            data = _zip[CHARTQA_ZIP].read(name)
+        image = Image.open(io.BytesIO(data))
     image = image.convert("RGB")
     if case.get("crop_box"):
         x0, y0, x1, y1 = case["crop_box"]
@@ -421,7 +464,12 @@ VARIANTS = {
     "tuned": "The per-task winners combined: selfcheck for chart questions, expert prompt for tables",
     "expert": "Task-specific instructions that spell out how to read the image (axes, legend, units, every row and column)",
     "selfcheck": "Structured self-check: short notes (chart questions) or a row and column count (tables) before the answer",
+    # round 2 (docs/research/vision-eval/improvements/PLAN.md)
+    "vote3": "Majority of the baseline, selfcheck and upscale answers (answers equal under the 5% rule count as one; a tie goes to selfcheck); built from stored runs, no extra calls",
+    "readfirst": "Read, then answer: the model extracts the chart's data table, then answers from the image plus that table, with notes before the answer",
+    "layoutmask": "Layout-guided page text: DocLayout-YOLO's tables, figures, display equations and page furniture are painted white before the same prompt",
 }
+MASK_LABELS = ("figure", "table", "isolate_formula", "abandon")  # what the page_text answer key leaves out
 EXPERT_PROMPTS = {
     "chart_qa": ("You are reading a chart to answer one question. First locate the title, axis labels, units, legend and every "
                  "data label printed on the chart. Use printed data labels when they exist; otherwise estimate from the gridlines. "
@@ -475,11 +523,22 @@ def run_case(root, model, case, variant="baseline"):
                      "numeric_expected": sum(numbers(expected).values()), "numeric_predicted": sum(numbers(observed).values()),
                      "numeric_matched": sum((numbers(expected) & numbers(observed)).values())}
     if task == "page_text":
+        masked = []
+        if variant == "layoutmask":
+            from PIL import ImageDraw
+            image = image.copy()
+            draw = ImageDraw.Draw(image)
+            for box in regions.yolo_all(image):
+                if box["label"] in MASK_LABELS:
+                    draw.rectangle(box["bbox"], fill="white")
+                    masked.append(box["label"])
         out, _ = vlm_client.chat(model, "Transcribe all the running text on this page in reading order: headings, paragraphs, lists, "
                                  "captions, headers and footers. Skip tables, figures and display equations.", TEXT_SCHEMA,
                                  [vlm_client.png_bytes(image, 1800)], max_tokens=6000)
         p, r, f = f1(words(case["gold"]), words(out["text"]))
         _, nr, _ = f1(numbers(case["gold"]), numbers(out["text"]))
+        if variant == "layoutmask":
+            out["masked"] = dict(Counter(masked))
         return out, {"word_precision": p, "word_recall": r, "word_f1": f, "numeric_recall": nr}
     if task == "table":
         prompt = EXPERT_PROMPTS["table"] if variant == "expert" else regions.READ_PROMPTS["table"]
@@ -492,6 +551,14 @@ def run_case(root, model, case, variant="baseline"):
     if task == "chart_qa":
         if variant == "expert":
             out, _ = vlm_client.chat(model, EXPERT_PROMPTS["chart_qa"] + case["question"], ANSWER_SCHEMA, [png], max_tokens=300)
+        elif variant == "readfirst":
+            table, _ = vlm_client.chat(model, regions.READ_PROMPTS["chart"], regions.TABLE_SCHEMA, [png], max_tokens=3000)
+            csv_text = "\n".join(",".join(str(c) for c in row) for row in [table.get("header") or []] + (table.get("rows") or []))
+            out, _ = vlm_client.chat(model, "Here is a data table you extracted from this chart:\n" + csv_text + "\nUse the chart and "
+                                     "the table. In notes, briefly (under 60 words) list the values the question needs and any "
+                                     "calculation. Then give the answer: a number without units, or a short word or phrase."
+                                     "\nQuestion: " + case["question"], CHART_CHECK_SCHEMA, [png], max_tokens=600)
+            out["extracted_table"] = csv_text
         elif variant == "selfcheck":
             out, _ = vlm_client.chat(model, "In notes, briefly (under 60 words) list the values you read from the chart that the question "
                                      "needs and any calculation. Then give the answer: a number without units, or a short word or phrase."
@@ -577,7 +644,17 @@ def score_chart_table(gold_rows, out, tolerance=0.05):
 
 # ---------- run and report ----------
 
-def run(root, model, tasks, limit=None, table_only=False, variant="baseline", which="v1"):
+def _timed(root, model, case, table_only, variant):
+    started = time.perf_counter()
+    try:
+        prediction, metrics = run_table_only(root, model, case) if table_only else run_case(root, model, case, variant)
+        status, error = "complete", None
+    except Exception as exc:  # failures stay in the denominator
+        prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
+    return prediction, metrics, status, error, time.perf_counter() - started
+
+
+def run(root, model, tasks, limit=None, table_only=False, variant="baseline", which="v1", workers=1):
     manifest = load_cases(root, which)
     db = connect(root)
     db.execute(RESULT_SCHEMA)
@@ -593,21 +670,36 @@ def run(root, model, tasks, limit=None, table_only=False, variant="baseline", wh
         db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)", (run_id, model, now(), json.dumps(config), "running"))
         done = {c for (c,) in db.execute("SELECT case_id FROM vision_results WHERE run_id=?", (run_id,))}
         cases = [c for c in manifest["cases"] if c["task"] == task and c["id"] not in done][:limit]
-        for n, case in enumerate(cases, 1):
-            started = time.perf_counter()
-            try:
-                prediction, metrics = run_table_only(root, model, case) if table_only else run_case(root, model, case, variant)
-                status, error = "complete", None
-            except Exception as exc:  # failures stay in the denominator
-                prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
-            db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
-                       (run_id, case["id"], task, model + ("" if mode == "image" else " [table only]") + ("" if variant == "baseline" else f" [{variant}]"), status,
-                        json.dumps(prediction), json.dumps(metrics), time.perf_counter() - started, error, now()))
-            db.commit()
-            if n % 10 == 0 or n == len(cases):
-                print(json.dumps({"model": model, "task": task, "mode": mode, "done": n, "of": len(cases)}), flush=True)
+        # workers > 1 sends requests concurrently (vLLM batches them); results are written from this thread only
+        from concurrent.futures import ThreadPoolExecutor
+        label = model + ("" if mode == "image" else " [table only]") + ("" if variant == "baseline" else f" [{variant}]")
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+            for n, (case, result) in enumerate(zip(cases, pool.map(lambda c: _timed(root, model, c, table_only, variant), cases)), 1):
+                prediction, metrics, status, error, seconds = result
+                db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                           (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
+                db.commit()
+                if n % 25 == 0 or n == len(cases):
+                    print(json.dumps({"model": model, "task": task, "variant": variant, "done": n, "of": len(cases)}), flush=True)
         db.execute("UPDATE runs SET status='complete' WHERE id=?", (run_id,))
         db.commit()
+
+
+def base_task(task):
+    """chart_qa_confirm2 -> chart_qa, table_confirm -> table, page_text_confirm2 -> page_text."""
+    for suffix in ("_confirm2", "_dev2", "_confirm"):
+        if task.endswith(suffix):
+            return task[: -len(suffix)]
+    return task
+
+
+def family(task):
+    """Holm families: round-1 development, round-1 confirmation, round-2 development, round-2 confirmation."""
+    if task.endswith("_confirm2"):
+        return "confirmatory_v2"
+    if task.endswith("_dev2"):
+        return "exploratory_v2"
+    return "confirmatory" if task.endswith("_confirm") else "exploratory"
 
 
 def aggregate(task, rows):
@@ -631,7 +723,7 @@ def aggregate(task, rows):
         out["numeric_precision"] = nm / np_ if np_ else None
     else:
         keys = {"table": ("teds", "teds_structure", "cell_f1", "numeric_recall"), "page_text": ("word_f1", "numeric_recall"),
-                "chart_qa": ("correct",), "chart_table": ("value_recall", "value_precision", "label_recall")}[task.replace("_confirm", "")]
+                "chart_qa": ("correct",), "chart_table": ("value_recall", "value_precision", "label_recall")}[base_task(task)]
         for k in keys:
             values = [float(m.get(k) or 0) for m, _ in ok] + [0.0] * (n - len(ok))
             out[k] = sum(values) / n if n else None
@@ -646,10 +738,11 @@ def report(root):
         groups.setdefault((task, model), []).append((status, json.loads(metrics) if metrics else None, seconds))
     summary = [{"task": t, "model": m, **aggregate(t, rows)} for (t, m), rows in sorted(groups.items())]
     split_of = {c["id"]: c.get("split") for c in load_cases(root)["cases"] if c["task"] == "chart_qa"}
-    if (root / "evaluation" / CASE_FILES["confirm"]).exists():
-        split_of.update({c["id"]: c.get("split") for c in load_cases(root, "confirm")["cases"] if c["task"] == "chart_qa_confirm"})
+    for which in ("confirm", "v2"):
+        if (root / "evaluation" / CASE_FILES[which]).exists():
+            split_of.update({c["id"]: c.get("split") for c in load_cases(root, which)["cases"] if c.get("split")})
     for r in summary:
-        if r["task"] in ("chart_qa", "chart_qa_confirm"):
+        if base_task(r["task"]) == "chart_qa":
             rows = db.execute("SELECT case_id, status, metrics FROM vision_results WHERE task=? AND model=?", (r["task"], r["model"])).fetchall()
             for split in ("human", "augmented"):
                 chosen = [json.loads(m or "null") for c, s, m in rows if split_of.get(c) == split]
@@ -662,7 +755,10 @@ def report(root):
     print(out)
 
 
-PRIMARY = {"chart_qa": "correct", "chart_table": "value_recall", "table": "teds", "chart_qa_confirm": "correct", "table_confirm": "teds"}
+PRIMARY = {"chart_qa": "correct", "chart_table": "value_recall", "table": "teds", "chart_qa_confirm": "correct", "table_confirm": "teds",
+           "chart_qa_dev2": "correct", "chart_qa_confirm2": "correct", "page_text_confirm2": "word_f1"}
+# page_text joined in round 2 (layoutmask); its v1 rows are round-2 development cases
+PRIMARY_V2_DEV = {"page_text": "word_f1"}
 
 
 def compare(root, draws=2000, seed=20261019):
@@ -676,12 +772,13 @@ def compare(root, draws=2000, seed=20261019):
     db = connect(root)
     scores = {}
     for model, task, case, status, metrics in db.execute("SELECT model, task, case_id, status, metrics FROM vision_results"):
-        if task not in PRIMARY or "[table only]" in model:
+        metric = PRIMARY.get(task) or PRIMARY_V2_DEV.get(task)
+        if not metric or "[table only]" in model:
             continue
         base, _, rest = model.partition(" [")
         variant = rest.rstrip("]") or "baseline"
         m = json.loads(metrics) if metrics else None
-        scores.setdefault((base, task, variant), {})[case] = float((m or {}).get(PRIMARY[task]) or 0) if status == "complete" else 0.0
+        scores.setdefault((base, task, variant), {})[case] = float((m or {}).get(metric) or 0) if status == "complete" else 0.0
     rng = random.Random(seed)
     out = []
     for (model, task, variant), cases in sorted(scores.items()):
@@ -693,12 +790,12 @@ def compare(root, draws=2000, seed=20261019):
         if not diffs:
             continue
         boot = sorted(sum(rng.choice(diffs) for _ in diffs) / len(diffs) for _ in range(draws))
-        row = {"model": model, "task": task, "variant": variant, "metric": PRIMARY[task], "cases": len(diffs),
+        row = {"model": model, "task": task, "variant": variant, "metric": PRIMARY.get(task) or PRIMARY_V2_DEV[task], "cases": len(diffs),
                "baseline": round(sum(base[c] for c in shared) / len(shared), 4), "variant_score": round(sum(cases[c] for c in shared) / len(shared), 4),
                "change": round(sum(diffs) / len(diffs), 4), "ci95": [round(boot[int(.025 * draws)], 4), round(boot[int(.975 * draws)], 4)],
                "better": sum(d > 1e-9 for d in diffs), "worse": sum(d < -1e-9 for d in diffs)}
         row["verdict"] = "better" if row["ci95"][0] > 0 else "worse" if row["ci95"][1] < 0 else "no clear change"
-        if task.startswith("chart_qa"):  # right/wrong per case: exact McNemar test on the discordant cases
+        if base_task(task) == "chart_qa":  # right/wrong per case: exact McNemar test on the discordant cases
             k, n = min(row["better"], row["worse"]), row["better"] + row["worse"]
             row["p_value"] = min(1.0, 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n) if n else 1.0
             row["test"] = "exact McNemar"
@@ -708,13 +805,22 @@ def compare(root, draws=2000, seed=20261019):
         out.append(row)
     # Holm correction within each family. Exploratory: every model x task x variant tried on the development
     # cases. Confirmatory: the pre-specified held-out tests of the variant chosen from the exploratory family.
-    for family in ("exploratory", "confirmatory"):
-        members = [r for r in out if (r["task"].endswith("_confirm")) == (family == "confirmatory")]
+    # round 2: only the pre-registered pick per task is confirmatory; vote3's member runs on confirm2 are supporting rows
+    sel = Path(__file__).resolve().parent / "docs/research/vision-eval/improvements/selection.json"
+    picked = {"chart_qa_confirm2": json.loads(sel.read_text(encoding="utf-8"))["chart_choice"], "page_text_confirm2": "layoutmask"} if sel.exists() else {}
+
+    def fam_of(r):
+        if r["task"] == "page_text":
+            return "exploratory_v2"
+        f = family(r["task"])
+        return "supporting_v2" if f == "confirmatory_v2" and picked.get(r["task"]) != r["variant"] else f
+    for fam in ("exploratory", "confirmatory", "exploratory_v2", "confirmatory_v2", "supporting_v2"):
+        members = [r for r in out if fam_of(r) == fam]
         order = sorted(members, key=lambda r: r["p_value"])
         running = 0.0
         for rank, r in enumerate(order):
             running = max(running, min(1.0, (len(order) - rank) * r["p_value"]))
-            r["family"] = family
+            r["family"] = fam
             r["p_holm"] = round(running, 4)
             r["verdict_after_correction"] = ("better" if r["change"] > 0 else "worse") if running < 0.05 else "not significant"
     for r in out:
@@ -726,6 +832,47 @@ def compare(root, draws=2000, seed=20261019):
     print(path)
 
 
+VOTE_MEMBERS = ("baseline", "selfcheck", "upscale")  # order fixed before any round-2 result; ties go to selfcheck
+
+
+def vote(root, model, task, which="v2"):
+    """vote3: majority of stored baseline / selfcheck / upscale answers on the same cases. No model call."""
+    manifest = load_cases(root, which)
+    db = connect(root)
+    answers = {}
+    for v in VOTE_MEMBERS:
+        label = model if v == "baseline" else f"{model} [{v}]"
+        rows = db.execute("SELECT case_id, status, prediction FROM vision_results WHERE task=? AND model=?", (task, label)).fetchall()
+        if not rows:
+            raise SystemExit(f"run {label} on {task} first")
+        for case_id, status, prediction in rows:
+            out = json.loads(prediction) if status == "complete" and prediction else None
+            answers.setdefault(case_id, {})[v] = (out or {}).get("answer")
+    same = lambda a, b: a is not None and b is not None and (relaxed_match(a, b) or relaxed_match(b, a))
+    config = {"protocol": PROTOCOL, "cases_sha256": manifest["cases_sha256"], "task": task, "model": model,
+              "weights": vlm_client.model_digest(model) or model, "mode": "image", "variant": "vote3", "members": VOTE_MEMBERS}
+    run_id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:24]
+    db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)", (run_id, model, now(), json.dumps(config), "complete"))
+    gold = {c["id"]: c["gold"] for c in manifest["cases"] if c["task"] == task}
+    for case_id, got in answers.items():
+        if case_id not in gold or len(got) < len(VOTE_MEMBERS):
+            continue
+        support = {v: sum(same(got[v], got[w]) for w in VOTE_MEMBERS) for v in VOTE_MEMBERS if got[v] is not None}
+        if not support:
+            status, chosen, metrics = "failed", None, None
+        else:
+            top = max(support.values())
+            winners = [v for v in VOTE_MEMBERS if support.get(v) == top]
+            pick = "selfcheck" if "selfcheck" in winners and len(winners) > 1 else winners[0]
+            chosen, status = got[pick], "complete"
+            metrics = {"correct": relaxed_match(chosen, gold[case_id]), "picked": pick, "agreement": top}
+        db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                   (run_id, case_id, task, f"{model} [vote3]", status, json.dumps({"answer": chosen, "members": got}),
+                    json.dumps(metrics), 0.0, None if status == "complete" else "no member answered", now()))
+    db.commit()
+    print(json.dumps({"vote3": task, "cases": len(answers)}))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
@@ -734,12 +881,18 @@ def main():
     b.add_argument("--force", action="store_true")
     r = sub.add_parser("run")
     r.add_argument("--model", required=True, help="ollama:<name>, openai:<name>, or yolo (layout only)")
-    r.add_argument("--task", action="append", choices=TASKS + ("chart_qa_confirm", "table_confirm"))
+    r.add_argument("--task", action="append", choices=TASKS + ("chart_qa_confirm", "table_confirm") + V2_TASKS)
     r.add_argument("--limit", type=int)
     r.add_argument("--table-only", action="store_true", help="chart_qa from the gold CSV instead of the image")
     r.add_argument("--variant", default="baseline", choices=sorted(VARIANTS))
-    r.add_argument("--cases", default="v1", choices=sorted(CASE_FILES), help="v1 (development) or confirm (held out)")
+    r.add_argument("--cases", default="v1", choices=sorted(CASE_FILES), help="v1 (development), confirm (held out) or v2 (round 2)")
+    r.add_argument("--workers", type=int, default=1, help="concurrent requests (vLLM batches them)")
     sub.add_parser("build-confirm", help="freeze the held-out confirmation cases")
+    sub.add_parser("build-v2", help="freeze the round-2 development and confirmation cases")
+    vo = sub.add_parser("vote", help="vote3 from stored baseline/selfcheck/upscale runs")
+    vo.add_argument("--model", required=True)
+    vo.add_argument("--task", required=True)
+    vo.add_argument("--cases", default="v2", choices=sorted(CASE_FILES))
     sub.add_parser("report")
     sub.add_parser("compare", help="each variant against baseline on the same cases, with paired bootstrap intervals")
     args = parser.parse_args()
@@ -747,9 +900,13 @@ def main():
         build(args.root, args.force)
     elif args.command == "run":
         tasks = tuple(args.task or (("layout",) if args.model == "yolo" else TASKS))
-        run(args.root, args.model, tasks, args.limit, args.table_only, args.variant, args.cases)
+        run(args.root, args.model, tasks, args.limit, args.table_only, args.variant, args.cases, args.workers)
     elif args.command == "build-confirm":
         build_confirm(args.root)
+    elif args.command == "build-v2":
+        build_v2(args.root)
+    elif args.command == "vote":
+        vote(args.root, args.model, args.task, args.cases)
     elif args.command == "compare":
         compare(args.root)
     else:
