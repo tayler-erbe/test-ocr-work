@@ -137,3 +137,9 @@ An answer contains individual claims with source/result references. Original quo
 Version field definitions, source artifacts, parser outputs, normalizers, prompts, models and validation rules independently. A parser change can alter offsets; old references continue resolving to the old artifact. Moving to a new schema must include migration/comparison rules and must not silently alter past accepted records.
 
 See [architecture](architecture.md) for storage and job boundaries and [evaluation](evaluation.md) for measuring these contracts.
+
+## v2 changelog (evidence policy version 2)
+
+- Duplicate policy: `validate_field`, `validate_multifield` and `validate_evidence_only` take `duplicates="reject"` (default, identical to v1 behaviour) or `"drop_exact"`. `drop_exact` removes only an exact repeat (same ID for ID selection; same resolved `(id, start, end)` for offsets/anchors), keeps the first, and never merges distinct trimmed selections that share an ID; overlap is still rejected. `FieldResult` gains `raw_response` (deep copy as received) and `normalizations` (audit records, empty under `reject`). `to_frozen_prediction` output is unchanged.
+- Retrieval helper: new `retrieval_v2.select_context(spans, fields, budget_bytes, ...)` does field-balanced BM25 with legal query expansion, heading boost, per-field minimum budget and opening/closing spans. Its report is "context coverage, not answer recall": it widens what is retrieved and does not claim any clause exists. Not wired into `private_extraction.py` or the reviewer app.
+- Defaults unchanged: frozen validators and results are unaffected unless a caller opts in.

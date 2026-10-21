@@ -247,5 +247,80 @@ class Acceptance(unittest.TestCase):
         self.assertIn("complete document", msgs[1]["content"])
 
 
+class DuplicatePolicyV2(unittest.TestCase):
+    def setUp(self):
+        self.store = E.SourceStore("doc", spans_of(DOC), DOC)
+        self.ids = list(self.store.block_ids)
+        self.b = next(x for x in self.store.blocks() if "Acme" in x.text)
+
+    def test_policy_version(self):
+        self.assertEqual(E.EVIDENCE_POLICY_VERSION, "2")
+
+    def test_exact_duplicate_id_dropped_with_audit(self):
+        resp = {"outcome": "found", "evidence": [self.ids[0], self.ids[1], self.ids[0]]}
+        r = E.validate_field(self.store, resp, False, duplicates="drop_exact")
+        self.assertTrue(r.accepted)
+        self.assertEqual(len(r.evidence), 2)
+        self.assertEqual(r.normalizations, [{"type": "exact_duplicate_removed", "id": self.ids[0], "position": 2, "policy_version": "2"}])
+        self.assertEqual(r.raw_response, resp)
+        self.assertIsNot(r.raw_response, resp)
+        self.assertEqual(len(r.raw_response["evidence"]), 3)
+
+    def test_default_still_rejects_and_has_empty_audit(self):
+        resp = {"outcome": "found", "evidence": [self.ids[0], self.ids[0]]}
+        with self.assertRaises(E.EvidenceError):
+            E.validate_field(self.store, resp, False)
+        with self.assertRaises(E.EvidenceError):
+            E.validate_field(self.store, resp, False, duplicates="reject")
+        ok = E.validate_field(self.store, {"outcome": "found", "evidence": [self.ids[0]]}, False)
+        self.assertEqual(ok.normalizations, [])
+
+    def test_unknown_policy_is_a_programming_error(self):
+        with self.assertRaises(ValueError):
+            E.validate_field(self.store, {"outcome": "found", "evidence": [self.ids[0]]}, False, duplicates="merge")
+
+    def test_same_id_disjoint_offsets_passes_under_both(self):
+        resp = {"outcome": "found", "evidence": [{"id": self.b.id, "start": 0, "end": 4}, {"id": self.b.id, "start": 10, "end": 14}]}
+        for pol in ("reject", "drop_exact"):
+            r = E.validate_field(self.store, resp, False, "offsets", duplicates=pol)
+            self.assertEqual(len(r.evidence), 2, pol)
+            self.assertEqual(r.normalizations, [], pol)
+
+    def test_overlapping_offsets_still_rejected_under_drop_exact(self):
+        resp = {"outcome": "found", "evidence": [{"id": self.b.id, "start": 0, "end": 8}, {"id": self.b.id, "start": 4, "end": 10}]}
+        with self.assertRaises(E.EvidenceError):
+            E.validate_field(self.store, resp, False, "offsets", duplicates="drop_exact")
+
+    def test_identical_offset_repeat_dropped(self):
+        item = {"id": self.b.id, "start": 0, "end": 8}
+        resp = {"outcome": "found", "evidence": [item, dict(item)]}
+        with self.assertRaises(E.EvidenceError):
+            E.validate_field(self.store, resp, False, "offsets")
+        r = E.validate_field(self.store, resp, False, "offsets", duplicates="drop_exact")
+        self.assertEqual(len(r.evidence), 1)
+        self.assertEqual(r.normalizations[0]["position"], 1)
+
+    def test_identical_anchor_repeat_dropped_after_resolution(self):
+        item = {"id": self.b.id, "first": "Acme", "last": "Inc."}
+        r = E.validate_field(self.store, {"outcome": "found", "evidence": [item, dict(item)]}, False, "anchors", duplicates="drop_exact")
+        self.assertEqual(len(r.evidence), 1)
+        self.assertEqual(len(r.normalizations), 1)
+
+    def test_multifield_and_evidence_only_pass_policy_through(self):
+        resp = {"fields": {"a": {"outcome": "found", "evidence": [self.ids[0], self.ids[0]]}}}
+        self.assertIsInstance(E.validate_multifield(self.store, resp, ["a"], False)["a"], E.EvidenceError)
+        out = E.validate_multifield(self.store, resp, ["a"], False, duplicates="drop_exact")
+        self.assertTrue(out["a"].accepted)
+        norms = []
+        items = E.validate_evidence_only(self.store, {"evidence": [self.ids[0], self.ids[0]]}, duplicates="drop_exact", normalizations=norms)
+        self.assertEqual((len(items), len(norms)), (1, 1))
+        with self.assertRaises(E.EvidenceError):
+            E.validate_evidence_only(self.store, {"evidence": [self.ids[0], self.ids[0]]})
+
+    def test_frozen_prediction_unchanged_by_audit_fields(self):
+        r = E.validate_field(self.store, {"outcome": "found", "evidence": [self.ids[0]]}, False)
+        self.assertEqual(set(E.to_frozen_prediction(self.store, r)), {"matches"})
+
+
 if __name__ == "__main__":
     unittest.main()

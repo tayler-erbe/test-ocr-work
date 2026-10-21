@@ -27,6 +27,7 @@ comparable with earlier runs.
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import re
 from dataclasses import dataclass, field
@@ -37,6 +38,12 @@ OUTCOMES_EXCERPT = ("found", "not_found_in_excerpts", "insufficient_evidence", "
 OUTCOMES_FULL = ("found", "not_present_after_full_review", "insufficient_evidence", "unreadable")
 NLI_LABELS = ("Entailment", "Contradiction", "NotMentioned")
 MAX_EVIDENCE = 30
+
+# Evidence policy version. "2" adds the opt-in ``duplicates="drop_exact"`` policy (audit trail in
+# FieldResult.normalizations / .raw_response). The default policy, ``duplicates="reject"``, is the original
+# frozen behaviour and is unchanged.
+EVIDENCE_POLICY_VERSION = "2"
+DUPLICATE_POLICIES = ("reject", "drop_exact")
 
 # A terminator followed by whitespace ends a block, unless the token before it is an abbreviation,
 # a bare number ("5."), a single letter ("A.") or a roman numeral ("iv."), which would cut clause numbers
@@ -365,13 +372,22 @@ class FieldResult:
     candidates: list = field(default_factory=list)     # insufficient_evidence: kept for review, not accepted
     accepted: bool = False
     value: object = None
+    raw_response: object = None                         # deep copy of the response exactly as received
+    normalizations: list = field(default_factory=list)  # audit records; empty under duplicates="reject"
 
 
-def _items(store: SourceStore, raw: list, selection: str) -> list[dict]:
+def _check_policy(duplicates: str) -> None:
+    if duplicates not in DUPLICATE_POLICIES:
+        raise ValueError(f"duplicates must be one of {DUPLICATE_POLICIES}, got {duplicates!r}")
+
+
+def _items(store: SourceStore, raw: list, selection: str, *, duplicates: str = "reject",
+           normalizations: list | None = None) -> list[dict]:
+    _check_policy(duplicates)
     if not isinstance(raw, list) or len(raw) > MAX_EVIDENCE:
         raise EvidenceError("evidence must be a list of at most 30 items")
     out, seen_ids, taken = [], set(), []
-    for it in raw:
+    for pos, it in enumerate(raw):
         if selection == "ids":
             if not isinstance(it, str):
                 raise EvidenceError("evidence items must be block ID strings")
@@ -394,6 +410,12 @@ def _items(store: SourceStore, raw: list, selection: str) -> list[dict]:
         # an identical repeat is still a duplicate, and any overlap is rejected below.
         key = bid if selection == "ids" else (bid, s, e)
         if key in seen_ids:
+            if duplicates == "drop_exact":
+                # Exact repeat only (same ID, or same resolved (id, start, end)): keep the first, record the removal.
+                if normalizations is not None:
+                    normalizations.append({"type": "exact_duplicate_removed", "id": bid, "position": pos,
+                                           "policy_version": EVIDENCE_POLICY_VERSION})
+                continue
             raise EvidenceError(f"duplicate evidence {bid!r}")
         seen_ids.add(key)
         m = store.materialize(bid, s, e)
@@ -404,7 +426,8 @@ def _items(store: SourceStore, raw: list, selection: str) -> list[dict]:
     return sorted(out, key=lambda m: m["start"])
 
 
-def validate_field(store: SourceStore, response: object, full_document: bool, selection: str = "ids") -> FieldResult:
+def validate_field(store: SourceStore, response: object, full_document: bool, selection: str = "ids", *,
+                   duplicates: str = "reject") -> FieldResult:
     """Accept or reject one field response {outcome, evidence}. Raises EvidenceError on any violation."""
     if not isinstance(response, dict) or set(response) != {"outcome", "evidence"}:
         raise EvidenceError("response must be exactly {outcome, evidence}")
@@ -412,16 +435,18 @@ def validate_field(store: SourceStore, response: object, full_document: bool, se
     allowed = outcomes_for(full_document)
     if outcome not in allowed:
         raise EvidenceError(f"outcome {outcome!r} not allowed here (allowed: {', '.join(allowed)})")
-    items = _items(store, response["evidence"], selection)
+    raw = copy.deepcopy(response)
+    norms: list = []
+    items = _items(store, response["evidence"], selection, duplicates=duplicates, normalizations=norms)
     if outcome == "found":
         if not items:
             raise EvidenceError("'found' requires evidence")
-        return FieldResult("found", evidence=items, accepted=True)
+        return FieldResult("found", evidence=items, accepted=True, raw_response=raw, normalizations=norms)
     if outcome == "insufficient_evidence":
-        return FieldResult(outcome, candidates=items, accepted=False)
+        return FieldResult(outcome, candidates=items, accepted=False, raw_response=raw, normalizations=norms)
     if items:
         raise EvidenceError(f"'{outcome}' requires evidence []")
-    return FieldResult(outcome, accepted=True)
+    return FieldResult(outcome, accepted=True, raw_response=raw, normalizations=norms)
 
 
 def validate_presence(response: object, full_document: bool) -> str:
@@ -432,16 +457,19 @@ def validate_presence(response: object, full_document: bool) -> str:
     return response["outcome"]
 
 
-def validate_evidence_only(store: SourceStore, response: object, selection: str = "ids") -> list[dict]:
+def validate_evidence_only(store: SourceStore, response: object, selection: str = "ids", *, duplicates: str = "reject",
+                           normalizations: list | None = None) -> list[dict]:
+    """Under duplicates="drop_exact" pass a list as ``normalizations`` to receive the audit records."""
     if not isinstance(response, dict) or set(response) != {"evidence"}:
         raise EvidenceError("evidence response must be exactly {evidence}")
-    items = _items(store, response["evidence"], selection)
+    items = _items(store, response["evidence"], selection, duplicates=duplicates, normalizations=normalizations)
     if not items:
         raise EvidenceError("evidence stage requires at least one block")
     return items
 
 
-def validate_multifield(store: SourceStore, response: object, field_ids: list[str], full_document: bool, selection: str = "ids") -> dict:
+def validate_multifield(store: SourceStore, response: object, field_ids: list[str], full_document: bool, selection: str = "ids", *,
+                       duplicates: str = "reject") -> dict:
     """Per-field outcomes; one bad field does not discard the others (each gets its own error)."""
     if not isinstance(response, dict) or set(response) != {"fields"} or not isinstance(response["fields"], dict):
         raise EvidenceError("response must be exactly {fields: {...}}")
@@ -450,7 +478,7 @@ def validate_multifield(store: SourceStore, response: object, field_ids: list[st
     out = {}
     for f in field_ids:
         try:
-            out[f] = validate_field(store, response["fields"][f], full_document, selection)
+            out[f] = validate_field(store, response["fields"][f], full_document, selection, duplicates=duplicates)
         except EvidenceError as e:
             out[f] = e
     return out
