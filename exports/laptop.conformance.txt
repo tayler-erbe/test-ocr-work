@@ -1,0 +1,12 @@
+PASS code fingerprints
+PASS frozen manifests
+PASS case data (2931 images, receipt hashes)
+PASS scorers on golden predictions
+PASS statistics on golden table
+PASS round 2: code fingerprints
+PASS round 2: requests and stand-in scoring
+PASS round 2: vote3 majority rule
+PASS round 2: statistics and Holm families
+PASS result file laptop.jsonl
+Round-2 variant status: vote3 = confirmed; selfcheck = supporting comparison on chart_qa_confirm2, not confirmatory; the cheaper chart candidate; upscale = vote3 member; supporting comparison only; layoutmask = experimental; readfirst = dropped on development data (interval crossed zero); kept for reproducibility only
+CONFORMANT

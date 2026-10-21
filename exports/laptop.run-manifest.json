@@ -1,0 +1,938 @@
+{
+  "schema": "laptop-export-handoff-1",
+  "source_commit": "5bd04e42b9e6952f34a9a06e7aea3a3514adb945",
+  "row_count": 18244,
+  "filename": "laptop.jsonl",
+  "bytes": 20090340,
+  "sha256": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753",
+  "public_only_audit": {
+    "method": "Every row matched to frozen public case IDs, tasks and manifest hashes; campaign used only the public case pack in its separate library.",
+    "all_rows_verified": true,
+    "institutional_documents_included": false,
+    "no_row_redaction_or_scoring_changes": true
+  },
+  "case_sets": {
+    "v1": {
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "cases": 530
+    },
+    "confirm": {
+      "cases_sha256": "a8e2b349e391506ca6b0cd231fed71a2108c22c16a9af487cd2e177fc0b22702",
+      "cases": 2181
+    },
+    "v2": {
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "cases": 1988
+    }
+  },
+  "models": {
+    "ollama:qwen2.5vl:7b": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+    "ollama:qwen3-vl:8b-instruct": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb"
+  },
+  "model_weight_note": "Qwen2.5-VL 7B matches the desktop digest; Qwen3-VL 8B instruct has different weights and is not a same-weights reproduction.",
+  "runtime": {
+    "python": "3.12.10",
+    "ollama": "0.34.4",
+    "workers": 1,
+    "packages": {
+      "pillow": "12.3.0",
+      "numpy": "2.5.4",
+      "apted": "1.0.3",
+      "torch": "2.14.1+cpu",
+      "torchvision": "0.29.1+cpu",
+      "doclayout_yolo": "0.0.4"
+    }
+  },
+  "source_file_sha256": {
+    "tools/contract.json": "dacec633298eca8d1bbf111b5b7046d59e1e3149031e867223ae9888443303a0",
+    "tools/golden_scores.json": "f0ea1c2cc472624db496d90a5a971e8c1a91d4de2a884cc507d795a99b624af7",
+    "tools/eval_contract.py": "fcecd7551ca76ab3f057310ed0b4a27e1cf2d158625cb9a4292411bea2e8e751",
+    "tools/contract_r2.json": "aa3243e1291def7c5e100e58560207f97e990913de4e529c2200482e5d63cbf8",
+    "tools/golden_r2.json": "9a0b34aca0040e72ef4c3298db1aa84862ea0f62ed8249953b581d8f9c106f1f",
+    "tools/eval_contract_r2.py": "ddb7ccd0dbf5e52dfb042c14e8ea98f139ff41f378bb04383cbe3d1561f2a4a8",
+    "vision_eval.py": "585455dd7ecad59245dfb9393d5dbdd21053038e36590849f796270bf0cc9c99",
+    "vlm_client.py": "9c43bce0f773834220832a1429d566e85c4a40174dd5cc3c7c64d25e845613c7",
+    "regions.py": "98c173b4c566005a2687065c6030dfde96fdf0d6e7d33338a8ccfe1534ca4739"
+  },
+  "run_configs": {
+    "e05be24fd7fe833fa12973b7": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "ad100fb9b490bfa9a82bf4bc": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "ocr_crop",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "7815ca484e473ca084851242": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "affdb74dca1d43da39f4ef31": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "d323741eba73a95fe404e15e": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "93bfaed8e647cde2dd005f22": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "d635518a3e492116729d02c9": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "357279801f4e534bff780b0c": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "3b6b55497023a06eeab840ec": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "4824e621310edd75a275742e": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "5410e81cf7ca64762f49d03c": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "10cd6622c9bbacdae5d6fd00": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "f922490a627d3ad8119d804b": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "208beb31d74c23abd57a942d": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "9a2a107a9df4358e137d2c41": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "ocr_crop",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "b4c0b2713a56410496608d97": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "94dd816886e05d5b0362c289": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "acc116a421608de9afeebfa0": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "f43a35d6eb0c331a794899fd": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "5afbe931655a0cb885121f1c": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "a32e5f5ddff2a539473b28f2": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "8a3ac8682f8a29afe25117d0": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "6df970015b523071d99d0e72": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "expert"
+    },
+    "6ff1a4de643cbe2f13a9634a": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_qa",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "d264ad4cf0f3093fe7c02980": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "chart_table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "7d8f2b4c2c18b565dabada4a": {
+      "protocol": "vision-v1",
+      "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+      "task": "table",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "adb6337028f8064883362cc9": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "48f64de64026648fc630be7a": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "d3ce6c37ae7013d3020d9820": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "4a197e8eada123dbcd7e35db": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "vote3",
+      "members": [
+        "baseline",
+        "selfcheck",
+        "upscale"
+      ]
+    },
+    "b3824698ff20a1fddfcc48a4": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "a92100693951b48479280a50": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "6bd422adb1e519f6859b7d0b": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "abf313dc91569dc83f1ef9c8": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "vote3",
+      "members": [
+        "baseline",
+        "selfcheck",
+        "upscale"
+      ]
+    },
+    "dac70d86d632a40e60b4b46d": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "page_text_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image"
+    },
+    "037143ed257154b1632addb5": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "page_text_confirm2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "weights": "70e58e37beb15464e19aa903dedb2cba828b89c0fb186f75ff2738c7347b96eb",
+      "mode": "image",
+      "variant": "layoutmask"
+    },
+    "e0b4930d236dd425dbb9d14d": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "d630a2f45b7d5e58b0aa47c9": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "0e6c0689601b74751250192f": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "11bfe2bb0a69b87de8752558": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_dev2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "vote3",
+      "members": [
+        "baseline",
+        "selfcheck",
+        "upscale"
+      ]
+    },
+    "0ca321534531ec04dddd9ddc": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "1da71904469acf0feb087a03": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "selfcheck"
+    },
+    "2b26ec8d536f41c5ebcb594e": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "upscale"
+    },
+    "ba48afd48c2f508086793a05": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "chart_qa_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "vote3",
+      "members": [
+        "baseline",
+        "selfcheck",
+        "upscale"
+      ]
+    },
+    "8a3bb2753630f65765ee103e": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "page_text_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image"
+    },
+    "41bb8bf73971e80f7baa45c1": {
+      "protocol": "vision-v1",
+      "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+      "task": "page_text_confirm2",
+      "model": "ollama:qwen2.5vl:7b",
+      "weights": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "mode": "image",
+      "variant": "layoutmask"
+    }
+  },
+  "row_counts": [
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 199
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa",
+      "variant": "selfcheck",
+      "status": "failed",
+      "rows": 1
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 58
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "baseline",
+      "status": "failed",
+      "rows": 2
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 56
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "expert",
+      "status": "failed",
+      "rows": 4
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 58
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_table",
+      "variant": "upscale",
+      "status": "failed",
+      "rows": 2
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "ocr_crop",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 50
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "table",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "table",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "table",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "table",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 200
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_table",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_table",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_table",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_table",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "ocr_crop",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 50
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "table",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "table",
+      "variant": "expert",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "table",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v1",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "table",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 60
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_confirm2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_confirm2",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 1321
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_confirm2",
+      "variant": "selfcheck",
+      "status": "failed",
+      "rows": 1
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_confirm2",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_confirm2",
+      "variant": "vote3",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_dev2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_dev2",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 585
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_dev2",
+      "variant": "selfcheck",
+      "status": "failed",
+      "rows": 1
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_dev2",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "chart_qa_dev2",
+      "variant": "vote3",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "page_text_confirm2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 76
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "page_text_confirm2",
+      "variant": "baseline",
+      "status": "failed",
+      "rows": 4
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen2.5vl:7b",
+      "task": "page_text_confirm2",
+      "variant": "layoutmask",
+      "status": "complete",
+      "rows": 80
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_confirm2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_confirm2",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 1320
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_confirm2",
+      "variant": "selfcheck",
+      "status": "failed",
+      "rows": 2
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_confirm2",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_confirm2",
+      "variant": "vote3",
+      "status": "complete",
+      "rows": 1322
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_dev2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_dev2",
+      "variant": "selfcheck",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_dev2",
+      "variant": "upscale",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "chart_qa_dev2",
+      "variant": "vote3",
+      "status": "complete",
+      "rows": 586
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "page_text_confirm2",
+      "variant": "baseline",
+      "status": "complete",
+      "rows": 79
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "page_text_confirm2",
+      "variant": "baseline",
+      "status": "failed",
+      "rows": 1
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "page_text_confirm2",
+      "variant": "layoutmask",
+      "status": "complete",
+      "rows": 77
+    },
+    {
+      "case_set": "v2",
+      "model": "ollama:qwen3-vl:8b-instruct",
+      "task": "page_text_confirm2",
+      "variant": "layoutmask",
+      "status": "failed",
+      "rows": 3
+    }
+  ],
+  "errors": {
+    "Truncated: Truncated generation": 15,
+    "HTTPError: HTTP Error 500: Internal Server Error": 6
+  },
+  "derived_vote_rows": 3816,
+  "conformance_log": "laptop.conformance.txt",
+  "conformance_log_sha256": "86b9c5ae451d8e86044e3df43c36b7dd9eb63812847eddf180d86a1c33e3a7dd",
+  "conformance_exit_code": 0,
+  "permission": "User explicitly authorized this public-benchmark row-level export on a dedicated branch; other private/model-output exclusions remain."
+}
