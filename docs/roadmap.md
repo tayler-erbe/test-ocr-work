@@ -2,7 +2,7 @@
 
 | Priority | Work | Completion criterion |
 |---|---|---|
-| 1 | Finish the controlled Nemotron reassessment | Preserve every attempt, compare mechanism-specific configurations, confirm a fixed reasoning contrast on separately frozen public documents |
+| 1 | Compare the next exact API model | Nemotron round complete (312 requests); run the second model on identical public inputs and scorer, preserve failures and report document-level uncertainty |
 | 2 | Complete portfolio integration | Add the reviewed case study to the existing website; verify navigation, filters, source links, mobile layout and downloadable public results |
 | 3 | Define one business workflow | Agree input connection, packet types, field definitions, downstream records and reviewer actions |
 | 4 | Connect evidence extraction to review | Versioned adapter, source-page navigation, explicit unread/uncertain states, persistent corrections and reviewed export |

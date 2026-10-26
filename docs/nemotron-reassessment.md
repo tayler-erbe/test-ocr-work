@@ -1,6 +1,6 @@
 # Nemotron reassessment: experiment plan
 
-Status: exploratory protocol fixed before new requests. This supersedes no frozen result and makes no model-rejection claim.
+Status: completed 26 October 2026. This preserved plan records the protocol fixed before requests. The eight-arm campaign (192 requests) and separate reasoning comparison (120 requests) are complete. See [completed findings](../results/legal/README.md). This supersedes no frozen result and makes no model-rejection claim.
 
 ## Question
 

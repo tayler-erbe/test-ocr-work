@@ -13,6 +13,23 @@ Completed 26 October 2026: **192 requests, eight configurations, the same 24 pub
 | ids | 4/12 | 12/12 | 7/12 | 9/12 |
 | schema_in_prompt | 4/12 | 7/12 | 9/12 | 12/12 |
 
+## Completed follow-up: 26 October 2026
+
+The Nemotron evaluation round is complete: **312 requests across 84 public cases**. The exploratory campaign ran eight configurations on the same 24 previously exposed cases (192 requests); the separate reasoning comparison ran two configurations on 60 cases from 60 documents (120 requests). Requests are repeated observations, not unique documents.
+
+| Public task | Reasoning off | Reasoning on | Mechanically accepted, off / on |
+|---|---:|---:|---:|
+| CUAD extraction, 30 documents | 3/30 (10.0%) | 13/30 (43.3%) | 7/30 / 20/30 |
+| ContractNLI, 30 documents | 5/30 (16.7%) | 12/30 (40.0%) | 28/30 / 22/30 |
+
+Both comparison arms used identical prompts, retrieved context, JSON schema, temperature zero and a 16,000-token output budget. Only reasoning was switched. Cases were frozen before inference; reference labels never entered model requests. The frozen scorer was unchanged; failures stayed in every denominator. Reasoning-on truncated once per task; reasoning-off did not truncate. Mechanical acceptance is not semantic correctness.
+
+**Configuration contributed to the earlier poor result.** Reasoning improved strict correctness on this separate public set; increasing the budget alone did not improve the exploratory baseline. Evidence-by-ID removed CUAD validation failures in the exploratory arm, but did not establish correct answers. JSON-object/schema-in-prompt and full-document arms were exploratory protocol comparisons, not isolated proof of a decoding or deployment defect.
+
+**This is not production approval or a cross-model winner.** Absolute strict scores remain low. The 60-case set has no matched second-model results. Documents were absent from locally recorded earlier runs, not proven absent from pretraining or unrecorded experiments. Small samples and single stochastic exploratory passes limit conclusions. No evidence establishes a faulty deployment or an irredeemable model.
+
+Next: compare the exact second API model on identical inputs; repeat promising stochastic configurations; improve evidence selection and validation; and validate on representative human-labelled documents before promotion. The completed benchmark round does not mean all optimization is exhausted. Institutional/private validation must stay in an approved environment.
+
 ## What this changes
 
 - The original baseline reproduced at 1/12 CUAD and 5/12 NLI. Raising the budget alone to 16,000 left both strict scores unchanged.
