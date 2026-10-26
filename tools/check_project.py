@@ -18,6 +18,8 @@ def privacy_check():
               'urba' + 'icompute', 'urbadvan' + 'alytics', 'uill' + 'inois.edu',
               'pram' + 'od', 'terbe' + '2022']
     pattern = re.compile('|'.join(denied), re.I)
+    needles = ['ua' + 'fr', 'uf' + 'ar', 'urba' + 'icompute', 'urbadvan' + 'alytics',
+               'uill' + 'inois.edu', 'pram' + 'od', 'terbe' + '2022']
     extensions = {'.md', '.py', '.json', '.jsonl', '.html', '.js', '.css', '.toml', '.yml', '.yaml', '.txt', '.ps1', '.cmd', '.ics'}
     failures = []
     for path in ROOT.rglob('*'):
@@ -29,7 +31,8 @@ def privacy_check():
         if path.suffix.lower() in extensions:
             with path.open(encoding='utf8', errors='replace') as stream:
                 for line in stream:
-                    if pattern.search(line):
+                    lowered = line.lower()
+                    if any(needle in lowered for needle in needles) and pattern.search(line):
                         failures.append(relative + ': historical identity')
                         break
     dashboard = json.loads((ROOT / 'site/data/benchmark.json').read_text())

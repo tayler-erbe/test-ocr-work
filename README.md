@@ -26,6 +26,8 @@ The vision campaign contains **40,975 public result rows across two machines**. 
 
 The measured laptop used approximately **12 GB GPU memory and 64 GB system RAM**. Desktop results used a 32 GB GPU. No sustained L4/L40S throughput, purchase-cost advantage or production SLA has been established.
 
+The [new controlled Nemotron results](results/legal/README.md) preserve all 192 exploratory requests across eight configurations as aggregate measurements. A separate confirmation run remains in progress.
+
 **Nemotron is being reassessed.** Earlier results describe tested configurations, not an irredeemable model limitation. The follow-up separates reasoning, output budget, sampling, context coverage and evidence representation. See [the experiment plan](docs/nemotron-reassessment.md).
 
 ## Start here
