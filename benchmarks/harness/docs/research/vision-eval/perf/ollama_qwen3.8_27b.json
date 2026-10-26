@@ -1,0 +1,27 @@
+{
+ "model": "ollama:qwen3.8:27b",
+ "weights": "22130167c4c20e20c7b71454612966ca8e8171e9b3cc8ab6ce8aa6cbfec79643",
+ "created": "2026-10-20T03:28:35.220314+00:00",
+ "per_level_minimum": 24,
+ "ollama_vram": {
+  "size_vram_gb": 17.44,
+  "size_gb": 17.44
+ },
+ "levels": [
+  {
+   "concurrency": 1,
+   "requests": 24,
+   "failed": 0,
+   "wall_seconds": 15.01,
+   "requests_per_second": 1.599,
+   "p50_seconds": 0.463,
+   "p95_seconds": 0.632,
+   "mean_prompt_tokens": 428,
+   "gpu": {
+    "used_mib": 19514,
+    "total_mib": 32607,
+    "gpu": "NVIDIA GeForce RTX 5090"
+   }
+  }
+ ]
+}

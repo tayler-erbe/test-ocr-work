@@ -1,21 +1,17 @@
-name: Evidence and evaluation invariants
+name: Public benchmark and evidence checks
 on:
   push:
   pull_request:
 jobs:
-  provider-free-checks:
-    runs-on: ${{ matrix.os }}
+  provider-free:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compile application and evaluation modules
-        run: python -m compileall -q local_demo.py document_lab.py acquire_datasets.py benchmark_tasks.py quality_check.py private_extraction.py additional_evaluations.py gold_annotations.py build_lab_reports.py freeze_holdout.py resume_large_downloads.py supplement_datasets.py audit_context_recall.py nim_evaluation.py nim_diagnostics.py build_nim_report.py local_model_evaluation.py protocols
-      - name: Check evidence, scoring, storage and download invariants
-        run: python -m unittest discover -p "test_*.py" -v
-      - name: Validate quality policy
-        run: python quality_check.py --policy-only
+      - run: python -m pip install -r requirements/conformance_requirements.txt
+      - run: python tools/check_project.py

@@ -1,52 +1,20 @@
-# Python and local development
 __pycache__/
 *.py[cod]
 .venv/
 venv/
-env/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-build/
-dist/
-*.egg-info/
-.idea/
-.vscode/
-.DS_Store
-
-# Credentials and local configuration
 .env
 .env.*
 !.env.example
-
-# Documents, extraction output, and generated indexes
-input_files/
-output_results/
-extracted_text/
-db_*/
-*.sqlite3
-*.sqlite3-shm
-*.sqlite3-wal
-
-# Local runtime and evaluation artifacts
-work/
-outputs/
-models/
-model_cache/
-evaluation_results/
-*.log
-datasets/
-private_samples/
-reports/
-evaluation/
-tools/
 *.sqlite3*
-.ocr-venv/
+*.log
 *.part
-
-# Legacy local scratch copies
-Document Intelligence_contract_review_oldv2debug.py
-Document Intelligence_contract_review_oldv2.py
-Document Intelligence_contract_review-oldv1.py
+node_modules/
+dist/
+build/
+.pytest_cache/
+.coverage
+.DS_Store
+work/
+local/
+private_samples/
+*.LOCAL_ONLY.*

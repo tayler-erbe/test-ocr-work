@@ -1,0 +1,732 @@
+{
+ "requests": {
+  "chart_qa/baseline/small": {
+   "requests": [
+    {
+     "prompt": "Answer the question about this chart. Reply with only the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 300,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "9445453b9dda59abdfffe4d53c5953677f42d2967bf15ddad8dd58b69a92b205"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/baseline/large": {
+   "requests": [
+    {
+     "prompt": "Answer the question about this chart. Reply with only the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 300,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1133
+       ],
+       "pixels_sha256": "c2c17fb60a0dd0dbaa8dc32793e931b7edc505289eb19e0e609b53a8fb697214"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/selfcheck/small": {
+   "requests": [
+    {
+     "prompt": "In notes, briefly (under 60 words) list the values you read from the chart that the question needs and any calculation. Then give the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "notes": {
+        "type": "string",
+        "maxLength": 400
+       },
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "notes",
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 600,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "9445453b9dda59abdfffe4d53c5953677f42d2967bf15ddad8dd58b69a92b205"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "notes": "fabricated",
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/selfcheck/large": {
+   "requests": [
+    {
+     "prompt": "In notes, briefly (under 60 words) list the values you read from the chart that the question needs and any calculation. Then give the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "notes": {
+        "type": "string",
+        "maxLength": 400
+       },
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "notes",
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 600,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1133
+       ],
+       "pixels_sha256": "c2c17fb60a0dd0dbaa8dc32793e931b7edc505289eb19e0e609b53a8fb697214"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "notes": "fabricated",
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/upscale/small": {
+   "requests": [
+    {
+     "prompt": "Answer the question about this chart. Reply with only the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 300,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1143
+       ],
+       "pixels_sha256": "9b5b21efd8959ef5883558514fbf0f918daff8ee8e7912d3e7bf444608408af2"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/upscale/large": {
+   "requests": [
+    {
+     "prompt": "Answer the question about this chart. Reply with only the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 300,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1133
+       ],
+       "pixels_sha256": "c2c17fb60a0dd0dbaa8dc32793e931b7edc505289eb19e0e609b53a8fb697214"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "answer": "12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/readfirst/small": {
+   "requests": [
+    {
+     "prompt": "Extract the data shown in this chart as a table: the first column is the category or x value, one column per series, using the series names from the legend or axis. Read values as precisely as the chart allows; do not invent series. Put the chart title in title and the axis units in notes.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "title": {
+        "type": "string"
+       },
+       "header": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        },
+        "maxItems": 40
+       },
+       "rows": {
+        "type": "array",
+        "maxItems": 200,
+        "items": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         },
+         "maxItems": 40
+        }
+       },
+       "notes": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "header",
+       "rows"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 3000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "9445453b9dda59abdfffe4d53c5953677f42d2967bf15ddad8dd58b69a92b205"
+      }
+     ]
+    },
+    {
+     "prompt": "Here is a data table you extracted from this chart:\nx,y\na,12\nUse the chart and the table. In notes, briefly (under 60 words) list the values the question needs and any calculation. Then give the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "notes": {
+        "type": "string",
+        "maxLength": 400
+       },
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "notes",
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 600,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "9445453b9dda59abdfffe4d53c5953677f42d2967bf15ddad8dd58b69a92b205"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "notes": "fabricated",
+    "answer": "12",
+    "extracted_table": "x,y\na,12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "chart_qa/readfirst/large": {
+   "requests": [
+    {
+     "prompt": "Extract the data shown in this chart as a table: the first column is the category or x value, one column per series, using the series names from the legend or axis. Read values as precisely as the chart allows; do not invent series. Put the chart title in title and the axis units in notes.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "title": {
+        "type": "string"
+       },
+       "header": {
+        "type": "array",
+        "items": {
+         "type": "string"
+        },
+        "maxItems": 40
+       },
+       "rows": {
+        "type": "array",
+        "maxItems": 200,
+        "items": {
+         "type": "array",
+         "items": {
+          "type": "string"
+         },
+         "maxItems": 40
+        }
+       },
+       "notes": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "header",
+       "rows"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 3000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1133
+       ],
+       "pixels_sha256": "c2c17fb60a0dd0dbaa8dc32793e931b7edc505289eb19e0e609b53a8fb697214"
+      }
+     ]
+    },
+    {
+     "prompt": "Here is a data table you extracted from this chart:\nx,y\na,12\nUse the chart and the table. In notes, briefly (under 60 words) list the values the question needs and any calculation. Then give the answer: a number without units, or a short word or phrase.\nQuestion: What is the highest value?",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "notes": {
+        "type": "string",
+        "maxLength": 400
+       },
+       "answer": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "notes",
+       "answer"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 600,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1600,
+        1133
+       ],
+       "pixels_sha256": "c2c17fb60a0dd0dbaa8dc32793e931b7edc505289eb19e0e609b53a8fb697214"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "notes": "fabricated",
+    "answer": "12",
+    "extracted_table": "x,y\na,12"
+   },
+   "metrics": {
+    "correct": true
+   }
+  },
+  "page_text/baseline/small": {
+   "requests": [
+    {
+     "prompt": "Transcribe all the running text on this page in reading order: headings, paragraphs, lists, captions, headers and footers. Skip tables, figures and display equations.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "text": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 6000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "9445453b9dda59abdfffe4d53c5953677f42d2967bf15ddad8dd58b69a92b205"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "text": "Section 2 reports 12.5% growth in 2024 across 3 regions"
+   },
+   "metrics": {
+    "word_precision": 0.7272727272727273,
+    "word_recall": 1.0,
+    "word_f1": 0.8421052631578948,
+    "numeric_recall": 1.0
+   }
+  },
+  "page_text/baseline/large": {
+   "requests": [
+    {
+     "prompt": "Transcribe all the running text on this page in reading order: headings, paragraphs, lists, captions, headers and footers. Skip tables, figures and display equations.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "text": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 6000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1800,
+        1275
+       ],
+       "pixels_sha256": "dd485f8239ff5bca1616c63b59d817babc8c036f74ef6f7827812e982cc08c1a"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "text": "Section 2 reports 12.5% growth in 2024 across 3 regions"
+   },
+   "metrics": {
+    "word_precision": 0.7272727272727273,
+    "word_recall": 1.0,
+    "word_f1": 0.8421052631578948,
+    "numeric_recall": 1.0
+   }
+  },
+  "page_text/layoutmask/small": {
+   "requests": [
+    {
+     "prompt": "Transcribe all the running text on this page in reading order: headings, paragraphs, lists, captions, headers and footers. Skip tables, figures and display equations.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "text": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 6000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        420,
+        300
+       ],
+       "pixels_sha256": "d35f7599124168814e449c54e98e765095589e6f41bed6c762ed39a040019cd3"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "text": "Section 2 reports 12.5% growth in 2024 across 3 regions",
+    "masked": {
+     "figure": 1,
+     "table": 1,
+     "isolate_formula": 1,
+     "abandon": 1
+    }
+   },
+   "metrics": {
+    "word_precision": 0.7272727272727273,
+    "word_recall": 1.0,
+    "word_f1": 0.8421052631578948,
+    "numeric_recall": 1.0
+   }
+  },
+  "page_text/layoutmask/large": {
+   "requests": [
+    {
+     "prompt": "Transcribe all the running text on this page in reading order: headings, paragraphs, lists, captions, headers and footers. Skip tables, figures and display equations.",
+     "schema": {
+      "type": "object",
+      "properties": {
+       "text": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "text"
+      ],
+      "additionalProperties": false
+     },
+     "max_tokens": 6000,
+     "think": false,
+     "images": [
+      {
+       "size": [
+        1800,
+        1275
+       ],
+       "pixels_sha256": "4dd0401b009e1c80417ef2b0c87b07de9bfdf0e2f265b2b3605b6ae0d9bf3803"
+      }
+     ]
+    }
+   ],
+   "prediction": {
+    "text": "Section 2 reports 12.5% growth in 2024 across 3 regions",
+    "masked": {
+     "figure": 1,
+     "table": 1,
+     "isolate_formula": 1,
+     "abandon": 1
+    }
+   },
+   "metrics": {
+    "word_precision": 0.7272727272727273,
+    "word_recall": 1.0,
+    "word_f1": 0.8421052631578948,
+    "numeric_recall": 1.0
+   }
+  }
+ },
+ "vote": [
+  {
+   "case": "v0",
+   "status": "complete",
+   "answer": "12",
+   "metrics": {
+    "correct": true,
+    "picked": "selfcheck",
+    "agreement": 2
+   }
+  },
+  {
+   "case": "v1",
+   "status": "complete",
+   "answer": "12",
+   "metrics": {
+    "correct": true,
+    "picked": "selfcheck",
+    "agreement": 1
+   }
+  },
+  {
+   "case": "v2",
+   "status": "complete",
+   "answer": "102",
+   "metrics": {
+    "correct": true,
+    "picked": "selfcheck",
+    "agreement": 3
+   }
+  },
+  {
+   "case": "v3",
+   "status": "complete",
+   "answer": "No",
+   "metrics": {
+    "correct": false,
+    "picked": "selfcheck",
+    "agreement": 2
+   }
+  },
+  {
+   "case": "v4",
+   "status": "complete",
+   "answer": "8",
+   "metrics": {
+    "correct": false,
+    "picked": "selfcheck",
+    "agreement": 1
+   }
+  },
+  {
+   "case": "v5",
+   "status": "failed",
+   "answer": null,
+   "metrics": null
+  },
+  {
+   "case": "v6",
+   "status": "complete",
+   "answer": "41",
+   "metrics": {
+    "correct": true,
+    "picked": "selfcheck",
+    "agreement": 2
+   }
+  }
+ ],
+ "stats": [
+  {
+   "model": "m",
+   "task": "chart_qa_confirm2",
+   "variant": "selfcheck",
+   "cases": 40,
+   "baseline": 0.6,
+   "variant_score": 0.775,
+   "change": 0.175,
+   "ci95": [
+    0.075,
+    0.3
+   ],
+   "better": 7,
+   "worse": 0,
+   "test": "exact McNemar",
+   "p_value": 0.0156,
+   "family": "supporting_v2",
+   "p_holm": 0.0156,
+   "verdict_after_correction": "better"
+  },
+  {
+   "model": "m",
+   "task": "chart_qa_confirm2",
+   "variant": "vote3",
+   "cases": 40,
+   "baseline": 0.6,
+   "variant_score": 0.725,
+   "change": 0.125,
+   "ci95": [
+    0.025,
+    0.25
+   ],
+   "better": 5,
+   "worse": 0,
+   "test": "exact McNemar",
+   "p_value": 0.0625,
+   "family": "confirmatory_v2",
+   "p_holm": 0.106,
+   "verdict_after_correction": "not significant"
+  },
+  {
+   "model": "m",
+   "task": "chart_qa_dev2",
+   "variant": "selfcheck",
+   "cases": 30,
+   "baseline": 0.6667,
+   "variant_score": 0.6667,
+   "change": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ],
+   "better": 0,
+   "worse": 0,
+   "test": "exact McNemar",
+   "p_value": 1.0,
+   "family": "exploratory_v2",
+   "p_holm": 1.0,
+   "verdict_after_correction": "not significant"
+  },
+  {
+   "model": "m",
+   "task": "page_text_confirm2",
+   "variant": "layoutmask",
+   "cases": 20,
+   "baseline": 0.7013,
+   "variant_score": 0.7276,
+   "change": 0.0263,
+   "ci95": [
+    -0.0003,
+    0.0528
+   ],
+   "better": 11,
+   "worse": 9,
+   "test": "paired bootstrap",
+   "p_value": 0.053,
+   "family": "confirmatory_v2",
+   "p_holm": 0.106,
+   "verdict_after_correction": "not significant"
+  }
+ ]
+}

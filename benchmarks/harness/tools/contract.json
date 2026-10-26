@@ -1,0 +1,45 @@
+{
+ "protocol": "vision-v1",
+ "requests_sha256": "6f80a9395a02bbbe5e34f856ac9c8fb66d9a6d5edbae8fd47c481968bd318608",
+ "client_sha256": "c0ffb588647f79bc9601aa015b6a9ca40912b8d6bada17bc0e3d5ad3b0365fbf",
+ "scorers_sha256": "d438bf722d3a99142aebc4ebf933c50084d0dd4151a2e3ec15f564c9176dcfe3",
+ "prompts_sha256": "a579532922ca65bc7dd724b2f1d8a6f385b375c5b3cefa9cb2b35cc921369120",
+ "method_sha256": "1d53d2b0692b224feff5f5214abef8ac2822a186c97c31818587585dc74dfb02",
+ "frozen_case_sets": {
+  "v1": {
+   "file": "evaluation/vision_cases_v1.json",
+   "protocol": "vision-v1",
+   "required": true,
+   "cases_sha256": "d92bcbc12d72600f36bd981080b4080c30d793efb0fd39b6ea2cd00fcdf4d6f7",
+   "counts": {
+    "layout": 120,
+    "ocr_crop": 50,
+    "table": 60,
+    "page_text": 40,
+    "chart_qa": 200,
+    "chart_table": 60
+   }
+  },
+  "confirm": {
+   "file": "evaluation/vision_confirm_v1.json",
+   "protocol": "vision-v1-confirm",
+   "required": true,
+   "cases_sha256": "a8e2b349e391506ca6b0cd231fed71a2108c22c16a9af487cd2e177fc0b22702",
+   "counts": {
+    "chart_qa_confirm": 2022,
+    "table_confirm": 159
+   }
+  },
+  "v2": {
+   "file": "evaluation/vision_cases_v2.json",
+   "protocol": "vision-v1-v2",
+   "required": false,
+   "cases_sha256": "0615583a6cfe12856ad6aa8cc1f5125b7306a53a4156ce2f439392a1de41a729",
+   "counts": {
+    "chart_qa_dev2": 586,
+    "chart_qa_confirm2": 1322,
+    "page_text_confirm2": 80
+   }
+  }
+ }
+}
