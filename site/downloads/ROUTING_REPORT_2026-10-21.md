@@ -4,7 +4,7 @@ Source: `merged/final/MERGED_REPORT.md`, produced by `tools/merge_results.py --r
 
 ## Status: prototype routing, not production approval
 
-These results select candidate routes for the prototype. They do not approve anything for production. The best laptop crop OCR (8B) still has about 1.23% character error and 96.5% numeric recall, below the project's existing acceptance targets. Readiness is decided by human-labelled institutional documents (the annotation pilot), not by these public benchmarks.
+These results select candidate routes for the prototype. They do not approve anything for production. The best laptop crop OCR (8B) still has about 1.23% character error and 96.5% numeric recall, below the project's existing acceptance targets. Readiness is decided by human-labelled documents from the target domain, not by these public benchmarks.
 
 ## Routing choices
 

@@ -6,7 +6,7 @@ A public-data engineering case study by Tayler Erbe. The project evaluates how m
 
 ## Why this matters
 
-An ERP migration can move records without unlocking the information in their attachments. A single packet may combine narrative text, scans, budget tables, charts and spreadsheets rendered as PDF. Teams need searchable, structured records with evidence they can inspect—not simply plausible generated text.
+A records system can hold every document and still not unlock the information inside it. A single packet may combine narrative text, scans, budget tables, charts and spreadsheets rendered as PDF. Teams need searchable, structured records with evidence they can inspect—not simply plausible generated text.
 
 Potential applications include **research proposals and award documents, procurement proposals, contracts and amendments, invoices, purchase orders, financial reports and technical reports**. These are intended applications, not claims that every document type has been validated. Native spreadsheets should be parsed directly when available.
 
@@ -24,7 +24,7 @@ Local inference is an option where sensitive content must stay within an organiz
 
 The vision campaign contains **40,975 public result rows across two machines**. Rows repeat cases across configurations; they are not independent documents. Round-2 chart confirmation covers **1,322 questions across 722 charts**. Self-check is a supporting comparison; vote3 was the selected confirmatory method.
 
-The measured laptop used approximately **12 GB GPU memory and 64 GB system RAM**. Desktop results used a 32 GB GPU. No sustained L4/L40S throughput, purchase-cost advantage or production SLA has been established.
+The measured laptop used approximately **12 GB GPU memory and 64 GB system RAM**. Desktop results used a 32 GB GPU. No sustained shared-GPU throughput, purchase-cost advantage or production SLA has been established.
 
 The [new controlled Nemotron results](results/legal/README.md) preserve all 192 exploratory requests across eight configurations as aggregate measurements. A separate 60-document public confirmation run is also complete; its results support reasoning-on while leaving substantial accuracy limitations.
 

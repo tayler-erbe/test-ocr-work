@@ -2,7 +2,7 @@
 
 ## The problem
 
-Structured systems often retain unstructured attachments. ERP migration, reporting and search can remain dependent on manually opening packets containing mixed PDF pages, scans, tables, charts and spreadsheet exports. This is the problem addressed by the prototype; this evaluation did not measure its industry prevalence or financial impact.
+Structured systems often retain unstructured attachments. Reporting and search can remain dependent on manually opening packets containing mixed PDF pages, scans, tables, charts and spreadsheet exports. This is the problem addressed by the prototype; this evaluation did not measure its industry prevalence or financial impact.
 
 ## Candidate workflows
 
