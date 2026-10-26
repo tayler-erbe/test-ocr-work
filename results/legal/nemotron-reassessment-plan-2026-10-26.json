@@ -1,0 +1,90 @@
+{
+  "role": "exploratory; 24 previously exposed cases, not promotion evidence",
+  "arms": {
+    "baseline": {
+      "thinking": false,
+      "budget": 2000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "budget": {
+      "thinking": false,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "reasoning": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "sampling": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 1,
+      "top_p": 1
+    },
+    "definitions": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 1,
+      "top_p": 1,
+      "definitions": true
+    },
+    "full_document": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 1,
+      "top_p": 1,
+      "full": true
+    },
+    "ids": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 1,
+      "top_p": 1,
+      "ids": true
+    },
+    "schema_in_prompt": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 1,
+      "top_p": 1,
+      "prompt_schema": true
+    }
+  },
+  "case_ids": [
+    "cuad:FreezeTagInc_20180411_8-K_EX-10.1_11139603_EX-10.1_Sponsorship Agreement__Competitive Restriction Exception",
+    "cuad:PAXMEDICA,INC_07_02_2020-EX-10.12-Master Service Agreement__Governing Law",
+    "cuad:SPOKHOLDINGS,INC_06_19_2020-EX-10.1-COOPERATION AGREEMENT__Ip Ownership Assignment",
+    "cuad:VAPOTHERM, INC. - Manufacturing and Supply Agreement__Audit Rights",
+    "cuad:CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement__Non-Compete",
+    "cuad:GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement__Document Name",
+    "cuad:Monsanto Company - SECOND A_R EXCLUSIVE AGENCY AND MARKETING AGREEMENT __Ip Ownership Assignment",
+    "cuad:TRICITYBANKSHARESCORP_05_15_1998-EX-10-OUTSOURCING AGREEMENT__Agreement Date",
+    "cuad:PcquoteComInc_19990721_S-1A_EX-10.11_6377149_EX-10.11_Co-Branding Agreement1__Termination For Convenience",
+    "cuad:WestPharmaceuticalServicesInc_20200116_8-K_EX-10.1_11947529_EX-10.1_Supply Agreement__Effective Date",
+    "cuad:HERTZGLOBALHOLDINGS,INC_07_07_2016-EX-10.4-INTELLECTUAL PROPERTY AGREEMENT__Competitive Restriction Exception",
+    "cuad:WOMENSGOLFUNLIMITEDINC_03_29_2000-EX-10.13-ENDORSEMENT AGREEMENT__Parties",
+    "contractnli:40:nda-2",
+    "contractnli:585:nda-12",
+    "contractnli:4:nda-7",
+    "contractnli:47:nda-2",
+    "contractnli:97:nda-19",
+    "contractnli:395:nda-8",
+    "contractnli:493:nda-17",
+    "contractnli:41:nda-5",
+    "contractnli:301:nda-17",
+    "contractnli:127:nda-1",
+    "contractnli:600:nda-4",
+    "contractnli:446:nda-1"
+  ],
+  "requests_sha256": "66eb25252034d5992de3e1caa5bb4ab4d2e8fcc3c240de3a6d7ef42b0f510f88",
+  "references_sha256": "39d79a12f587565539ccc94914ecd5e1da2b0f8349f2e9370dadcaad48db1a4d",
+  "full_sources_sha256": "73cc2048590840a49b490d63e0c847332e3eca28f75262333d4d6761ee303aaa",
+  "script_sha256": "1fd163bdc4043b3aa1fcf1499f4f163b7b8738d326c0d5ffef1cf92305c7a399",
+  "model": "nvidia/nemotron-3-nano",
+  "scorer_sha256": "43f78d7f122a6c1c0df5a484a49569ff20858ad72f0fac784b86615ca1e0d27f",
+  "deployment_snapshot_sha256": "3a428051463e86dbcded34e6112ef6fbcf884410cf8143ed4a6a50419df0cf9a"
+}
