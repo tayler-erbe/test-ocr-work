@@ -60,3 +60,37 @@ Serving metadata and service version matched the prior local audit. That is not 
 | ContractNLI, 30 documents | 5/30 | 12/30 | 28/30 / 22/30 |
 
 The cases were fixed before inference. This was a pre-specified reasoning contrast after exploratory work, not a fully independent external replication or evidence of absence from model training. No comparison model was run on these 60 cases; these results cannot establish a cross-model winner. The adjacent aggregate report includes document-level paired uncertainty and label/evidence diagnostics.
+
+## External evidence and the next optimization round
+
+Research checked 26 October 2026. The completed round is not a demonstrated model ceiling.
+
+### What the released model is intended for
+
+NVIDIA positions the text Nano checkpoint for general reasoning, coding, agents, chat and retrieval-augmented generation. Its headline suite covers math, coding, tool use, instruction following and long context; these are not interchangeable with legal extraction plus exact evidence. The model card recommends temperature 1.0/top_p 1.0 for reasoning, versus 0.6/0.95 for tool calling. Our temperature-zero confirmation isolated the reasoning switch; it was not an optimization of every generation setting. A sampling arm was screened on 24 cases, but not independently confirmed or repeated. [NVIDIA model card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16).
+
+NVIDIA's reproduction recipe uses task-specific prompts and settings, repeated samples on several benchmarks, and much larger generation caps for some tasks. It therefore does not support equating our single-pass strict scores with the published benchmark scores. Its large default output cap is not evidence that increasing our cap will fix errors: our 2k-to-16k budget-only arm did not improve strict scores. [Reproduction recipe](https://github.com/NVIDIA-NeMo/Evaluator/blob/main/packages/nemo-evaluator-launcher/examples/nemotron/nano-v3-reproducibility.md).
+
+### What other practitioners actually reported
+
+- Firsthand reports include good results on coding, long instructions and RAG/MCP applications. These are uncontrolled anecdotes, not legal benchmark replication. [Community experience](https://www.reddit.com/r/LocalLLaMA/comments/1pocsdy/nemotron_3_nano_30b_is_amazing_tldr/).
+- A tester reported hallucinations and missed details in targeted extraction at about 200k context, including after changing quantization. Their runtime, quantization and context differ from ours, so this supports investigating a failure mode, not diagnosing our endpoint. [Firsthand extraction report](https://www.reddit.com/r/LocalLLaMA/comments/1pn8upp/nvidia_releases_nemotron_3_nano_a_new_30b_hybrid/).
+- A practitioner evaluated section-based fact extraction with word-for-word evidence validation and reported a benefit from thinking. This used **Nemotron 3.5 Lightning**, not our Nano checkpoint, only 48 sections from two documents, and an uncalibrated model judge. It is a useful architecture hypothesis, not a comparable accuracy result. [Practitioner's methods and caveats](https://threadunsafe.dev/screaming-in-space/continuum/platform/benchmarks/models/nemotron-3.5-lightning-30b-a3b).
+- NVIDIA reports a legal-pretraining ablation improving a proxy LegalBench average from 64.6 to 74.7. That is a separately trained ablation, not an accuracy claim for our deployed artifact or our strict scorer. It suggests domain adaptation may help, without proving the existing endpoint should score 74.7 here. The dataset also names Contract-NLI-derived training material; training/test overlap must be examined before any future adaptation. [Legal dataset card](https://huggingface.co/datasets/nvidia/Nemotron-Pretraining-Legal-v1/blob/c02b324e8b94a3f06800e46273bc0d59be295c6b/README.md).
+
+The targeted search did not identify a reproducible, independent evaluation of this exact deployed checkpoint on our CUAD/ContractNLI protocol. Search results titled as model comparisons were not treated as evidence without matched underlying results. Different Nano, VL, Omni and Lightning variants must not share scores by name association. The tested text model does not directly read PDF images; OCR/vision is a separate pipeline component.
+
+### Why 13/30 and 12/30 are not the whole diagnosis
+
+On the 60-case reasoning-on comparison, CUAD presence/absence was correct in 25/29 parseable responses (25/30 counting the invalid response as failure), but this is not answer extraction accuracy. Nine responses failed quote-to-span validation and one was invalid/truncated. ContractNLI label-only correctness was 17/29 parseable responses (17/30 counting failure), versus 12/30 strict; seven responses had label/evidence inconsistencies and one was invalid/truncated. These checks overlap and must not be summed as exclusive failure categories. See the confirmation aggregate JSON.
+
+These diagnostics justify work on evidence representation, retrieval and semantic decisions. They do not justify relaxing the existing strict scorer or presenting presence detection as successful extraction. The balanced CUAD set contains 15 absent cases: an always-empty answer baseline would score 15/30 under the strict absent-answer rule, above the observed 13/30. That calculated trivial baseline is not a useful extractor, but it prevents overstating relative improvement. For balanced three-label NLI, a constant label has 10/30 label accuracy before evidence requirements.
+
+### Proposed next experiment, not yet run
+
+1. Audit exact model build, chat template, reasoning parser and effective request settings. Run a small mechanically scored capability check using the provider's published protocol; passing would not prove legal quality, but failing would justify serving investigation.
+2. On development cases, separate decisions: select clause/evidence IDs first, then label or extract; code copies exact evidence. Compare the existing context with larger uncut clause-level context. Use gold context only as a separately labelled diagnostic upper bound, never as deployable retrieval or an input containing reference answers.
+3. Compare temperature-zero and task-appropriate sampling with repeated runs. Use disjoint worked examples from development documents; keep all original scorers and failures. Measure accuracy, abstention, quote validity, latency and tokens separately.
+4. Freeze the resulting configuration before another document-disjoint confirmation. Compare a second model on identical inputs. Keep the current 60 cases as exposed diagnostics after any tuning on their failures.
+
+No new inference was performed for this literature review. These are proposed experiments, not promised improvements or production approval.
