@@ -27,10 +27,19 @@ Completed 26 October 2026: **192 requests, eight configurations, the same 24 pub
 
 **Do not reject Nemotron as irredeemable.** The tested configuration mattered. The software and evidence interface also matter. Neither a bad deployment nor a model-family limitation has been established. More budget alone was insufficient; reasoning and output protocol deserve further testing.
 
-A separate, fixed reasoning-on/off comparison is running on 60 public cases from 60 documents absent from locally recorded earlier runs. Both arms use temperature zero and 16,000 output tokens. No confirmation result is reported here yet. “Unused” does not establish absence from model pretraining or unrecorded experiments.
+The separate fixed reasoning-on/off comparison completed: 120 requests over 60 public cases from 60 documents absent from locally recorded earlier runs. Both arms used temperature zero, 16,000 output tokens, identical retrieved context, prompts, schemas and scoring. CUAD strict correctness improved from 3/30 to 13/30; NLI from 5/30 to 12/30. Reasoning-on had one truncation per task; reasoning-off had none. All failures remained in denominators. These results support enabling reasoning for further work, but neither configuration establishes production adequacy. “Unused” does not establish absence from model pretraining or unrecorded experiments.
 
 ## Reproduction and limits
 
 See [the frozen experiment plan](../../docs/nemotron-reassessment.md) and the adjacent aggregate JSON. The unchanged legal scorer and public input pack live under benchmarks/harness/. Raw final answers and deployment metadata remain local. No reasoning traces or private documents were retained in this repository.
 
 Serving metadata and service version matched the prior local audit. That is not a model-weight checksum or proof of correct backend configuration. Latencies are observed request times, not isolated sustained throughput. Small exposed samples, multiple comparisons and single stochastic draws prohibit production approval or a universal ranking.
+
+## Separate public confirmation
+
+| Task | Reasoning off, 16k | Reasoning on, 16k | Accepted off / on |
+|---|---:|---:|---:|
+| CUAD, 30 documents | 3/30 | 13/30 | 7/30 / 20/30 |
+| ContractNLI, 30 documents | 5/30 | 12/30 | 28/30 / 22/30 |
+
+The cases were fixed before inference. This was a pre-specified reasoning contrast after exploratory work, not a fully independent external replication or evidence of absence from model training. No comparison model was run on these 60 cases; these results cannot establish a cross-model winner. The adjacent aggregate report includes document-level paired uncertainty and label/evidence diagnostics.

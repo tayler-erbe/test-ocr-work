@@ -26,15 +26,16 @@ The vision campaign contains **40,975 public result rows across two machines**. 
 
 The measured laptop used approximately **12 GB GPU memory and 64 GB system RAM**. Desktop results used a 32 GB GPU. No sustained L4/L40S throughput, purchase-cost advantage or production SLA has been established.
 
-The [new controlled Nemotron results](results/legal/README.md) preserve all 192 exploratory requests across eight configurations as aggregate measurements. A separate confirmation run remains in progress.
+The [new controlled Nemotron results](results/legal/README.md) preserve all 192 exploratory requests across eight configurations as aggregate measurements. A separate 60-document public confirmation run is also complete; its results support reasoning-on while leaving substantial accuracy limitations.
 
-**Nemotron is being reassessed.** Earlier results describe tested configurations, not an irredeemable model limitation. The follow-up separates reasoning, output budget, sampling, context coverage and evidence representation. See [the experiment plan](docs/nemotron-reassessment.md).
+**Nemotron configuration matters.** Earlier results describe tested configurations, not an irredeemable model limitation. The follow-up separates reasoning, output budget, sampling, context coverage and evidence representation. See [the experiment plan](docs/nemotron-reassessment.md).
 
 ## Start here
 
 - [Interactive case study](site/index.html): serve it locally with `python -m http.server 8931 --directory site`, then open `http://127.0.0.1:8931/`.
 - [Corrected routing report](results/vision/ROUTING_REPORT.md): decisions and limitations.
 - [Generated merged results](results/vision/merged/MERGED_REPORT.md): measured configuration tables.
+- [History resync instructions](docs/RESYNC.md): required for older checkouts after the privacy scrub.
 - [Methods](docs/methods.md), [applications](docs/applications.md), [next steps](docs/roadmap.md).
 
 The site source is intended for integration into [taylererbe.com](https://taylererbe.com/). This repository does not claim that deployment has completed.

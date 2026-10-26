@@ -1,0 +1,179 @@
+{
+  "status": "complete",
+  "attempts": 120,
+  "expected_attempts": 120,
+  "cases": 60,
+  "limitations": "See frozen run plan for case exposure and configuration-selection status. Repeated stochastic draws absent; no model rejection or production approval. Raw-presence and label-only metrics ignore evidence validity and are diagnostics only.",
+  "groups": [
+    {
+      "arm": "off_16000",
+      "dataset": "contractnli",
+      "n": 30,
+      "documents": 30,
+      "correct": 5,
+      "accepted": 28,
+      "truncated": 0,
+      "validation_outcomes": {
+        "NLI label/evidence inconsistency": 2,
+        "valid": 28
+      },
+      "evidence_f1": 0.22398361495135688,
+      "median_seconds": 0.7355160003062338,
+      "reasoning_observed": 0,
+      "raw_presence_correct": {
+        "n": 0,
+        "mean": null
+      },
+      "label_correct_ignoring_evidence": {
+        "n": 30,
+        "mean": 0.16666666666666666
+      },
+      "reference_answer_recovery": {
+        "n": 0,
+        "mean": null
+      },
+      "false_present": 0,
+      "absent_cases_with_parseable_presence": 0,
+      "nli_confusion": {
+        "Entailment -> Contradiction": 1,
+        "Contradiction -> Entailment": 8,
+        "NotMentioned -> Entailment": 6,
+        "Entailment -> NotMentioned": 7,
+        "Contradiction -> NotMentioned": 2,
+        "NotMentioned -> NotMentioned": 3,
+        "Entailment -> Entailment": 2,
+        "NotMentioned -> Contradiction": 1
+      }
+    },
+    {
+      "arm": "off_16000",
+      "dataset": "cuad",
+      "n": 30,
+      "documents": 30,
+      "correct": 3,
+      "accepted": 7,
+      "truncated": 0,
+      "validation_outcomes": {
+        "Quote is absent or ambiguous inside its source span": 23,
+        "valid": 7
+      },
+      "evidence_f1": 0.12333184057321989,
+      "median_seconds": 1.8163723999168724,
+      "reasoning_observed": 0,
+      "raw_presence_correct": {
+        "n": 30,
+        "mean": 0.5666666666666667
+      },
+      "label_correct_ignoring_evidence": {
+        "n": 0,
+        "mean": null
+      },
+      "reference_answer_recovery": {
+        "n": 15,
+        "mean": 0.14444444444444443
+      },
+      "false_present": 13,
+      "absent_cases_with_parseable_presence": 15,
+      "nli_confusion": {}
+    },
+    {
+      "arm": "on_16000",
+      "dataset": "contractnli",
+      "n": 30,
+      "documents": 30,
+      "correct": 12,
+      "accepted": 22,
+      "truncated": 1,
+      "validation_outcomes": {
+        "valid": 22,
+        "NLI label/evidence inconsistency": 7,
+        "invalid_or_missing_json": 1
+      },
+      "evidence_f1": 0.39555555555555555,
+      "median_seconds": 4.918541099876165,
+      "reasoning_observed": 30,
+      "raw_presence_correct": {
+        "n": 0,
+        "mean": null
+      },
+      "label_correct_ignoring_evidence": {
+        "n": 29,
+        "mean": 0.5862068965517241
+      },
+      "reference_answer_recovery": {
+        "n": 0,
+        "mean": null
+      },
+      "false_present": 0,
+      "absent_cases_with_parseable_presence": 0,
+      "nli_confusion": {
+        "Entailment -> NotMentioned": 6,
+        "Contradiction -> Contradiction": 6,
+        "NotMentioned -> NotMentioned": 7,
+        "Entailment -> Entailment": 4,
+        "Contradiction -> NotMentioned": 1,
+        "Contradiction -> Entailment": 2,
+        "NotMentioned -> Entailment": 1,
+        "NotMentioned -> Contradiction": 2
+      }
+    },
+    {
+      "arm": "on_16000",
+      "dataset": "cuad",
+      "n": 30,
+      "documents": 30,
+      "correct": 13,
+      "accepted": 20,
+      "truncated": 1,
+      "validation_outcomes": {
+        "Quote is absent or ambiguous inside its source span": 9,
+        "valid": 20,
+        "invalid_or_missing_json": 1
+      },
+      "evidence_f1": 0.4913636363636364,
+      "median_seconds": 5.992256350116804,
+      "reasoning_observed": 30,
+      "raw_presence_correct": {
+        "n": 29,
+        "mean": 0.8620689655172413
+      },
+      "label_correct_ignoring_evidence": {
+        "n": 0,
+        "mean": null
+      },
+      "reference_answer_recovery": {
+        "n": 15,
+        "mean": 0.044444444444444446
+      },
+      "false_present": 1,
+      "absent_cases_with_parseable_presence": 14,
+      "nli_confusion": {}
+    }
+  ],
+  "paired_contrasts": [
+    {
+      "arm": "on_16000",
+      "comparator": "off_16000",
+      "dataset": "cuad",
+      "paired_cases": 30,
+      "documents": 30,
+      "accuracy_difference": 0.3333333333333333,
+      "exploratory_document_bootstrap_95_percentile_interval": [
+        0.13333333333333333,
+        0.5333333333333333
+      ]
+    },
+    {
+      "arm": "on_16000",
+      "comparator": "off_16000",
+      "dataset": "contractnli",
+      "paired_cases": 30,
+      "documents": 30,
+      "accuracy_difference": 0.23333333333333334,
+      "exploratory_document_bootstrap_95_percentile_interval": [
+        0.03333333333333333,
+        0.43333333333333335
+      ]
+    }
+  ]
+}

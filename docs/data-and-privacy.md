@@ -6,4 +6,4 @@ Public case families include ChartQA, public document-layout/table/image sources
 
 Large public images are stored in Git LFS. Runtime databases and new raw model responses stay local. Public row exports remain separate from aggregate presentation data. Never add keys, service URLs or deployment metadata that identifies a private environment.
 
-The privacy gate scans the current tracked/project tree and validates prohibited paths and identifiers. It does not erase older commits, remote branches, clones, Git LFS history or downloaded copies. Historical publication risk must be assessed separately before making a repository public.
+The privacy gate scans the current tracked/project tree and validates prohibited paths and identifiers. The reachable histories of all 14 personal-repository branches were scrubbed separately on 26 October 2026. See [resync instructions](RESYNC.md). Other clones, host caches, unreachable objects, Git LFS storage and earlier downloads are outside that guarantee. Review remaining publication risk before making the repository public.

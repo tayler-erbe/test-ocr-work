@@ -1,0 +1,25 @@
+{
+  "purpose": "fixed reasoning control; no selection or tuning on these cases",
+  "arms": {
+    "off_16000": {
+      "thinking": false,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "on_16000": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "pack_receipt_sha256": "b15a5030d85572b504dcff750d136ee43c38049935036ca49af1006cc81a4129",
+  "cases": 60,
+  "documents": 60,
+  "script_sha256": "f79e9801befd3d0bfa55bb0dd5ea91c5c828bef6e120ae80d58d36251afc784d",
+  "request_builder_sha256": "1fd163bdc4043b3aa1fcf1499f4f163b7b8738d326c0d5ffef1cf92305c7a399",
+  "model": "nvidia/nemotron-3-nano",
+  "limitations": "Unused in locally recorded runs; not proof of absence from other machines, unrecorded experiments, or model pretraining.",
+  "deployment_snapshot_sha256": "3a428051463e86dbcded34e6112ef6fbcf884410cf8143ed4a6a50419df0cf9a"
+}
