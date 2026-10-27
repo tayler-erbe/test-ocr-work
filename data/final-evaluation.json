@@ -1,0 +1,633 @@
+{
+  "as_of": "2026-10-27",
+  "status": "Benchmark evaluation complete; advisory routing only; no production approval",
+  "source_commit": "d526982",
+  "hardware_measured": "RTX 5090 32 GB for round 3; earlier laptop vision results separate",
+  "hardware_targets": [
+    "L4 24 GB",
+    "L40S 48 GB"
+  ],
+  "target_hardware_measured": false,
+  "hypotheses": {
+    "H1": {
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "primary_metric": "teds",
+      "holm_alpha": 0.025,
+      "primary_interval": [
+        0.0478,
+        0.1394
+      ],
+      "primary_p": 0.0,
+      "numeric_recall_interval": [
+        -0.0079,
+        0.0994
+      ],
+      "margin": 0.02,
+      "beats": true,
+      "numeric_non_inferior": true,
+      "passed": true,
+      "reading": "passed"
+    },
+    "H2": {
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "primary_metric": "word_f1",
+      "holm_alpha": 0.05,
+      "primary_interval": [
+        0.0303,
+        0.1348
+      ],
+      "primary_p": 0.001,
+      "numeric_recall_interval": [
+        -0.0473,
+        0.0509
+      ],
+      "margin": 0.02,
+      "beats": true,
+      "numeric_non_inferior": false,
+      "passed": false,
+      "reading": "cleaner output, fewer numbers: lead on the primary metric without numeric non-inferiority"
+    }
+  },
+  "comparisons": [
+    {
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": true,
+      "word_f1": {
+        "model_mean": 0.8989,
+        "comparator_mean": 0.8195,
+        "difference": 0.0794,
+        "ci95": [
+          0.0303,
+          0.1348
+        ],
+        "p_two_sided": 0.001,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8822,
+        "comparator_mean": 0.8834,
+        "difference": -0.0012,
+        "ci95": [
+          -0.0473,
+          0.0509
+        ],
+        "p_two_sided": 0.913,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": true,
+      "teds": {
+        "model_mean": 0.8523,
+        "comparator_mean": 0.7625,
+        "difference": 0.0898,
+        "ci95": [
+          0.0514,
+          0.1343
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9739,
+        "comparator_mean": 0.9322,
+        "difference": 0.0417,
+        "ci95": [
+          -0.0013,
+          0.0925
+        ],
+        "p_two_sided": 0.058,
+        "verdict": "not distinguishable; non-inferior"
+      }
+    }
+  ],
+  "parser_runs": [
+    {
+      "run_id": "937d061a67552b30cd417b4b",
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 3.06,
+      "word_f1": 0.8989394320081356,
+      "numeric_recall": 0.8822366455917011
+    },
+    {
+      "run_id": "ca4a584a90e4f38bb9ab4b1e",
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 0.93,
+      "teds": 0.8035033328334349,
+      "teds_structure": 0.884492984356822,
+      "cell_f1": 0.7427454323458305,
+      "numeric_recall": 0.9190434154342753
+    },
+    {
+      "run_id": "c67e87220ab2129202b6b3a2",
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 9,
+      "median_seconds": 3.17,
+      "word_f1": 0.7371488847773222,
+      "numeric_recall": 0.7815797361235289
+    },
+    {
+      "run_id": "4f6bd04211cfdca521f23a10",
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 1.25,
+      "teds": 0.8523335903686011,
+      "teds_structure": 0.9279066043568726,
+      "cell_f1": 0.7953749115873218,
+      "numeric_recall": 0.9739094324891426
+    },
+    {
+      "run_id": "7260f1e64db855dcdfde3f34",
+      "model": "parser:paddle-pipeline",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "paddleocr_vl_1.6_pipeline"
+      },
+      "side": null,
+      "max_tokens": null,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 4.01,
+      "word_f1": 0.9217927012426482,
+      "numeric_recall": 0.7705717349105086
+    },
+    {
+      "run_id": "c57c1e642dde2ad94642d722",
+      "model": "parser:paddle-pipeline",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "paddleocr_vl_1.6_pipeline"
+      },
+      "side": null,
+      "max_tokens": null,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 2.9,
+      "teds": 0.7847615607878388,
+      "teds_structure": 0.8374698486506362,
+      "cell_f1": 0.7372290749233152,
+      "numeric_recall": 0.8507660260096219
+    },
+    {
+      "run_id": "7ee726576a145dc2800a1002",
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 11.4,
+      "word_f1": 0.8978847195699757,
+      "numeric_recall": 0.7056827748530026
+    },
+    {
+      "run_id": "b09e8c0d137365316e605c68",
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 4.39,
+      "teds": 0.7050656460169178,
+      "teds_structure": 0.7966452266282077,
+      "cell_f1": 0.6870586120080711,
+      "numeric_recall": 0.8536929992010225
+    }
+  ],
+  "legal_runs": [
+    {
+      "model": "qwen3-32b",
+      "reasoning": "off",
+      "arm": "off_16000",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 18,
+      "failed": 0,
+      "truncated": 0,
+      "evidence_f1": 0.63,
+      "presence_correct": 0,
+      "presence_scored": 0,
+      "output_budget": 16000,
+      "context": 40960,
+      "artifact": "030ee887880fc378860c2dd35101da424377520441ae4bfe7be6deff8ade7840"
+    },
+    {
+      "model": "qwen3-32b",
+      "reasoning": "off",
+      "arm": "off_16000",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 14,
+      "failed": 8,
+      "truncated": 0,
+      "evidence_f1": 0.5241392771217332,
+      "presence_correct": 18,
+      "presence_scored": 22,
+      "output_budget": 16000,
+      "context": 40960,
+      "artifact": "030ee887880fc378860c2dd35101da424377520441ae4bfe7be6deff8ade7840"
+    },
+    {
+      "model": "qwen3-32b",
+      "reasoning": "on",
+      "arm": "on_16000",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 16,
+      "failed": 0,
+      "truncated": 0,
+      "evidence_f1": 0.5155555555555555,
+      "presence_correct": 0,
+      "presence_scored": 0,
+      "output_budget": 16000,
+      "context": 40960,
+      "artifact": "030ee887880fc378860c2dd35101da424377520441ae4bfe7be6deff8ade7840"
+    },
+    {
+      "model": "qwen3-32b",
+      "reasoning": "on",
+      "arm": "on_16000",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 15,
+      "failed": 9,
+      "truncated": 0,
+      "evidence_f1": 0.5147504537282879,
+      "presence_correct": 18,
+      "presence_scored": 21,
+      "output_budget": 16000,
+      "context": 40960,
+      "artifact": "030ee887880fc378860c2dd35101da424377520441ae4bfe7be6deff8ade7840"
+    },
+    {
+      "model": "gpt-oss-20b",
+      "reasoning": "low",
+      "arm": "off_16000",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 14,
+      "failed": 10,
+      "truncated": 0,
+      "evidence_f1": 0.45444444444444443,
+      "presence_correct": 0,
+      "presence_scored": 0,
+      "output_budget": 16000,
+      "context": 65536,
+      "artifact": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe"
+    },
+    {
+      "model": "gpt-oss-20b",
+      "reasoning": "low",
+      "arm": "off_16000",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 15,
+      "failed": 9,
+      "truncated": 0,
+      "evidence_f1": 0.5430237358101135,
+      "presence_correct": 17,
+      "presence_scored": 21,
+      "output_budget": 16000,
+      "context": 65536,
+      "artifact": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe"
+    },
+    {
+      "model": "gpt-oss-20b",
+      "reasoning": "high",
+      "arm": "on_16000",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 4,
+      "failed": 20,
+      "truncated": 8,
+      "evidence_f1": 0.13333333333333333,
+      "presence_correct": 0,
+      "presence_scored": 0,
+      "output_budget": 16000,
+      "context": 65536,
+      "artifact": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe"
+    },
+    {
+      "model": "gpt-oss-20b",
+      "reasoning": "high",
+      "arm": "on_16000",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 11,
+      "failed": 15,
+      "truncated": 11,
+      "evidence_f1": 0.3926315789473684,
+      "presence_correct": 12,
+      "presence_scored": 15,
+      "output_budget": 16000,
+      "context": 65536,
+      "artifact": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe"
+    },
+    {
+      "model": "hosted-nemotron-3-nano",
+      "reasoning": "off",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 5,
+      "failed": 2,
+      "truncated": 0,
+      "output_budget": 16000,
+      "context": 262144,
+      "artifact": "served alias; weights checksum unavailable"
+    },
+    {
+      "model": "hosted-nemotron-3-nano",
+      "reasoning": "off",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 3,
+      "failed": 23,
+      "truncated": 0,
+      "output_budget": 16000,
+      "context": 262144,
+      "artifact": "served alias; weights checksum unavailable"
+    },
+    {
+      "model": "hosted-nemotron-3-nano",
+      "reasoning": "on",
+      "dataset": "contractnli",
+      "attempted": 30,
+      "correct": 12,
+      "failed": 8,
+      "truncated": 1,
+      "output_budget": 16000,
+      "context": 262144,
+      "artifact": "served alias; weights checksum unavailable"
+    },
+    {
+      "model": "hosted-nemotron-3-nano",
+      "reasoning": "on",
+      "dataset": "cuad",
+      "attempted": 30,
+      "correct": 13,
+      "failed": 10,
+      "truncated": 1,
+      "output_budget": 16000,
+      "context": 262144,
+      "artifact": "served alias; weights checksum unavailable"
+    }
+  ],
+  "latency": [
+    {
+      "model": "parser:nemotron-parse",
+      "served": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 53.7,
+      "cases_per_minute": 44.7,
+      "p50": 1.04,
+      "p95": 3.28,
+      "max": 4.24,
+      "failed": 0,
+      "when": "2026-10-26 20:32:50"
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "served": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 17.2,
+      "cases_per_minute": 139.7,
+      "p50": 1.2,
+      "p95": 4.28,
+      "max": 5.08,
+      "failed": 0,
+      "when": "2026-10-26 20:33:08"
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "served": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 99.4,
+      "cases_per_minute": 24.1,
+      "p50": 1.31,
+      "p95": 5.6,
+      "max": 20.24,
+      "failed": 2,
+      "when": "2026-10-26 20:52:38"
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "served": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 32.9,
+      "cases_per_minute": 73.0,
+      "p50": 1.53,
+      "p95": 5.79,
+      "max": 21.27,
+      "failed": 2,
+      "when": "2026-10-26 20:53:12"
+    },
+    {
+      "model": "parser:olmocr2",
+      "served": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 374.8,
+      "cases_per_minute": 6.4,
+      "p50": 6.59,
+      "p95": 24.43,
+      "max": 60.68,
+      "failed": 1,
+      "when": "2026-10-26 21:10:21"
+    },
+    {
+      "model": "parser:olmocr2",
+      "served": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 125.9,
+      "cases_per_minute": 19.1,
+      "p50": 6.57,
+      "p95": 25.25,
+      "max": 63.03,
+      "failed": 1,
+      "when": "2026-10-26 21:12:30"
+    },
+    {
+      "model": "openai:qwen3vl32b",
+      "served": "qwen3vl32b",
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 657.4,
+      "cases_per_minute": 3.7,
+      "p50": 10.89,
+      "p95": 26.31,
+      "max": 130.73,
+      "failed": 2,
+      "when": "2026-10-26 21:47:48"
+    },
+    {
+      "model": "openai:qwen3vl32b",
+      "served": "qwen3vl32b",
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 257.4,
+      "cases_per_minute": 9.3,
+      "p50": 11.84,
+      "p95": 33.03,
+      "max": 150.66,
+      "failed": 2,
+      "when": "2026-10-26 21:52:12"
+    }
+  ],
+  "sources": {
+    "results/vision/round3/stats.json": {
+      "sha256": "64520c220f3032f3e8c455024dd21f3190c9a6f21665d4df20dbf578d33c0950"
+    },
+    "results/vision/round3/parsers.json": {
+      "sha256": "ccf25cc1b330cf3a4ab881cdc054a6e7942fd2fcfb789cff8e212ada6ae0f763"
+    },
+    "results/vision/round3/latency.json": {
+      "sha256": "574ff04102dd52d09556ac9289e489587dd2a220f299b1ef748eaafb228d7829"
+    },
+    "results/vision/round3/PURGED.json": {
+      "sha256": "3f6a546d66f157cd2b515bbfc21ebe70a22c62c299d2b3b03ce8d6e9e9d0f158"
+    },
+    "results/legal/nemotron-confirmation-2026-10-26.json": {
+      "sha256": "17fbfcc5cf3a497230b48a506a03b3eac4b1d9cb388b738f4afa8f2b5072a791"
+    },
+    "results/legal/round3/gpt-oss-20b-confirm/summary.json": {
+      "sha256": "6551a32ea2f5bb0b0f6d34732fc2154593fc40b1122c7cd8e36752443dc08201"
+    },
+    "results/legal/round3/gpt-oss-20b-confirm/PLAN.json": {
+      "sha256": "6804a668b6d1d19851b91e381222c4845dc4cbac68c548b6cf69c370e94cd516"
+    },
+    "results/legal/round3/qwen3-32b-confirm/summary.json": {
+      "sha256": "6ea7c9c4af0c5e827dbdeb0ebac39d4c981a5aa21c3e89e3fb76718b016a99f8"
+    },
+    "results/legal/round3/qwen3-32b-confirm/PLAN.json": {
+      "sha256": "ef7aaec706b4a7ad7b8c939edc62743bda43d3295c826441347a4ebc4dfd6ee9"
+    }
+  },
+  "limitations": [
+    "Public proxies, not target-domain validation",
+    "No field-bound numeric precision or cross-page packet score",
+    "Same-case legal comparisons retain different runtimes, quantization and context",
+    "No L4/L40S speed or concurrency guarantee",
+    "Fine-tuning benefit not evaluated"
+  ]
+}
