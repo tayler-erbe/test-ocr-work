@@ -1,0 +1,371 @@
+{
+  "draws": 2000,
+  "seed": 20261026,
+  "margin": 0.02,
+  "comparisons": [
+    {
+      "model": "parser:nemotron-parse",
+      "task": "layout",
+      "comparator": "yolo",
+      "cases": 120,
+      "clusters": 120,
+      "confirmatory": false,
+      "figure_f1": {
+        "model_mean": 0.6115,
+        "comparator_mean": 0.8761,
+        "difference": -0.2646,
+        "ci95": [
+          -0.3764,
+          -0.1555
+        ],
+        "verdict": "worse"
+      },
+      "table_f1": {
+        "model_mean": 0.9245,
+        "comparator_mean": 0.8907,
+        "difference": 0.0338,
+        "ci95": [
+          0.0,
+          0.0803
+        ],
+        "verdict": "not distinguishable"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8698,
+        "comparator_mean": 0.8094,
+        "difference": 0.0604,
+        "ci95": [
+          -0.0031,
+          0.1218
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8816,
+        "comparator_mean": 0.9086,
+        "difference": -0.0271,
+        "ci95": [
+          -0.0857,
+          0.027
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8678,
+        "comparator_mean": 0.8138,
+        "difference": 0.054,
+        "ci95": [
+          0.0089,
+          0.0968
+        ],
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8473,
+        "comparator_mean": 0.8719,
+        "difference": -0.0246,
+        "ci95": [
+          -0.0743,
+          0.0224
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8415,
+        "comparator_mean": 0.8212,
+        "difference": 0.0204,
+        "ci95": [
+          -0.0186,
+          0.0655
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9426,
+        "comparator_mean": 0.9692,
+        "difference": -0.0266,
+        "ci95": [
+          -0.0683,
+          0.0043
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8105,
+        "comparator_mean": 0.8508,
+        "difference": -0.0403,
+        "ci95": [
+          -0.109,
+          0.023
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9174,
+        "comparator_mean": 0.9666,
+        "difference": -0.0492,
+        "ci95": [
+          -0.1042,
+          0.007
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8974,
+        "comparator_mean": 0.8094,
+        "difference": 0.0881,
+        "ci95": [
+          0.0407,
+          0.1434
+        ],
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7429,
+        "comparator_mean": 0.9086,
+        "difference": -0.1657,
+        "ci95": [
+          -0.2455,
+          -0.1005
+        ],
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8921,
+        "comparator_mean": 0.8138,
+        "difference": 0.0783,
+        "ci95": [
+          0.0345,
+          0.1207
+        ],
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7156,
+        "comparator_mean": 0.8719,
+        "difference": -0.1563,
+        "ci95": [
+          -0.2077,
+          -0.1083
+        ],
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7913,
+        "comparator_mean": 0.8212,
+        "difference": -0.0299,
+        "ci95": [
+          -0.0907,
+          0.0326
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9063,
+        "comparator_mean": 0.9692,
+        "difference": -0.0629,
+        "ci95": [
+          -0.1187,
+          -0.0205
+        ],
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7924,
+        "comparator_mean": 0.8508,
+        "difference": -0.0584,
+        "ci95": [
+          -0.1171,
+          0.0025
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8784,
+        "comparator_mean": 0.9666,
+        "difference": -0.0882,
+        "ci95": [
+          -0.1401,
+          -0.0282
+        ],
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.6588,
+        "comparator_mean": 0.8094,
+        "difference": -0.1506,
+        "ci95": [
+          -0.2555,
+          -0.0548
+        ],
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7211,
+        "comparator_mean": 0.9086,
+        "difference": -0.1875,
+        "ci95": [
+          -0.3043,
+          -0.0868
+        ],
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7453,
+        "comparator_mean": 0.8138,
+        "difference": -0.0684,
+        "ci95": [
+          -0.1269,
+          -0.0197
+        ],
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8389,
+        "comparator_mean": 0.8719,
+        "difference": -0.033,
+        "ci95": [
+          -0.0966,
+          0.023
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8619,
+        "comparator_mean": 0.8212,
+        "difference": 0.0408,
+        "ci95": [
+          -0.0219,
+          0.1145
+        ],
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9754,
+        "comparator_mean": 0.9692,
+        "difference": 0.0061,
+        "ci95": [
+          -0.0083,
+          0.0236
+        ],
+        "verdict": "not distinguishable; non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8892,
+        "comparator_mean": 0.8508,
+        "difference": 0.0384,
+        "ci95": [
+          0.0133,
+          0.0682
+        ],
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9606,
+        "comparator_mean": 0.9666,
+        "difference": -0.0061,
+        "ci95": [
+          -0.0207,
+          0.0094
+        ],
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    }
+  ]
+}
