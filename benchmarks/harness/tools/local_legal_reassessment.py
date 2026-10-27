@@ -32,6 +32,7 @@ sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(HERE))
 from nemotron_reassessment import ARMS, make_body, sha, summarize  # noqa: E402
 from nim_evaluation import frozen  # noqa: E402
+from campaign_control import paused, durable_json, checkpoint_rows, append_row, acquire_lock
 
 OLLAMA = "http://127.0.0.1:11434"
 CONTEXT = 32768  # default; the run records the value actually used (--context)
@@ -84,12 +85,12 @@ def residency(model):
     return {"fully_on_gpu": False, "note": "model not listed as loaded"}
 
 
-def snapshot(model):
+def snapshot(model, context=CONTEXT):
     tags = ollama("/api/tags", timeout=20)["models"]
     tag = next((m for m in tags if m["name"] == model), None)
     if tag is None:
         raise SystemExit("Model is not installed in Ollama: " + model)
-    info = {"model": tag, "runtime": ollama("/api/version", timeout=20), "context": CONTEXT,
+    info = {"model": tag, "runtime": ollama("/api/version", timeout=20), "context": context,
             "thinking_control": "levels low/high" if model.startswith("gpt-oss") else "boolean"}
     return info, sha(info)
 
@@ -182,10 +183,14 @@ def main():
     parser.add_argument("--confirm", action="store_true", help="60-document reasoning on/off contrast instead of the 24-case arms")
     parser.add_argument("--pack", type=Path, help="frozen 60-document pack directory (with --confirm)")
     parser.add_argument("--context", type=int, help="num_ctx sent to Ollama; default per family (DEFAULT_CONTEXT), recorded in PLAN.json")
+    parser.add_argument("--control-dir", type=Path, required=True, help="Shared campaign pause flag directory")
+    parser.add_argument("--resume", action="store_true", help="Continue same-plan journal, never rerun completed failures")
     parser.add_argument("--run", action="store_true")
     args = parser.parse_args()
-    if args.out.exists():
-        raise SystemExit("Use a NEW output directory; never reuse stale results")
+    if paused(args.control_dir):
+        print("PAUSED: no inference or model loading performed")
+        return
+    acquire_lock(args.out.parent / (hashlib.sha256(str(args.out.resolve()).encode()).hexdigest() + ".LOCAL_ONLY.lock"))
     model = os.environ.get("OLLAMA_MODEL")
     if not model:
         raise SystemExit("Set OLLAMA_MODEL to the exact Ollama tag, e.g. gpt-oss:20b")
@@ -221,19 +226,26 @@ def main():
                  "context": context, "context_guard": "measured prompt tokens + budget + 64 <= context",
                  "script_sha256": script_sha, "request_builder_sha256": builder_sha, "scorer_sha256": scorer_sha})
     if args.run:
-        info, digest = snapshot(model)
+        info, digest = snapshot(model, context)
         plan["deployment_snapshot"] = info
         plan["deployment_snapshot_sha256"] = digest
-    args.out.mkdir(parents=True)
-    (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
-    rows = []
+    rows = checkpoint_rows(args.out, plan, args.resume)
+    completed = {(row["arm"], row["case_id"]) for row in rows}
+    expected = {(arm, request["case_id"]) for request, _, arm, _, _ in schedule}
+    if not completed <= expected:
+        raise ValueError("Checkpoint contains attempts outside the schedule")
     for request, ref, arm, config, visible in schedule:
+        if paused(args.control_dir):
+            break
+        if (arm, request["case_id"]) in completed:
+            continue
         body = make_body(request, config, model, visible if config.get("full") else None)
         if not args.run:
             continue
         row = {"arm": arm, "case_id": request["case_id"], "dataset": ref["case"]["dataset"], "request_sha256": sha(body),
                "status": "failed", "metrics": {"correct": False, "evidence_f1": 0},
                "source_spans": len(visible), "source_bytes": sum(len(s["text"].encode()) for s in visible)}
+        durable_json(args.out / "IN_FLIGHT.LOCAL_ONLY.json", {"arm": arm, "case_id": request["case_id"], "request_sha256": sha(body)})
         started = time.perf_counter()
         try:
             tokens = measure_prompt(model, body, context)
@@ -256,11 +268,13 @@ def main():
                 row["error_code"] = str(exc)
         row["seconds"] = time.perf_counter() - started
         rows.append(row)
-        with (args.out / "events.LOCAL_ONLY.jsonl").open("a", encoding="utf8") as f:
-            f.write(json.dumps(row) + "\n")
-        (args.out / "summary.json").write_text(json.dumps(summarize(rows), indent=2), encoding="utf8")
+        append_row(args.out, row)
+        (args.out / "IN_FLIGHT.LOCAL_ONLY.json").unlink()
+        durable_json(args.out / "summary.json", summarize(rows))
         print(json.dumps({k: row.get(k) for k in ("arm", "dataset", "status", "error_code", "seconds")}), flush=True)
-    print(json.dumps({"planned_requests": len(schedule), "executed": len(rows), "plan_sha256": sha(plan)}))
+    state = {"status": "complete" if len(rows) == len(schedule) else "paused" if paused(args.control_dir) else "planned", "planned_requests": len(schedule), "executed": len(rows), "plan_sha256": sha(plan)}
+    durable_json(args.out / "STATUS.LOCAL_ONLY.json", state)
+    print(json.dumps(state))
 
 
 if __name__ == "__main__":

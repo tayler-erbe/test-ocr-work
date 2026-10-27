@@ -32,6 +32,8 @@ import time
 import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+from campaign_control import paused, bounded_results, durable_json, acquire_lock
 import vision_eval as ve  # noqa: E402
 from document_lab import connect, now  # noqa: E402
 
@@ -196,12 +198,18 @@ def run_case(root, backend, url, model, task, case):
     return prediction, score(task, case, scorer_input)
 
 
-def run(root, backend, url, tasks, limit=None, workers=1):
+def run(root, backend, url, tasks, limit=None, workers=1, control=None):
+    if paused(control):
+        print("PAUSED: no inference or model loading performed")
+        return
+    acquire_lock(Path(root) / "evaluation" / "parser-runner.LOCAL_ONLY.lock")
     model, served = served_model(url)
     db = connect(root)
     db.execute(ve.RESULT_SCHEMA)
     spec = BACKENDS[backend]
     for task in tasks:
+        if paused(control):
+            break
         manifest = ve.load_cases(root, TASK_CASES[task])
         config = {"protocol": PROTOCOL, "cases_sha256": manifest["cases_sha256"], "task": task, "model": "parser:" + backend,
                   "weights": served, "side": spec["side"], "max_tokens": spec["max_tokens"], "prompt": spec["prompts"]["page" if ve.base_task(task) == "page_text" else ve.base_task(task)],
@@ -212,9 +220,14 @@ def run(root, backend, url, tasks, limit=None, workers=1):
         done = {c for (c,) in db.execute("SELECT case_id FROM vision_results WHERE run_id=?", (run_id,))}
         cases = [c for c in manifest["cases"] if c["task"] == task and c["id"] not in done][:limit]
         label = "parser:" + backend
-        from concurrent.futures import ThreadPoolExecutor
+        markers = Path(root) / "evaluation" / "round3-control" / run_id
+        markers.mkdir(parents=True, exist_ok=True)
+        if any(markers.glob("*.LOCAL_ONLY.json")):
+            raise ValueError("Uncertain interrupted parser request: manual audit required before resume")
 
         def one(case):
+            marker = markers / (hashlib.sha256(case["id"].encode()).hexdigest() + ".LOCAL_ONLY.json")
+            durable_json(marker, {"case_id": case["id"], "run_id": run_id})
             started = time.perf_counter()
             try:
                 prediction, metrics = run_case(root, backend, url, model, task, case)
@@ -223,15 +236,20 @@ def run(root, backend, url, tasks, limit=None, workers=1):
                 prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
             return prediction, metrics, status, error, time.perf_counter() - started
 
-        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-            for n, (case, (prediction, metrics, status, error, seconds)) in enumerate(zip(cases, pool.map(one, cases)), 1):
-                db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
-                           (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
-                db.commit()
-                if n % 20 == 0 or n == len(cases):
-                    print(json.dumps({"backend": backend, "task": task, "done": n, "of": len(cases), "run_id": run_id}), flush=True)
-        db.execute("UPDATE runs SET status='complete' WHERE id=?", (run_id,))
+        for n, (case, (prediction, metrics, status, error, seconds)) in enumerate(bounded_results(cases, one, workers, control), 1):
+            db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                       (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
+            db.commit()
+            (markers / (hashlib.sha256(case["id"].encode()).hexdigest() + ".LOCAL_ONLY.json")).unlink()
+            if n % 20 == 0 or n == len(cases):
+                print(json.dumps({"backend": backend, "task": task, "done": n, "of": len(cases), "run_id": run_id}), flush=True)
+        recorded = db.execute("SELECT COUNT(*) FROM vision_results WHERE run_id=?", (run_id,)).fetchone()[0]
+        expected = sum(c["task"] == task for c in manifest["cases"])
+        state = "complete" if recorded == expected else "paused" if paused(control) else "partial"
+        db.execute("UPDATE runs SET status=? WHERE id=?", (state, run_id))
         db.commit()
+        print(json.dumps({"run_id": run_id, "status": state, "recorded": recorded, "expected": expected}), flush=True)
+
 
 
 def report(root, out):
@@ -262,12 +280,13 @@ def main():
     r.add_argument("--url", default="http://127.0.0.1:8001/v1")
     r.add_argument("--task", action="append", required=True, choices=sorted(TASK_CASES))
     r.add_argument("--limit", type=int)
-    r.add_argument("--workers", type=int, default=4)
+    r.add_argument("--workers", type=int, default=1)
+    r.add_argument("--control-dir", type=Path, required=True, help="Shared campaign pause flag directory")
     p = sub.add_parser("report")
     p.add_argument("--out", required=True)
     args = parser.parse_args()
     if args.cmd == "run":
-        run(args.root, args.backend, args.url.rstrip("/"), args.task, args.limit, args.workers)
+        run(args.root, args.backend, args.url.rstrip("/"), args.task, args.limit, args.workers, args.control_dir)
     else:
         report(args.root, args.out)
 
