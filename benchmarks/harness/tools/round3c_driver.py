@@ -70,6 +70,8 @@ def main():
     if len(sys.argv) < 2 or sys.argv[1] != "run":
         print(__doc__)
         return 2
+    while not r3.done("stats3b"):  # never share the card with a running round 3b
+        time.sleep(60)
     r3.log("round 3c start")
     if not r3.done("purge3c"):
         purge()
