@@ -1,6 +1,6 @@
 {
   "as_of": "2026-10-27",
-  "experiment_dates": "19\u201327 October 2026",
+  "experiment_dates": "19–27 October 2026",
   "desktop_rows": 22731,
   "laptop_rows": 18244,
   "total_rows": 40975,
@@ -2178,11 +2178,11 @@
       "lower_is_better": false,
       "score": 0.8195,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
+      "failed": 3,
+      "median_seconds": 21.59,
       "numeric_recall": 0.8834,
       "numeric_precision": null,
-      "source": "round3-stats",
+      "source": "round3-vlm",
       "source_section": "page_text_confirm3"
     },
     {
@@ -2196,11 +2196,11 @@
       "lower_is_better": false,
       "score": 0.7625,
       "cases": 100,
-      "failed": null,
-      "median_seconds": null,
+      "failed": 4,
+      "median_seconds": 5.65,
       "numeric_recall": 0.9322,
       "numeric_precision": null,
-      "source": "round3-stats",
+      "source": "round3-vlm",
       "source_section": "table_confirm3"
     }
   ],
@@ -2208,7 +2208,8 @@
     "results/vision/merged/MERGED_REPORT.md": "ef5f44f5ee77f482457aa6b156cd9ff662b7f1d388cd11caafcca587003f1be7",
     "results/vision/ROUTING_REPORT.md": "c7a05c3891c692c9c4f30b177b94ead4f96c225048e008f2cf03b2503970fba4",
     "results/vision/exports/laptop.run-manifest.json": "e2d9732fd81887c3eec02bbe18f091bc1217464c59c07b60d6d63044098307f0",
-    "benchmarks/harness/docs/handoff/CODEX_HANDOFF.md": "e2721e44d53c6adb59956a10a02fd5bf12aa0f1bfc0f6c2886c9ec69ec5b0ec5"
+    "benchmarks/harness/docs/handoff/CODEX_HANDOFF.md": "e2721e44d53c6adb59956a10a02fd5bf12aa0f1bfc0f6c2886c9ec69ec5b0ec5",
+    "downloads/vlm_v3.json": "b53fedad0d186c0ad2411c9866d0f10ec6ea573ac1c5ed23060613575da13f87"
   },
   "sources": {
     "merged-report": {
@@ -2227,6 +2228,11 @@
       "label": "Paired final comparisons",
       "url": "downloads/stats.json",
       "sha256": "64520c220f3032f3e8c455024dd21f3190c9a6f21665d4df20dbf578d33c0950"
+    },
+    "round3-vlm": {
+      "label": "32B comparator failures and latency (scores in stats.json)",
+      "url": "downloads/vlm_v3.json",
+      "sha256": "b53fedad0d186c0ad2411c9866d0f10ec6ea573ac1c5ed23060613575da13f87"
     }
   },
   "legal_screening": [

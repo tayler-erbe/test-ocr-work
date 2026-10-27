@@ -1,0 +1,18 @@
+{
+  "what": "Qwen3-VL 32B AWQ comparator on the round-3b fresh sets at the equal 8,192-token budget (desktop RTX 5090, vLLM). Scores are in stats.json; this file adds failures and latency.",
+  "model": "openai:qwen3vl32b [budget8192]",
+  "rows": [
+    {
+      "task": "table_confirm3",
+      "cases": 100,
+      "failed": 4,
+      "median_seconds": 5.65
+    },
+    {
+      "task": "page_text_confirm3",
+      "cases": 80,
+      "failed": 3,
+      "median_seconds": 21.59
+    }
+  ]
+}
