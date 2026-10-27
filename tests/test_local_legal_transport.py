@@ -35,5 +35,16 @@ class LocalTransportTests(unittest.TestCase):
         self.assertFalse(row["metrics"]["correct"])
         self.assertNotIn("thinking", row)
 
+    def test_prompt_measurement_is_a_one_token_prefill_without_reasoning(self):
+        body = {"response_format": {"type": "json_object"}, "messages": [{"role": "user", "content": "public source"}],
+                "chat_template_kwargs": {"enable_thinking": True}, "temperature": 0, "top_p": 1, "max_tokens": 16000}
+        calls = []
+        adapter.ollama = lambda path, payload=None, timeout=0: calls.append(payload) or {"prompt_eval_count": 4321}
+        self.assertEqual(adapter.measure_prompt("gpt-oss:20b", body, 65536), 4321)
+        self.assertEqual(calls[0]["options"]["num_predict"], 1)
+        self.assertEqual(calls[0]["options"]["num_ctx"], 65536)
+        self.assertEqual(calls[0]["think"], "low")
+        self.assertEqual(calls[0]["format"], "json")
+
 if __name__ == "__main__":
     unittest.main()

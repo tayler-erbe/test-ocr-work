@@ -12,7 +12,7 @@ Thinking control differs per model family and is recorded in every row:
 Public data only. Raw final answers stay in the new local output directory; thinking text is not saved.
 
   set OLLAMA_MODEL=gpt-oss:20b
-  python -X utf8 tools/local_legal_reassessment.py --out <new dir> --full-spans handoff/legal-comparison-24/full_spans.json --run
+  python -X utf8 tools/local_legal_reassessment.py --out <new dir> [--context N] --full-spans handoff/legal-comparison-24/full_spans.json --run
   python -X utf8 tools/local_legal_reassessment.py --confirm --pack <60-doc pack dir> --out <new dir> --run
 """
 import argparse
@@ -34,7 +34,9 @@ from nemotron_reassessment import ARMS, make_body, sha, summarize  # noqa: E402
 from nim_evaluation import frozen  # noqa: E402
 
 OLLAMA = "http://127.0.0.1:11434"
-CONTEXT = 32768
+CONTEXT = 32768  # default; the run records the value actually used (--context)
+# Default context per family: the published window, capped where the KV cache would not fit a 32 GB card.
+DEFAULT_CONTEXT = {"gpt-oss": 65536, "nemotron": 65536, "qwen3": 40960}
 PACK24 = REPO / "handoff" / "legal-comparison-24"
 
 
@@ -52,15 +54,34 @@ def think_value(model, on):
     return bool(on)
 
 
-def translate(body, model):
+def translate(body, model, context=CONTEXT):
     """OpenAI-style body from make_body -> Ollama /api/chat body. Nothing else changes."""
     fmt = body["response_format"]
     native = {"model": model, "messages": body["messages"], "stream": False, "keep_alive": "10m",
               "think": think_value(model, body["chat_template_kwargs"]["enable_thinking"]),
               "format": fmt["json_schema"]["schema"] if fmt["type"] == "json_schema" else "json",
               "options": {"temperature": body["temperature"], "top_p": body["top_p"],
-                          "num_predict": body["max_tokens"], "num_ctx": CONTEXT}}
+                          "num_predict": body["max_tokens"], "num_ctx": context}}
     return native
+
+
+def measure_prompt(model, body, context):
+    """Exact prompt length by the model's own tokenizer: a one-token prefill, no reasoning, nothing scored.
+    Replaces the byte guard, which rejected token-feasible requests (docs/round3/LOCAL_CONTEXT_PREFLIGHT.json)."""
+    native = translate(body, model, context)
+    native["think"] = think_value(model, False)
+    native["options"]["num_predict"] = 1
+    raw = ollama("/api/chat", native, timeout=600)
+    return raw.get("prompt_eval_count")
+
+
+def residency(model):
+    """Where the loaded weights sit (Ollama /api/ps). A run counts only when everything is on the GPU."""
+    for m in ollama("/api/ps", timeout=20).get("models", []):
+        if m.get("name") == model:
+            return {"size": m.get("size"), "size_vram": m.get("size_vram"), "context_length": m.get("context_length"),
+                    "fully_on_gpu": bool(m.get("size")) and m.get("size_vram") == m.get("size")}
+    return {"fully_on_gpu": False, "note": "model not listed as loaded"}
 
 
 def snapshot(model):
@@ -73,8 +94,8 @@ def snapshot(model):
     return info, sha(info)
 
 
-def call(model, body):
-    native = translate(body, model)
+def call(model, body, context=CONTEXT):
+    native = translate(body, model, context)
     raw = ollama("/api/chat", native)
     message = raw.get("message", {})
     return {"content": message.get("content"), "done_reason": raw.get("done_reason"),
@@ -160,6 +181,7 @@ def main():
     parser.add_argument("--full-spans", type=Path, help="JSON {case_id: spans} exported from the lab database (full_document arm)")
     parser.add_argument("--confirm", action="store_true", help="60-document reasoning on/off contrast instead of the 24-case arms")
     parser.add_argument("--pack", type=Path, help="frozen 60-document pack directory (with --confirm)")
+    parser.add_argument("--context", type=int, help="num_ctx sent to Ollama; default per family (DEFAULT_CONTEXT), recorded in PLAN.json")
     parser.add_argument("--run", action="store_true")
     args = parser.parse_args()
     if args.out.exists():
@@ -167,6 +189,7 @@ def main():
     model = os.environ.get("OLLAMA_MODEL")
     if not model:
         raise SystemExit("Set OLLAMA_MODEL to the exact Ollama tag, e.g. gpt-oss:20b")
+    context = args.context or next((v for k, v in DEFAULT_CONTEXT.items() if model.startswith(k)), CONTEXT)
     scorer = frozen()
     builder_sha = hashlib.sha256((HERE / "nemotron_reassessment.py").read_bytes()).hexdigest()
     script_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
@@ -194,8 +217,9 @@ def main():
                     for request, ref in zip(requests, references) for arm in args.arms]
     plan.update({"model": "ollama/" + model, "transport": "ollama native /api/chat on 127.0.0.1, think field per family",
                  "thinking_control": "levels low/high" if model.startswith("gpt-oss") else "boolean",
-                 "comparison_limits": "GPT-OSS contrasts low versus high reasoning, never off versus on. Local versus hosted runs confound checkpoint, quantization, runtime and context unless independently matched. Byte guard is conservative and can reject token-feasible requests; preflight rejections are not model-quality evidence.",
-                 "context": CONTEXT, "script_sha256": script_sha, "request_builder_sha256": builder_sha, "scorer_sha256": scorer_sha})
+                 "comparison_limits": "GPT-OSS contrasts low versus high reasoning, never off versus on. Local versus hosted runs confound checkpoint, quantization, runtime and context unless independently matched. Context fit is measured per request with the model's own tokenizer (one-token prefill); a request whose measured prompt plus budget exceeds the context is recorded as context_exceeded, never silently truncated, and is not model-quality evidence.",
+                 "context": context, "context_guard": "measured prompt tokens + budget + 64 <= context",
+                 "script_sha256": script_sha, "request_builder_sha256": builder_sha, "scorer_sha256": scorer_sha})
     if args.run:
         info, digest = snapshot(model)
         plan["deployment_snapshot"] = info
@@ -212,16 +236,23 @@ def main():
                "source_spans": len(visible), "source_bytes": sum(len(s["text"].encode()) for s in visible)}
         started = time.perf_counter()
         try:
-            if len(json.dumps(body).encode()) + config["budget"] + 2048 > CONTEXT:
-                raise ValueError("conservative_context_budget_exceeded")
-            result = call(model, body)
+            tokens = measure_prompt(model, body, context)
+            row["prompt_tokens_measured"] = tokens
+            if "residency" not in plan:  # first load: everything must sit on the GPU or the run does not count
+                plan["residency"] = residency(model)
+                (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
+                if not plan["residency"]["fully_on_gpu"]:
+                    raise SystemExit("Model is not fully resident on the GPU at this context; lower --context or stop: " + json.dumps(plan["residency"]))
+            if tokens is None or tokens + config["budget"] + 64 > context:
+                raise ValueError("context_exceeded")
+            result = call(model, body, context)
             row.update(retained_result(result))
             row.update(score_row(scorer, request, ref, config, visible, result))
         except urllib.error.URLError:
             row["error_type"] = "ServiceError"
         except Exception as exc:  # failures stay in the denominator
             row["error_type"] = type(exc).__name__
-            if isinstance(exc, ValueError) and str(exc) in ("conservative_context_budget_exceeded", "non_stop_generation"):
+            if isinstance(exc, ValueError) and str(exc) in ("context_exceeded", "non_stop_generation"):
                 row["error_code"] = str(exc)
         row["seconds"] = time.perf_counter() - started
         rows.append(row)

@@ -17,6 +17,8 @@ Rules that carry over unchanged: one model resident on the GPU at a time, served
 
 The hosted Nemotron 3 Nano 30B endpoint received an eight-configuration campaign on the 24-case public pack and a reasoning on/off contrast on 60 public documents unused in locally recorded earlier runs. No other model has had that. Round 3 gives the identical campaign to every text model, local ones included, through `benchmarks/harness/tools/local_legal_reassessment.py`. It imports the arms, the request builder and the frozen scorer from the Nemotron tools; only the transport changes (Ollama's native chat endpoint, which is the only way to set thinking on a local model).
 
+Context fit is measured per request with the model's own tokenizer (a one-token prefill) against the context recorded in the plan (gpt-oss and Nemotron 65,536; Qwen3 32B 40,960, its published window); a request that cannot fit is recorded as `context_exceeded`, never truncated. The byte guard that rejected token-feasible requests is gone. The run also records whether the weights sit fully on the GPU and stops if they do not.
+
 Thinking control per family is recorded in every row: Qwen3 and Nemotron use think on/off; gpt-oss cannot switch reasoning off, so its "off" arms run reasoning level low and its "on" arms level high.
 
 | Id | Model | Machine | Fits | Why |
