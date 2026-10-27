@@ -183,9 +183,11 @@ def main():
     parser.add_argument("--pack", type=Path, help="frozen 60-document pack directory (with --confirm)")
     parser.add_argument("--context", type=int, help="num_ctx sent to Ollama; default per family (DEFAULT_CONTEXT), recorded in PLAN.json")
     parser.add_argument("--run", action="store_true")
+    parser.add_argument("--resume", action="store_true", help="continue an output directory this script started (same model and arms); finished requests are skipped")
     args = parser.parse_args()
-    if args.out.exists():
+    if args.out.exists() and not args.resume:
         raise SystemExit("Use a NEW output directory; never reuse stale results")
+    pause_file = Path(os.environ["ROUND3_PAUSE_FILE"]) if os.environ.get("ROUND3_PAUSE_FILE") else None
     model = os.environ.get("OLLAMA_MODEL")
     if not model:
         raise SystemExit("Set OLLAMA_MODEL to the exact Ollama tag, e.g. gpt-oss:20b")
@@ -224,13 +226,28 @@ def main():
         info, digest = snapshot(model)
         plan["deployment_snapshot"] = info
         plan["deployment_snapshot_sha256"] = digest
-    args.out.mkdir(parents=True)
-    (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
     rows = []
+    if args.resume and args.out.exists():
+        earlier = json.loads((args.out / "PLAN.json").read_text(encoding="utf8"))
+        for key in ("model", "arms", "context", "request_builder_sha256", "scorer_sha256"):
+            if earlier.get(key) != plan.get(key):
+                raise SystemExit(f"--resume refused: {key} differs from the plan already in {args.out}")
+        plan["residency"] = earlier.get("residency", plan.get("residency"))
+        events = args.out / "events.LOCAL_ONLY.jsonl"
+        if events.exists():
+            rows = [json.loads(line) for line in events.read_text(encoding="utf8").splitlines() if line.strip()]
+    else:
+        args.out.mkdir(parents=True)
+    (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
+    finished = {(r["arm"], r["case_id"]) for r in rows}
     for request, ref, arm, config, visible in schedule:
         body = make_body(request, config, model, visible if config.get("full") else None)
-        if not args.run:
+        if not args.run or (arm, request["case_id"]) in finished:
             continue
+        if pause_file and pause_file.exists():  # a pause between requests; rerun with --resume to continue
+            print(json.dumps({"paused": True, "executed": len(rows), "planned": len(schedule)}), flush=True)
+            ollama("/api/generate", {"model": model, "keep_alive": 0}, timeout=60)  # free the GPU now
+            sys.exit(75)
         row = {"arm": arm, "case_id": request["case_id"], "dataset": ref["case"]["dataset"], "request_sha256": sha(body),
                "status": "failed", "metrics": {"correct": False, "evidence_f1": 0},
                "source_spans": len(visible), "source_bytes": sum(len(s["text"].encode()) for s in visible)}
@@ -243,7 +260,9 @@ def main():
                 (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
                 if not plan["residency"]["fully_on_gpu"]:
                     raise SystemExit("Model is not fully resident on the GPU at this context; lower --context or stop: " + json.dumps(plan["residency"]))
-            if tokens is None or tokens + config["budget"] + 64 > context:
+            # Ollama truncates a prompt longer than num_ctx and then reports the truncated count, which lands within
+            # a few tokens of num_ctx; every budget here is >= 2000 tokens, so a truncated prefill can never pass.
+            if tokens is None or tokens >= context - 256 or tokens + config["budget"] + 64 > context:
                 raise ValueError("context_exceeded")
             result = call(model, body, context)
             row.update(retained_result(result))

@@ -24,6 +24,7 @@ import hashlib
 import html as html_lib
 import io
 import json
+import os
 from pathlib import Path
 import re
 import statistics
@@ -223,13 +224,22 @@ def run(root, backend, url, tasks, limit=None, workers=1):
                 prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
             return prediction, metrics, status, error, time.perf_counter() - started
 
-        with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-            for n, (case, (prediction, metrics, status, error, seconds)) in enumerate(zip(cases, pool.map(one, cases)), 1):
-                db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
-                           (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
-                db.commit()
-                if n % 20 == 0 or n == len(cases):
-                    print(json.dumps({"backend": backend, "task": task, "done": n, "of": len(cases), "run_id": run_id}), flush=True)
+        pause_file = os.environ.get("ROUND3_PAUSE_FILE")
+        n = 0
+        step = max(1, workers)
+        with ThreadPoolExecutor(max_workers=step) as pool:
+            for start in range(0, len(cases), step):  # one batch at a time, so a pause takes effect within one batch
+                if pause_file and Path(pause_file).exists():
+                    print(json.dumps({"paused": True, "backend": backend, "task": task, "done": n, "of": len(cases)}), flush=True)
+                    sys.exit(75)
+                batch = cases[start:start + step]
+                for case, (prediction, metrics, status, error, seconds) in zip(batch, pool.map(one, batch)):
+                    n += 1
+                    db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                               (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
+                    db.commit()
+                    if n % 20 == 0 or n == len(cases):
+                        print(json.dumps({"backend": backend, "task": task, "done": n, "of": len(cases), "run_id": run_id}), flush=True)
         db.execute("UPDATE runs SET status='complete' WHERE id=?", (run_id,))
         db.commit()
 

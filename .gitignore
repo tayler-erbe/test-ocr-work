@@ -18,3 +18,6 @@ work/
 local/
 private_samples/
 *.LOCAL_ONLY.*
+
+# round 3: raw local events never leave the machine
+results/legal/round3/**/events.LOCAL_ONLY.jsonl
