@@ -29,7 +29,16 @@ def main():
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--control-dir", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--summary-only", action="store_true", help="only recompute the agreement table from stored rows (no model calls)")
     args = parser.parse_args()
+    db = connect(args.root)
+    db.execute(ve.RESULT_SCHEMA)
+    manifest = ve.load_cases(args.root, "v1")
+    if args.summary_only:
+        for task, variant in GROUPS:
+            for (run_id,) in db.execute("SELECT id FROM runs WHERE model=?", (f"{MODEL} [{variant}] [replay]",)):
+                agreement(db, run_id, task, variant)
+        return
     if paused(args.control_dir):
         print("PAUSED")
         return
@@ -37,9 +46,6 @@ def main():
     weights = vlm_client.model_digest(MODEL)
     if not weights:
         raise SystemExit(f"{MODEL} is not being served right now")
-    db = connect(args.root)
-    db.execute(ve.RESULT_SCHEMA)
-    manifest = ve.load_cases(args.root, "v1")
     for task, variant in GROUPS:
         if paused(args.control_dir):
             break
@@ -72,13 +78,26 @@ def main():
         expected = sum(c["task"] == task for c in manifest["cases"])
         db.execute("UPDATE runs SET status=? WHERE id=?", ("complete" if recorded == expected else "partial", run_id))
         db.commit()
-        # agreement with the stored desktop rows, case by case
-        orig = f"{MODEL} [{variant}]"
-        pairs = db.execute("SELECT a.case_id, a.metrics, b.metrics FROM vision_results a JOIN vision_results b ON a.case_id=b.case_id AND b.model=? AND b.task=a.task WHERE a.run_id=?",
-                           (orig, run_id)).fetchall()
-        key = "correct" if task == "chart_qa" else "value_recall"
-        agree = sum(1 for _, m1, m2 in pairs if m1 and m2 and json.loads(m1).get(key) == json.loads(m2).get(key))
-        print(json.dumps({"task": task, "variant": variant, "paired": len(pairs), "identical_scores": agree}))
+        agreement(db, run_id, task, variant)
+
+
+def agreement(db, run_id, task, variant):
+    """Case-by-case agreement with the stored desktop rows. A failed case stores metrics as JSON null; it counts as
+    score zero on both sides, the same rule the scorer applies."""
+    orig = f"{MODEL} [{variant}]"
+    pairs = db.execute("SELECT a.case_id, a.metrics, b.metrics FROM vision_results a JOIN vision_results b ON a.case_id=b.case_id AND b.model=? AND b.task=a.task WHERE a.run_id=?",
+                       (orig, run_id)).fetchall()
+    key = "correct" if task == "chart_qa" else "value_recall"
+
+    def score(m):
+        d = json.loads(m) if m else None
+        return (d or {}).get(key, 0) or 0
+
+    agree = sum(1 for _, m1, m2 in pairs if score(m1) == score(m2))
+    mean_new = sum(score(m1) for _, m1, _ in pairs) / len(pairs) if pairs else None
+    mean_old = sum(score(m2) for _, _, m2 in pairs) / len(pairs) if pairs else None
+    print(json.dumps({"task": task, "variant": variant, "paired": len(pairs), "identical_scores": agree,
+                      "mean_replay": mean_new, "mean_original_desktop": mean_old}))
 
 
 if __name__ == "__main__":

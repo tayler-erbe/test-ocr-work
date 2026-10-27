@@ -1,0 +1,112 @@
+[
+  {
+    "arm": "definitions",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 6,
+    "truncated": 0,
+    "evidence_f1": 0.2916666666666667,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "definitions",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 4,
+    "truncated": 0,
+    "evidence_f1": 0.3941798941798942,
+    "presence_correct": 6,
+    "presence_scored": 8
+  },
+  {
+    "arm": "full_document",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 3,
+    "truncated": 0,
+    "evidence_f1": 0.5111111111111111,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "full_document",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 5,
+    "failed": 6,
+    "truncated": 1,
+    "evidence_f1": 0.4166666666666667,
+    "presence_correct": 5,
+    "presence_scored": 6
+  },
+  {
+    "arm": "ids",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 3,
+    "truncated": 0,
+    "evidence_f1": 0.5111111111111111,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "ids",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.448218863949201,
+    "presence_correct": 8,
+    "presence_scored": 12
+  },
+  {
+    "arm": "sampling",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 5,
+    "failed": 5,
+    "truncated": 0,
+    "evidence_f1": 0.3888888888888889,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "sampling",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 3,
+    "truncated": 0,
+    "evidence_f1": 0.39356390704429917,
+    "presence_correct": 7,
+    "presence_scored": 9
+  },
+  {
+    "arm": "schema_in_prompt",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 8,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.6166666666666667,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "schema_in_prompt",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 4,
+    "truncated": 0,
+    "evidence_f1": 0.3753968253968254,
+    "presence_correct": 6,
+    "presence_scored": 8
+  }
+]

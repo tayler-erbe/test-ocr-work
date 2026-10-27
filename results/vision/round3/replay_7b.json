@@ -1,0 +1,11 @@
+{
+  "what": "Reproducibility replay (round 3b, audit item 11): the two same-weight Qwen2.5-VL 7B comparison groups that did not reproduce between desktop and laptop, rerun on the desktop with vision_eval.run_case unchanged, protocol vision-v1-replay.",
+  "model": "ollama:qwen2.5vl:7b",
+  "when": "2026-10-26 21:52 to 21:55 PDT",
+  "groups": [
+    {"task": "chart_qa", "variant": "expert", "paired": 200, "identical_scores": 200, "mean_replay": 0.445, "mean_original_desktop": 0.445},
+    {"task": "chart_table", "variant": "upscale", "paired": 60, "identical_scores": 60, "mean_replay": 0.7836575214376938, "mean_original_desktop": 0.7836575214376938}
+  ],
+  "reading": "Every case scored identically to the stored desktop rows, so the desktop side is deterministic run to run. The cross-machine discrepancy is machine-specific (runtime or build), not run-to-run noise. The laptop replay (Codex, docs/round3/CODEX_TASKS_3B.md item 2) decides whether the laptop side is also stable.",
+  "note": "The first run's agreement summary crashed on failed rows stored as JSON null after all 260 cases were scored; the summary was recomputed from the stored rows with --summary-only. No model call was repeated."
+}

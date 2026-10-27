@@ -1,0 +1,164 @@
+{
+  "entries": [
+    {
+      "model": "parser:nemotron-parse",
+      "served": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 53.7,
+      "cases_per_minute": 44.7,
+      "p50": 1.04,
+      "p95": 3.28,
+      "max": 4.24,
+      "failed": 0,
+      "when": "2026-10-26 20:32:50"
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "served": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 17.2,
+      "cases_per_minute": 139.7,
+      "p50": 1.2,
+      "p95": 4.28,
+      "max": 5.08,
+      "failed": 0,
+      "when": "2026-10-26 20:33:08"
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "served": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 99.4,
+      "cases_per_minute": 24.1,
+      "p50": 1.31,
+      "p95": 5.6,
+      "max": 20.24,
+      "failed": 2,
+      "when": "2026-10-26 20:52:38"
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "served": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 32.9,
+      "cases_per_minute": 73.0,
+      "p50": 1.53,
+      "p95": 5.79,
+      "max": 21.27,
+      "failed": 2,
+      "when": "2026-10-26 20:53:12"
+    },
+    {
+      "model": "parser:olmocr2",
+      "served": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 374.8,
+      "cases_per_minute": 6.4,
+      "p50": 6.59,
+      "p95": 24.43,
+      "max": 60.68,
+      "failed": 1,
+      "when": "2026-10-26 21:10:21"
+    },
+    {
+      "model": "parser:olmocr2",
+      "served": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 125.9,
+      "cases_per_minute": 19.1,
+      "p50": 6.57,
+      "p95": 25.25,
+      "max": 63.03,
+      "failed": 1,
+      "when": "2026-10-26 21:12:30"
+    },
+    {
+      "model": "openai:qwen3vl32b",
+      "served": "qwen3vl32b",
+      "concurrency": 1,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 657.4,
+      "cases_per_minute": 3.7,
+      "p50": 10.89,
+      "p95": 26.31,
+      "max": 130.73,
+      "failed": 2,
+      "when": "2026-10-26 21:47:48"
+    },
+    {
+      "model": "openai:qwen3vl32b",
+      "served": "qwen3vl32b",
+      "concurrency": 4,
+      "queue": {
+        "pages": 20,
+        "tables": 20
+      },
+      "budget": 8192,
+      "wall_seconds": 257.4,
+      "cases_per_minute": 9.3,
+      "p50": 11.84,
+      "p95": 33.03,
+      "max": 150.66,
+      "failed": 2,
+      "when": "2026-10-26 21:52:12"
+    }
+  ]
+}
