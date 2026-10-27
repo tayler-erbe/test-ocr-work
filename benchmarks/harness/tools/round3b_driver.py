@@ -37,6 +37,19 @@ PADDLE_SCRIPT = "/mnt/c/dev/test-ocr-work/benchmarks/harness/tools/paddle_pipeli
 PADDLE_OUT = LAB / "round3" / "paddle_pipeline_v3.jsonl"
 
 
+def card():
+    """Round 3 hands the card back to the original server when it finishes; take it again, then wait until free."""
+    while True:
+        if r3.paused():
+            return False
+        if r3.done("restore"):
+            r3.reclaim()
+        used = r3.gpu_used_mib()
+        if used is not None and used < 3000:
+            return True
+        time.sleep(30)
+
+
 def parser_cmd(backend, tasks, max_tokens=None, mode="single", workers=4):
     cmd = PY + [str(HARNESS / "parser_eval.py"), "--root", str(LAB), "run", "--backend", backend, "--url", URL,
                 "--workers", str(workers), "--control-dir", str(CONTROL)]
@@ -67,7 +80,7 @@ def stage_parser(key, backend):
     if r3.done(stage):
         r3.log(f"skip {stage}: done")
         return True
-    if not r3.wait_for_gpu():
+    if not card():
         return False
     proc = r3.start_server(key)
     if not r3.server_ready():
@@ -99,7 +112,7 @@ def stage_vlm():
     if r3.done(stage):
         r3.log(f"skip {stage}: done")
         return True
-    if not r3.wait_for_gpu():
+    if not card():
         return False
     r3.log("starting the Qwen3-VL 32B AWQ server (the round-1/2 comparator build) on 127.0.0.1:8001")
     proc = subprocess.Popen(r3.WSL + ["bash", r3.RESTORE, "qwen3vl32b"])
@@ -123,7 +136,7 @@ def stage_replay():
     stage = "replay_7b"
     if r3.done(stage):
         return True
-    if not r3.wait_for_gpu():
+    if not card():
         return False
     ok = run_steps(stage, [("replay", PY + [str(HARNESS / "tools" / "replay_7b.py"), "--root", str(LAB), "--control-dir", str(CONTROL), "--workers", "4"], HARNESS)])
     r3.unload("qwen2.5vl:7b")
@@ -136,7 +149,7 @@ def stage_replay():
 def legal(stage, model, out, extra):
     if r3.done(stage):
         return True
-    if not r3.wait_for_gpu():
+    if not card():
         return False
     env = dict(os.environ, OLLAMA_MODEL=model)
     cmd = PY + [str(HARNESS / "tools" / "local_legal_reassessment.py"), "--out", str(out), "--run", "--control-dir", str(CONTROL)] + extra
@@ -178,8 +191,6 @@ def stage_stats():
 def run():
     r3.STATE.mkdir(parents=True, exist_ok=True)
     r3.log("round 3b driver start")
-    if r3.done("restore"):  # round 3 put the original server back; take the card again for 3b
-        r3.reclaim()
     for key, backend in PARSERS:
         if not stage_parser(key, backend):
             r3.log("paused")
