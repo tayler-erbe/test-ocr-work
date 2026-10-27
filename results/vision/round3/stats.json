@@ -230,30 +230,30 @@
       "model": "parser:nemotron-parse [budget12288]",
       "task": "page_text_confirm2",
       "comparator": "openai:qwen3vl32b",
-      "cases": 49,
-      "clusters": 49,
+      "cases": 80,
+      "clusters": 80,
       "confirmatory": false,
       "word_f1": {
-        "model_mean": 0.8665,
-        "comparator_mean": 0.8322,
-        "difference": 0.0343,
+        "model_mean": 0.8675,
+        "comparator_mean": 0.8138,
+        "difference": 0.0537,
         "ci95": [
-          -0.0227,
-          0.0897
+          0.0086,
+          0.0962
         ],
-        "p_two_sided": 0.209,
-        "verdict": "not distinguishable"
+        "p_two_sided": 0.021,
+        "verdict": "better"
       },
       "numeric_recall": {
-        "model_mean": 0.8543,
-        "comparator_mean": 0.9148,
-        "difference": -0.0606,
+        "model_mean": 0.8484,
+        "comparator_mean": 0.8719,
+        "difference": -0.0235,
         "ci95": [
-          -0.1259,
-          -0.0037
+          -0.0738,
+          0.0233
         ],
-        "p_two_sided": 0.03,
-        "verdict": "worse; NOT non-inferior"
+        "p_two_sided": 0.358,
+        "verdict": "not distinguishable; NOT non-inferior"
       }
     },
     {
@@ -343,6 +343,126 @@
           0.0502
         ],
         "p_two_sided": 0.688,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8861,
+        "comparator_mean": 0.8195,
+        "difference": 0.0666,
+        "ci95": [
+          0.0177,
+          0.1249
+        ],
+        "p_two_sided": 0.009,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8676,
+        "comparator_mean": 0.8834,
+        "difference": -0.0157,
+        "ci95": [
+          -0.07,
+          0.0416
+        ],
+        "p_two_sided": 0.586,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8039,
+        "comparator_mean": 0.7625,
+        "difference": 0.0414,
+        "ci95": [
+          -0.0057,
+          0.0909
+        ],
+        "p_two_sided": 0.08,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9217,
+        "comparator_mean": 0.9322,
+        "difference": -0.0105,
+        "ci95": [
+          -0.0716,
+          0.0529
+        ],
+        "p_two_sided": 0.753,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8861,
+        "comparator_mean": 0.8195,
+        "difference": 0.0666,
+        "ci95": [
+          0.0177,
+          0.1249
+        ],
+        "p_two_sided": 0.009,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8676,
+        "comparator_mean": 0.8834,
+        "difference": -0.0157,
+        "ci95": [
+          -0.07,
+          0.0416
+        ],
+        "p_two_sided": 0.586,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8039,
+        "comparator_mean": 0.7625,
+        "difference": 0.0414,
+        "ci95": [
+          -0.0057,
+          0.0909
+        ],
+        "p_two_sided": 0.08,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9217,
+        "comparator_mean": 0.9322,
+        "difference": -0.0105,
+        "ci95": [
+          -0.0716,
+          0.0529
+        ],
+        "p_two_sided": 0.753,
         "verdict": "not distinguishable; NOT non-inferior"
       }
     },
@@ -492,6 +612,36 @@
         "ci95": [
           -0.1401,
           -0.0282
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2 [budget12288]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.9011,
+        "comparator_mean": 0.8138,
+        "difference": 0.0873,
+        "ci95": [
+          0.055,
+          0.1218
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7184,
+        "comparator_mean": 0.8719,
+        "difference": -0.1536,
+        "ci95": [
+          -0.2025,
+          -0.1058
         ],
         "p_two_sided": 0.0,
         "verdict": "worse; NOT non-inferior"
@@ -795,6 +945,36 @@
           0.0094
         ],
         "p_two_sided": 0.494,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget12288]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7487,
+        "comparator_mean": 0.8138,
+        "difference": -0.0651,
+        "ci95": [
+          -0.1208,
+          -0.0189
+        ],
+        "p_two_sided": 0.004,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8414,
+        "comparator_mean": 0.8719,
+        "difference": -0.0305,
+        "ci95": [
+          -0.0916,
+          0.0248
+        ],
+        "p_two_sided": 0.336,
         "verdict": "not distinguishable; NOT non-inferior"
       }
     },

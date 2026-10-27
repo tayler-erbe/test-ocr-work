@@ -1,6 +1,6 @@
 {
   "protocol": "vision-v3-parsers",
-  "generated": "2026-10-27T03:27:32.832230+00:00",
+  "generated": "2026-10-27T06:13:33.584272+00:00",
   "runs": [
     {
       "run_id": "8a51c671db7dbc015be91810",
@@ -491,6 +491,320 @@
       "teds_structure": 0.8472231560007377,
       "cell_f1": 0.6854044500088396,
       "numeric_recall": 0.8784046811169587
+    },
+    {
+      "run_id": "937d061a67552b30cd417b4b",
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 3.06,
+      "word_f1": 0.8989394320081356,
+      "numeric_recall": 0.8822366455917011
+    },
+    {
+      "run_id": "ca4a584a90e4f38bb9ab4b1e",
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 0.93,
+      "teds": 0.8035033328334349,
+      "teds_structure": 0.884492984356822,
+      "cell_f1": 0.7427454323458305,
+      "numeric_recall": 0.9190434154342753
+    },
+    {
+      "run_id": "8d15ede021168bd73cbf0d31",
+      "model": "parser:nemotron-parse [budget6000]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 6000,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 2.37,
+      "word_f1": 0.8604401149829135,
+      "numeric_recall": 0.8440517055810899
+    },
+    {
+      "run_id": "c67e87220ab2129202b6b3a2",
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 9,
+      "median_seconds": 3.17,
+      "word_f1": 0.7371488847773222,
+      "numeric_recall": 0.7815797361235289
+    },
+    {
+      "run_id": "4f6bd04211cfdca521f23a10",
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 1.25,
+      "teds": 0.8523335903686011,
+      "teds_structure": 0.9279066043568726,
+      "cell_f1": 0.7953749115873218,
+      "numeric_recall": 0.9739094324891426
+    },
+    {
+      "run_id": "f509659e68d7e6b4c335bcfe",
+      "model": "parser:paddleocrvl [budget6000]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 6000,
+      "cases": 80,
+      "failed": 7,
+      "median_seconds": 2.59,
+      "word_f1": 0.7486686217760198,
+      "numeric_recall": 0.8428493885777811
+    },
+    {
+      "run_id": "7260f1e64db855dcdfde3f34",
+      "model": "parser:paddle-pipeline",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "paddleocr_vl_1.6_pipeline"
+      },
+      "side": null,
+      "max_tokens": null,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 4.01,
+      "word_f1": 0.9217927012426482,
+      "numeric_recall": 0.7705717349105086
+    },
+    {
+      "run_id": "c57c1e642dde2ad94642d722",
+      "model": "parser:paddle-pipeline",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "paddleocr_vl_1.6_pipeline"
+      },
+      "side": null,
+      "max_tokens": null,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 2.9,
+      "teds": 0.7847615607878388,
+      "teds_structure": 0.8374698486506362,
+      "cell_f1": 0.7372290749233152,
+      "numeric_recall": 0.8507660260096219
+    },
+    {
+      "run_id": "7ee726576a145dc2800a1002",
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 11.4,
+      "word_f1": 0.8978847195699757,
+      "numeric_recall": 0.7056827748530026
+    },
+    {
+      "run_id": "b09e8c0d137365316e605c68",
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 4.39,
+      "teds": 0.7050656460169178,
+      "teds_structure": 0.7966452266282077,
+      "cell_f1": 0.6870586120080711,
+      "numeric_recall": 0.8536929992010225
+    },
+    {
+      "run_id": "f0a66f7a94f409ef45495839",
+      "model": "parser:olmocr2 [budget6000]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 6000,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 8.65,
+      "word_f1": 0.9014349355546809,
+      "numeric_recall": 0.7213531943404067
+    },
+    {
+      "run_id": "6c9654bc8309613ec807141d",
+      "model": "parser:nemotron-parse [budget12288]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 12288,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 2.28,
+      "word_f1": 0.867459419528512,
+      "numeric_recall": 0.8484498537292382
+    },
+    {
+      "run_id": "ad5031dd34225a28ad241488",
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 2,
+      "median_seconds": 2.76,
+      "word_f1": 0.8860889740203867,
+      "numeric_recall": 0.8676464441473618
+    },
+    {
+      "run_id": "77a32c1652c0e027e73bbb12",
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 0.8,
+      "teds": 0.8039473069276352,
+      "teds_structure": 0.8861068028643746,
+      "cell_f1": 0.7434897226321059,
+      "numeric_recall": 0.9216849506403055
+    },
+    {
+      "run_id": "1620d05602ff8ea63d57285e",
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "page_text_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 80,
+      "failed": 2,
+      "median_seconds": 2.9,
+      "word_f1": 0.8860889740203867,
+      "numeric_recall": 0.8676464441473618
+    },
+    {
+      "run_id": "785481c3b89049a75fa64cdd",
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "table_confirm3",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8192,
+      "cases": 100,
+      "failed": 0,
+      "median_seconds": 0.92,
+      "teds": 0.8039473069276352,
+      "teds_structure": 0.8861068028643746,
+      "cell_f1": 0.7434897226321059,
+      "numeric_recall": 0.9216849506403055
+    },
+    {
+      "run_id": "018e8ca360aec880b2dbc231",
+      "model": "parser:paddleocrvl [budget12288]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 12288,
+      "cases": 80,
+      "failed": 7,
+      "median_seconds": 2.67,
+      "word_f1": 0.7487295604360507,
+      "numeric_recall": 0.8414289340323267
+    },
+    {
+      "run_id": "e6073bcde21b35808298f013",
+      "model": "parser:olmocr2 [budget12288]",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 12288,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 8.58,
+      "word_f1": 0.9010619565680301,
+      "numeric_recall": 0.7183513004010127
     }
   ]
 }
