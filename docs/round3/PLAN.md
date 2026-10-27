@@ -2,7 +2,7 @@
 
 **Scope, fixed 26 October evening: candidates that have not been run yet, nothing else.** Round 3 asks one question: is there a model not yet tested that fits this use case? It runs gpt-oss-20b on the legal track and Nemotron 3.5 Parse, olmOCR-2 and PaddleOCR-VL-1.6 on the page tasks. Every other item below (Qwen3 32B and local Nemotron legal arms, Qwen3 14B, the 8B numeric and masking work) is deferred and not scheduled; it stays in this file only so the ids keep meaning.
 
-Read [laptop readiness and methodological gates](LAPTOP.md) before execution. The gates qualify this proposed schedule; they are not completed inference results.
+Read [pause/resume controls](PAUSE_RESUME.md) and [laptop readiness and methodological gates](LAPTOP.md) before execution. The gates qualify this proposed schedule; they are not completed inference results.
 
 Round 3 adds new models to the existing public-benchmark evaluation without changing anything that produced the earlier rows. Frozen case manifests, the frozen scorers and the conformance checks stay as they are. Every new model, method or transport gets its own protocol label and its own run ids, so old and new rows never mix.
 

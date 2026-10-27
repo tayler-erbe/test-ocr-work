@@ -6,10 +6,11 @@
   python -X utf8 tools/round3_driver.py resume         # clear the pause and continue where it stopped
   python -X utf8 tools/round3_driver.py status         # what is done, what is running, GPU memory
 
-Pause: a file C:/dev/ocr-lab/round3/PAUSE. Every runner checks it between requests, exits with code 75,
-and the driver then stops the parser server or unloads the Ollama model, so the GPU is free within one
-request. Resume continues from the stored rows: parser results live in the lab database by run id and
-case id, legal results in each output directory's event file, and finished requests are skipped.
+Pause: the shared control directory C:/dev/ocr-lab/round3-control (tools/campaign_control.py, the
+cooperative request-boundary pause every runner honours). A pause flag stops dispatch; active requests
+drain and are checkpointed; the runner returns. The driver then does the part the runners deliberately do
+not: it stops the parser server it started, or unloads the Ollama model it loaded, so the GPU is free.
+Resume clears the flag and relaunches the same commands; finished requests, failures included, are skipped.
 
 Stages, in order: three parsers (Nemotron 3.5 Parse, PaddleOCR-VL-1.6, olmOCR-2), gpt-oss-20b legal arms,
 gpt-oss-20b 60-document contrast, parser report, restore of the original port-8001 server.
@@ -28,7 +29,8 @@ HARNESS = HERE.parent
 REPO = HARNESS.parent
 LAB = Path("C:/dev/ocr-lab")
 STATE = LAB / "round3"
-PAUSE = STATE / "PAUSE"
+CONTROL = LAB / "round3-control"  # shared with every runner (--control-dir)
+PAUSE = CONTROL / "PAUSE"
 LOG = STATE / "driver.log"
 WSL = ["wsl", "-d", "Ubuntu-24.04", "-u", "tayle", "--"]
 SERVE = "/mnt/c/dev/test-ocr-work/benchmarks/harness/tools/round3_serve.sh"
@@ -133,17 +135,17 @@ def run_parser(key, backend, tasks, smoke):
         stop_server(proc, key)
         mark(stage, ok=False)
         return True  # move on; the report shows the gap
-    env = dict(os.environ, ROUND3_PAUSE_FILE=str(PAUSE))
-    cmd = PY + [str(HARNESS / "parser_eval.py"), "--root", str(LAB), "run", "--backend", backend, "--url", URL, "--workers", "4"]
+    cmd = PY + [str(HARNESS / "parser_eval.py"), "--root", str(LAB), "run", "--backend", backend, "--url", URL,
+                "--workers", "4", "--control-dir", str(CONTROL)]
     for t in tasks:
         cmd += ["--task", t]
     if smoke:
         cmd += ["--limit", "3"]
     started = time.time()
-    rc = subprocess.run(cmd, cwd=HARNESS, env=env).returncode
+    rc = subprocess.run(cmd, cwd=HARNESS).returncode
     stop_server(proc, key)
     log(f"{stage}: exit {rc} after {time.time() - started:.0f} s")
-    if rc == 75:
+    if paused():  # the runner drained and returned; the server above is already stopped
         return False
     mark(stage, ok=(rc == 0))
     return True
@@ -178,8 +180,8 @@ def run_legal(confirm):
     if not wait_for_gpu():
         return False
     out = LEGAL_OUT / ("gpt-oss-20b-confirm" if confirm else "gpt-oss-20b-arms")
-    env = dict(os.environ, ROUND3_PAUSE_FILE=str(PAUSE), OLLAMA_MODEL=LEGAL_MODEL)
-    cmd = PY + [str(HERE / "local_legal_reassessment.py"), "--out", str(out), "--run"]
+    env = dict(os.environ, OLLAMA_MODEL=LEGAL_MODEL)
+    cmd = PY + [str(HERE / "local_legal_reassessment.py"), "--out", str(out), "--run", "--control-dir", str(CONTROL)]
     if out.exists():
         cmd.append("--resume")
     if confirm:
@@ -188,11 +190,13 @@ def run_legal(confirm):
         cmd += ["--full-spans", str(HARNESS / "handoff" / "legal-comparison-24" / "full_spans.json")]
     started = time.time()
     rc = subprocess.run(cmd, cwd=HARNESS, env=env).returncode
-    unload(LEGAL_MODEL)
+    unload(LEGAL_MODEL)  # the runner leaves the weights loaded; the driver owns that model and frees the GPU
     log(f"{stage}: exit {rc} after {time.time() - started:.0f} s")
-    if rc == 75:
+    status_file = out / "STATUS.LOCAL_ONLY.json"
+    state = json.loads(status_file.read_text(encoding="utf-8")).get("status") if status_file.exists() else None
+    if paused() or state == "paused":
         return False
-    mark(stage, ok=(rc == 0))
+    mark(stage, ok=(rc == 0 and state == "complete"))
     return True
 
 
@@ -263,9 +267,9 @@ def main():
     sub.add_parser("status")
     args = parser.parse_args()
     if args.cmd == "pause":
-        STATE.mkdir(parents=True, exist_ok=True)
+        CONTROL.mkdir(parents=True, exist_ok=True)
         PAUSE.write_text(time.strftime("%Y-%m-%d %H:%M:%S"), encoding="utf-8")
-        print("pause requested; the running stage stops after its current request and frees the GPU")
+        print("pause requested; the running stage drains its active requests, then the driver frees the GPU")
         return 0
     if args.cmd == "status":
         status()
