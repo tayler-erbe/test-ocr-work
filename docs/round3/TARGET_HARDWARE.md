@@ -25,13 +25,6 @@ Both cards are Ada generation with FP8 support. Two models can share one L40S (f
 
 Accuracy transfers (same weights, same decoding, temperature 0), subject to a reproduction check. Speed does not. Token generation is limited by memory bandwidth: the RTX 5090 has about 1.8 TB/s, the L40S about 0.86 TB/s and the L4 about 0.3 TB/s. Expect the L40S at roughly half the desktop's decode speed and the L4 at roughly a sixth, worst for the 32B models. Every throughput number in `RESULTS_3B.md` is desktop-only until measured on the target cards.
 
-## The target-hardware run (proposed, not started)
+## Decision (Tayler, 27 October 2026): no target-hardware run
 
-On one rented L4 and one rented L40S, public data only, the frozen harness unchanged:
-
-1. Reproduction check: a fixed subset of the fresh sets per recommended model, compared case by case with the desktop rows.
-2. Packet latency at concurrency 1 and 4: p50, p95, cases per minute, peak VRAM, failures.
-3. Largest workable context and concurrency for Qwen3 32B and the 32B vision model on the L4.
-4. Cost per 1,000 pages and per 1,000 clause questions at the measured throughput.
-
-Output: one hardware table per card, which becomes the "what to buy or rent" section of the public guidance and the sizing for the client build.
+All models were measured on one machine, so the desktop numbers are valid relative comparisons, and that is the precision this work needs. Note for any reader: absolute speeds on an L4 or L40S will be lower, and not exactly proportional. The large models (32B) are limited by memory bandwidth and slow down more than the small parsers, so the parsers' speed advantage should hold or widen on the target cards. Report desktop speeds as relative, with the bandwidth ratios above as the guide; fit on each card follows from the weight sizes in the table.
