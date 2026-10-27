@@ -214,6 +214,24 @@ def restore_original_server():
     mark("restore")
 
 
+def reclaim():
+    """Stop the port-8001 server ONLY when it is the restore this driver itself started (done_restore marker),
+    so an unfinished stage can continue. The restore happens again when the campaign completes."""
+    if not done("restore"):
+        print("nothing to reclaim: the port-8001 server is not this driver's restore")
+        return 1
+    log("reclaiming the GPU from the driver's own restored port-8001 server")
+    subprocess.run(WSL + ["pkill", "-f", "vllm serve.*--port 8001"], timeout=60)
+    (STATE / "done_restore").unlink(missing_ok=True)
+    for _ in range(30):
+        used = gpu_used_mib()
+        if used is not None and used < 3000:
+            break
+        time.sleep(2)
+    log(f"reclaimed; GPU {gpu_used_mib()} MiB")
+    return 0
+
+
 def status():
     STATE.mkdir(parents=True, exist_ok=True)
     print("paused:", paused())
@@ -265,7 +283,10 @@ def main():
     rs = sub.add_parser("resume")
     rs.add_argument("--smoke", action="store_true")
     sub.add_parser("status")
+    sub.add_parser("reclaim")
     args = parser.parse_args()
+    if args.cmd == "reclaim":
+        return reclaim()
     if args.cmd == "pause":
         CONTROL.mkdir(parents=True, exist_ok=True)
         PAUSE.write_text(time.strftime("%Y-%m-%d %H:%M:%S"), encoding="utf-8")

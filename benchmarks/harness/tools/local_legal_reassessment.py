@@ -79,7 +79,7 @@ def measure_prompt(model, body, context):
 def residency(model):
     """Where the loaded weights sit (Ollama /api/ps). A run counts only when everything is on the GPU."""
     for m in ollama("/api/ps", timeout=20).get("models", []):
-        if m.get("name") == model:
+        if model in (m.get("name"), m.get("model")):
             return {"size": m.get("size"), "size_vram": m.get("size_vram"), "context_length": m.get("context_length"),
                     "fully_on_gpu": bool(m.get("size")) and m.get("size_vram") == m.get("size")}
     return {"fully_on_gpu": False, "note": "model not listed as loaded"}
@@ -230,6 +230,13 @@ def main():
         plan["deployment_snapshot"] = info
         plan["deployment_snapshot_sha256"] = digest
     rows = checkpoint_rows(args.out, plan, args.resume)
+    if args.run:  # load once up front: everything must sit on the GPU or the run does not count (no request is in flight here)
+        ollama("/api/chat", {"model": model, "messages": [{"role": "user", "content": "ok"}], "stream": False, "keep_alive": "10m",
+                             "think": think_value(model, False), "options": {"num_predict": 1, "num_ctx": context}}, timeout=1800)
+        plan["residency"] = residency(model)
+        durable_json(args.out / "PLAN.json", plan)
+        if not plan["residency"]["fully_on_gpu"]:
+            raise SystemExit("Model is not fully resident on the GPU at this context; lower --context or stop: " + json.dumps(plan["residency"]))
     completed = {(row["arm"], row["case_id"]) for row in rows}
     expected = {(arm, request["case_id"]) for request, _, arm, _, _ in schedule}
     if not completed <= expected:
@@ -250,12 +257,9 @@ def main():
         try:
             tokens = measure_prompt(model, body, context)
             row["prompt_tokens_measured"] = tokens
-            if "residency" not in plan:  # first load: everything must sit on the GPU or the run does not count
-                plan["residency"] = residency(model)
-                (args.out / "PLAN.json").write_text(json.dumps(plan, indent=2), encoding="utf8")
-                if not plan["residency"]["fully_on_gpu"]:
-                    raise SystemExit("Model is not fully resident on the GPU at this context; lower --context or stop: " + json.dumps(plan["residency"]))
-            if tokens is None or tokens + config["budget"] + 64 > context:
+            # Ollama truncates a prompt longer than num_ctx and then reports the truncated count, which lands within
+            # a few tokens of num_ctx; every budget here is >= 2000 tokens, so a truncated prefill can never pass.
+            if tokens is None or tokens >= context - 256 or tokens + config["budget"] + 64 > context:
                 raise ValueError("context_exceeded")
             result = call(model, body, context)
             row.update(retained_result(result))
