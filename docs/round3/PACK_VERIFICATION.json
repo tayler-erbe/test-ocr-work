@@ -1,0 +1,13 @@
+{
+  "confirmation_cases": 60,
+  "confirmation_documents": 60,
+  "confirmation_receipt_sha256_canonical": "b15a5030d85572b504dcff750d136ee43c38049935036ca49af1006cc81a4129",
+  "confirmation_files": {
+    "requests.json": "c27077de2486c0b1c07ff5776678121e10406357d90399959418c8cd766914ea",
+    "references.DO_NOT_SEND_TO_MODEL.json": "9822431e0928e81bef6eac60e14e4339c8ce10c38f47cfb260fc52041b198a21",
+    "RECEIPT.json": "1f98ae405821365b9cdc350ef8a48701e080df53a7c2a0b7be44917d29e7829b"
+  },
+  "full_spans_cases": 24,
+  "full_spans_sha256": "e65ff580814b3245497787d69375e886bd0819f6938b769198417940903a2c91",
+  "scope": "Public CUAD and ContractNLI only; source database opened read-only; no model responses. References are scoring-only and never inference input."
+}

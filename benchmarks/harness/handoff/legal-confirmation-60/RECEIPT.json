@@ -1,0 +1,18 @@
+{
+  "cases": 60,
+  "documents": 60,
+  "strata": {
+    "cuad:present": 15,
+    "cuad:absent": 15,
+    "contractnli:Entailment": 10,
+    "contractnli:Contradiction": 10,
+    "contractnli:NotMentioned": 10
+  },
+  "selection": "seeded hash order; round robin label strata; one case per document; exclusions from local results and original frozen manifest",
+  "limitations": "Unused in locally recorded runs; not proof of absence from other machines, unrecorded experiments, or model pretraining.",
+  "source_script_sha256": "6c36724e6600c98dae213ba8bec2fcc91bb720b50ef2d1a0c99ac0ef71281e92",
+  "files": {
+    "references.DO_NOT_SEND_TO_MODEL.json": "9822431e0928e81bef6eac60e14e4339c8ce10c38f47cfb260fc52041b198a21",
+    "requests.json": "c27077de2486c0b1c07ff5776678121e10406357d90399959418c8cd766914ea"
+  }
+}

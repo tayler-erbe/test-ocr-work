@@ -1,0 +1,53 @@
+{
+  "model": "qwen3:14b",
+  "context": 32768,
+  "inference_executed": false,
+  "note": "Conservative byte guard, not exact tokenization. A rejection is an adapter eligibility failure, not model quality.",
+  "groups": {
+    "baseline": {
+      "planned": 24,
+      "byte_guard_rejections": 0,
+      "max_conservative_total": 22382
+    },
+    "budget": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 36383
+    },
+    "reasoning": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 36382
+    },
+    "sampling": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 36382
+    },
+    "definitions": {
+      "planned": 24,
+      "byte_guard_rejections": 14,
+      "max_conservative_total": 36802
+    },
+    "full_document": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 259878
+    },
+    "ids": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 36083
+    },
+    "schema_in_prompt": {
+      "planned": 24,
+      "byte_guard_rejections": 13,
+      "max_conservative_total": 36486
+    },
+    "confirmation_each_arm": {
+      "planned": 60,
+      "byte_guard_rejections": 32,
+      "max_conservative_total": 36575
+    }
+  }
+}
