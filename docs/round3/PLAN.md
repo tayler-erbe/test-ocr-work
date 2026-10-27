@@ -10,7 +10,7 @@ Two machines share the work. Each item below says which machine runs it and what
 
 | Machine | GPU | Runtime | Who drives it |
 |---|---|---|---|
-| Desktop | RTX 5090, 32 GB | Ollama on Windows; vLLM 0.30 under WSL2 | Claude |
+| Desktop | RTX 5090, 32 GB | Ollama on Windows; vLLM 0.30 under WSL2 | the desktop operator |
 | Laptop | RTX 4000 Ada Laptop, 12 GB, 64 GB RAM | Ollama on Windows (WSL2 status unknown: report it) | Codex |
 
 Rules that carry over unchanged: one model resident on the GPU at a time, served on 127.0.0.1; temperature 0 except where an arm explicitly sets sampling; failed and truncated answers score zero and stay in the denominator; no model grades another; nothing is re-run to rescue a result; public data only; aggregate tables only leave the machine.

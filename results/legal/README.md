@@ -1,3 +1,5 @@
+> Earlier Nemotron reassessment. The [final advisory](../../docs/EVALUATION.md) adds the completed cross-model comparison. Original results are retained below.
+
 # Nemotron controlled reassessment
 
 Completed 26 October 2026: **192 requests, eight configurations, the same 24 public diagnostic cases** (12 CUAD, 12 ContractNLI). All cases were previously exposed. This is exploratory, not a production model ranking.

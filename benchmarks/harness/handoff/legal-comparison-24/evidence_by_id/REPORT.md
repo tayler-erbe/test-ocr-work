@@ -1,6 +1,6 @@
 # Evidence-by-ID extraction: implementation and exploratory results (20 Oct 2026)
 
-Step 4 of the extraction plan (nemotron-failure-analysis.md section 8; evidence-and-fields.md), built and run on the desktop with local models only: Qwen3-32B (Ollama 0.34.4, digest 030ee887880f) and Qwen3-VL-32B-Instruct-AWQ (vLLM, served name qwen3vl32b). No Claude model read any document. Public data only (the 24-case input pack).
+Step 4 of the extraction plan (nemotron-failure-analysis.md section 8; evidence-and-fields.md), built and run on the desktop with local models only: Qwen3-32B (Ollama 0.34.4, digest 030ee887880f) and Qwen3-VL-32B-Instruct-AWQ (vLLM, served name qwen3vl32b). No the desktop operator model read any document. Public data only (the 24-case input pack).
 
 **Exploratory only.** 12 CUAD and 12 ContractNLI questions, all previously seen during diagnostics; only 6 of the 12 CUAD questions are positives. One question moves a score by about 8 points. No production claim.
 

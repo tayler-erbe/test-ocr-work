@@ -1,4 +1,4 @@
-"""The evaluation contract shared by the desktop (Claude-orchestrated) and laptop (Codex) runs of vision-v1.
+"""The evaluation contract shared by the desktop (operator-orchestrated) and laptop (Codex) runs of vision-v1.
 
 Two machines can only be compared if they ran the same cases, sent the models the same requests and scored
 the answers the same way. The fingerprints here are behavioural, not textual:

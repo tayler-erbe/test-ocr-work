@@ -32,7 +32,7 @@ That way both sets of results merge into one final report.
 2. **The frozen manifests are never edited or rebuilt.** Copy them in the case pack (section 5). `vision_eval.py build` only keeps pages whose image exists on the local disk, so a rebuild on another machine can silently produce a different case set.
 3. **Never lower a threshold, drop a case, or re-run a failed case to replace it.** Failed and truncated answers stay in the denominator as zero. `vision_eval.py run` resumes a run, but it never retries a recorded case.
 4. **No model grades another model.** Every score comes from published answer keys and plain code.
-5. **Local models only** for reading, extracting and answering. This project's rule for Claude is that it writes code and documents only; it never reads or judges the documents or images. Codex runs the local models on the laptop as before.
+5. **Local models only** for reading, extracting and answering. This project's rule for the desktop operator is that it writes code and documents only; it never reads or judges the documents or images. Codex runs the local models on the laptop as before.
 6. **Only aggregates go to GitHub.** Results, crops, exports, datasets and model outputs stay on the machine (`.gitignore` already excludes `*.sqlite3`; keep `exports/`, `merged/` and the pack out of git).
 7. **One model on the GPU at a time.** Unload each Ollama model (`keep_alive: 0`) before loading the next.
 

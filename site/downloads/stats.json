@@ -1,0 +1,1072 @@
+{
+  "draws": 2000,
+  "seed": 20261026,
+  "margin": 0.02,
+  "holm": {
+    "H1": {
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "primary_metric": "teds",
+      "holm_alpha": 0.025,
+      "primary_interval": [
+        0.0478,
+        0.1394
+      ],
+      "primary_p": 0.0,
+      "numeric_recall_interval": [
+        -0.0079,
+        0.0994
+      ],
+      "margin": 0.02,
+      "beats": true,
+      "numeric_non_inferior": true,
+      "passed": true,
+      "reading": "passed"
+    },
+    "H2": {
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "primary_metric": "word_f1",
+      "holm_alpha": 0.05,
+      "primary_interval": [
+        0.0303,
+        0.1348
+      ],
+      "primary_p": 0.001,
+      "numeric_recall_interval": [
+        -0.0473,
+        0.0509
+      ],
+      "margin": 0.02,
+      "beats": true,
+      "numeric_non_inferior": false,
+      "passed": false,
+      "reading": "cleaner output, fewer numbers: lead on the primary metric without numeric non-inferiority"
+    }
+  },
+  "comparisons": [
+    {
+      "model": "parser:nemotron-parse",
+      "task": "layout",
+      "comparator": "yolo",
+      "cases": 120,
+      "clusters": 120,
+      "confirmatory": false,
+      "figure_f1": {
+        "model_mean": 0.6115,
+        "comparator_mean": 0.8761,
+        "difference": -0.2646,
+        "ci95": [
+          -0.3764,
+          -0.1555
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse"
+      },
+      "table_f1": {
+        "model_mean": 0.9245,
+        "comparator_mean": 0.8907,
+        "difference": 0.0338,
+        "ci95": [
+          0.0,
+          0.0803
+        ],
+        "p_two_sided": 0.071,
+        "verdict": "not distinguishable"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8698,
+        "comparator_mean": 0.8094,
+        "difference": 0.0604,
+        "ci95": [
+          -0.0031,
+          0.1218
+        ],
+        "p_two_sided": 0.062,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8816,
+        "comparator_mean": 0.9086,
+        "difference": -0.0271,
+        "ci95": [
+          -0.0857,
+          0.027
+        ],
+        "p_two_sided": 0.358,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8678,
+        "comparator_mean": 0.8138,
+        "difference": 0.054,
+        "ci95": [
+          0.0089,
+          0.0968
+        ],
+        "p_two_sided": 0.018,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8473,
+        "comparator_mean": 0.8719,
+        "difference": -0.0246,
+        "ci95": [
+          -0.0743,
+          0.0224
+        ],
+        "p_two_sided": 0.331,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b [budget8744]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8678,
+        "comparator_mean": 0.8097,
+        "difference": 0.0581,
+        "ci95": [
+          0.0132,
+          0.1008
+        ],
+        "p_two_sided": 0.01,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8473,
+        "comparator_mean": 0.8719,
+        "difference": -0.0246,
+        "ci95": [
+          -0.0743,
+          0.0224
+        ],
+        "p_two_sided": 0.331,
+        "verdict": "not distinguishable; NOT non-inferior"
+      },
+      "note": "budget-matched arm: parser at its default budget against the 32B at 8,744 tokens"
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8415,
+        "comparator_mean": 0.8212,
+        "difference": 0.0204,
+        "ci95": [
+          -0.0186,
+          0.0655
+        ],
+        "p_two_sided": 0.327,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9426,
+        "comparator_mean": 0.9692,
+        "difference": -0.0266,
+        "ci95": [
+          -0.0683,
+          0.0043
+        ],
+        "p_two_sided": 0.112,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8105,
+        "comparator_mean": 0.8508,
+        "difference": -0.0403,
+        "ci95": [
+          -0.109,
+          0.023
+        ],
+        "p_two_sided": 0.406,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9174,
+        "comparator_mean": 0.9666,
+        "difference": -0.0492,
+        "ci95": [
+          -0.1042,
+          0.007
+        ],
+        "p_two_sided": 0.116,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget12288]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8675,
+        "comparator_mean": 0.8138,
+        "difference": 0.0537,
+        "ci95": [
+          0.0086,
+          0.0962
+        ],
+        "p_two_sided": 0.021,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8484,
+        "comparator_mean": 0.8719,
+        "difference": -0.0235,
+        "ci95": [
+          -0.0738,
+          0.0233
+        ],
+        "p_two_sided": 0.358,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget6000]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8604,
+        "comparator_mean": 0.8138,
+        "difference": 0.0467,
+        "ci95": [
+          0.0042,
+          0.0867
+        ],
+        "p_two_sided": 0.034,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8441,
+        "comparator_mean": 0.8719,
+        "difference": -0.0279,
+        "ci95": [
+          -0.0774,
+          0.019
+        ],
+        "p_two_sided": 0.255,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": true,
+      "word_f1": {
+        "model_mean": 0.8989,
+        "comparator_mean": 0.8195,
+        "difference": 0.0794,
+        "ci95": [
+          0.0303,
+          0.1348
+        ],
+        "p_two_sided": 0.001,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8822,
+        "comparator_mean": 0.8834,
+        "difference": -0.0012,
+        "ci95": [
+          -0.0473,
+          0.0509
+        ],
+        "p_two_sided": 0.913,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8035,
+        "comparator_mean": 0.7625,
+        "difference": 0.041,
+        "ci95": [
+          -0.0051,
+          0.0894
+        ],
+        "p_two_sided": 0.084,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.919,
+        "comparator_mean": 0.9322,
+        "difference": -0.0132,
+        "ci95": [
+          -0.0743,
+          0.0502
+        ],
+        "p_two_sided": 0.688,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8861,
+        "comparator_mean": 0.8195,
+        "difference": 0.0666,
+        "ci95": [
+          0.0177,
+          0.1249
+        ],
+        "p_two_sided": 0.009,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8676,
+        "comparator_mean": 0.8834,
+        "difference": -0.0157,
+        "ci95": [
+          -0.07,
+          0.0416
+        ],
+        "p_two_sided": 0.586,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [double]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8039,
+        "comparator_mean": 0.7625,
+        "difference": 0.0414,
+        "ci95": [
+          -0.0057,
+          0.0909
+        ],
+        "p_two_sided": 0.08,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9217,
+        "comparator_mean": 0.9322,
+        "difference": -0.0105,
+        "ci95": [
+          -0.0716,
+          0.0529
+        ],
+        "p_two_sided": 0.753,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8861,
+        "comparator_mean": 0.8195,
+        "difference": 0.0666,
+        "ci95": [
+          0.0177,
+          0.1249
+        ],
+        "p_two_sided": 0.009,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8676,
+        "comparator_mean": 0.8834,
+        "difference": -0.0157,
+        "ci95": [
+          -0.07,
+          0.0416
+        ],
+        "p_two_sided": 0.586,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:nemotron-parse [budget8192] [triple]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8039,
+        "comparator_mean": 0.7625,
+        "difference": 0.0414,
+        "ci95": [
+          -0.0057,
+          0.0909
+        ],
+        "p_two_sided": 0.08,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9217,
+        "comparator_mean": 0.9322,
+        "difference": -0.0105,
+        "ci95": [
+          -0.0716,
+          0.0529
+        ],
+        "p_two_sided": 0.753,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8974,
+        "comparator_mean": 0.8094,
+        "difference": 0.0881,
+        "ci95": [
+          0.0407,
+          0.1434
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7429,
+        "comparator_mean": 0.9086,
+        "difference": -0.1657,
+        "ci95": [
+          -0.2455,
+          -0.1005
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8921,
+        "comparator_mean": 0.8138,
+        "difference": 0.0783,
+        "ci95": [
+          0.0345,
+          0.1207
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7156,
+        "comparator_mean": 0.8719,
+        "difference": -0.1563,
+        "ci95": [
+          -0.2077,
+          -0.1083
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b [budget8744]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8921,
+        "comparator_mean": 0.8097,
+        "difference": 0.0824,
+        "ci95": [
+          0.0375,
+          0.1239
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7156,
+        "comparator_mean": 0.8719,
+        "difference": -0.1563,
+        "ci95": [
+          -0.2077,
+          -0.1083
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      },
+      "note": "budget-matched arm: parser at its default budget against the 32B at 8,744 tokens"
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7913,
+        "comparator_mean": 0.8212,
+        "difference": -0.0299,
+        "ci95": [
+          -0.0907,
+          0.0326
+        ],
+        "p_two_sided": 0.332,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9063,
+        "comparator_mean": 0.9692,
+        "difference": -0.0629,
+        "ci95": [
+          -0.1187,
+          -0.0205
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7924,
+        "comparator_mean": 0.8508,
+        "difference": -0.0584,
+        "ci95": [
+          -0.1171,
+          0.0025
+        ],
+        "p_two_sided": 0.067,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8784,
+        "comparator_mean": 0.9666,
+        "difference": -0.0882,
+        "ci95": [
+          -0.1401,
+          -0.0282
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2 [budget12288]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.9011,
+        "comparator_mean": 0.8138,
+        "difference": 0.0873,
+        "ci95": [
+          0.055,
+          0.1218
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7184,
+        "comparator_mean": 0.8719,
+        "difference": -0.1536,
+        "ci95": [
+          -0.2025,
+          -0.1058
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2 [budget6000]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.9014,
+        "comparator_mean": 0.8138,
+        "difference": 0.0877,
+        "ci95": [
+          0.0555,
+          0.1221
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7214,
+        "comparator_mean": 0.8719,
+        "difference": -0.1506,
+        "ci95": [
+          -0.1989,
+          -0.1041
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.8979,
+        "comparator_mean": 0.8195,
+        "difference": 0.0784,
+        "ci95": [
+          0.0262,
+          0.1352
+        ],
+        "p_two_sided": 0.002,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7057,
+        "comparator_mean": 0.8834,
+        "difference": -0.1777,
+        "ci95": [
+          -0.245,
+          -0.1134
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:olmocr2 [budget8192]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7051,
+        "comparator_mean": 0.7625,
+        "difference": -0.0574,
+        "ci95": [
+          -0.1148,
+          -0.0013
+        ],
+        "p_two_sided": 0.047,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8537,
+        "comparator_mean": 0.9322,
+        "difference": -0.0785,
+        "ci95": [
+          -0.1512,
+          -0.0055
+        ],
+        "p_two_sided": 0.032,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddle-pipeline",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.9218,
+        "comparator_mean": 0.8195,
+        "difference": 0.1023,
+        "ci95": [
+          0.0494,
+          0.162
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7706,
+        "comparator_mean": 0.8834,
+        "difference": -0.1128,
+        "ci95": [
+          -0.1809,
+          -0.0495
+        ],
+        "p_two_sided": 0.002,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddle-pipeline",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.7848,
+        "comparator_mean": 0.7625,
+        "difference": 0.0223,
+        "ci95": [
+          -0.0301,
+          0.0765
+        ],
+        "p_two_sided": 0.404,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8508,
+        "comparator_mean": 0.9322,
+        "difference": -0.0814,
+        "ci95": [
+          -0.159,
+          -0.0039
+        ],
+        "p_two_sided": 0.038,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "page_text",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 40,
+      "clusters": 40,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.6588,
+        "comparator_mean": 0.8094,
+        "difference": -0.1506,
+        "ci95": [
+          -0.2555,
+          -0.0548
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7211,
+        "comparator_mean": 0.9086,
+        "difference": -0.1875,
+        "ci95": [
+          -0.3043,
+          -0.0868
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7453,
+        "comparator_mean": 0.8138,
+        "difference": -0.0684,
+        "ci95": [
+          -0.1269,
+          -0.0197
+        ],
+        "p_two_sided": 0.002,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8389,
+        "comparator_mean": 0.8719,
+        "difference": -0.033,
+        "ci95": [
+          -0.0966,
+          0.023
+        ],
+        "p_two_sided": 0.303,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b [budget8744]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7453,
+        "comparator_mean": 0.8097,
+        "difference": -0.0644,
+        "ci95": [
+          -0.1192,
+          -0.0185
+        ],
+        "p_two_sided": 0.002,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8389,
+        "comparator_mean": 0.8719,
+        "difference": -0.033,
+        "ci95": [
+          -0.0966,
+          0.023
+        ],
+        "p_two_sided": 0.303,
+        "verdict": "not distinguishable; NOT non-inferior"
+      },
+      "note": "budget-matched arm: parser at its default budget against the 32B at 8,744 tokens"
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "table",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 60,
+      "clusters": 51,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8619,
+        "comparator_mean": 0.8212,
+        "difference": 0.0408,
+        "ci95": [
+          -0.0219,
+          0.1145
+        ],
+        "p_two_sided": 0.205,
+        "verdict": "not distinguishable"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9754,
+        "comparator_mean": 0.9692,
+        "difference": 0.0061,
+        "ci95": [
+          -0.0083,
+          0.0236
+        ],
+        "p_two_sided": 0.492,
+        "verdict": "not distinguishable; non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl",
+      "task": "table_confirm",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 159,
+      "clusters": 101,
+      "confirmatory": false,
+      "teds": {
+        "model_mean": 0.8892,
+        "comparator_mean": 0.8508,
+        "difference": 0.0384,
+        "ci95": [
+          0.0133,
+          0.0682
+        ],
+        "p_two_sided": 0.001,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9606,
+        "comparator_mean": 0.9666,
+        "difference": -0.0061,
+        "ci95": [
+          -0.0207,
+          0.0094
+        ],
+        "p_two_sided": 0.494,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget12288]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7487,
+        "comparator_mean": 0.8138,
+        "difference": -0.0651,
+        "ci95": [
+          -0.1208,
+          -0.0189
+        ],
+        "p_two_sided": 0.004,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8414,
+        "comparator_mean": 0.8719,
+        "difference": -0.0305,
+        "ci95": [
+          -0.0916,
+          0.0248
+        ],
+        "p_two_sided": 0.336,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget6000]",
+      "task": "page_text_confirm2",
+      "comparator": "openai:qwen3vl32b",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7487,
+        "comparator_mean": 0.8138,
+        "difference": -0.0651,
+        "ci95": [
+          -0.1206,
+          -0.0192
+        ],
+        "p_two_sided": 0.004,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.8428,
+        "comparator_mean": 0.8719,
+        "difference": -0.0291,
+        "ci95": [
+          -0.0898,
+          0.0258
+        ],
+        "p_two_sided": 0.346,
+        "verdict": "not distinguishable; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "page_text_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 80,
+      "clusters": 80,
+      "confirmatory": false,
+      "word_f1": {
+        "model_mean": 0.7371,
+        "comparator_mean": 0.8195,
+        "difference": -0.0824,
+        "ci95": [
+          -0.1456,
+          -0.0206
+        ],
+        "p_two_sided": 0.009,
+        "verdict": "worse"
+      },
+      "numeric_recall": {
+        "model_mean": 0.7816,
+        "comparator_mean": 0.8834,
+        "difference": -0.1018,
+        "ci95": [
+          -0.1814,
+          -0.0228
+        ],
+        "p_two_sided": 0.008,
+        "verdict": "worse; NOT non-inferior"
+      }
+    },
+    {
+      "model": "parser:paddleocrvl [budget8192]",
+      "task": "table_confirm3",
+      "comparator": "openai:qwen3vl32b [budget8192]",
+      "cases": 100,
+      "clusters": 87,
+      "confirmatory": true,
+      "teds": {
+        "model_mean": 0.8523,
+        "comparator_mean": 0.7625,
+        "difference": 0.0898,
+        "ci95": [
+          0.0514,
+          0.1343
+        ],
+        "p_two_sided": 0.0,
+        "verdict": "better"
+      },
+      "numeric_recall": {
+        "model_mean": 0.9739,
+        "comparator_mean": 0.9322,
+        "difference": 0.0417,
+        "ci95": [
+          -0.0013,
+          0.0925
+        ],
+        "p_two_sided": 0.058,
+        "verdict": "not distinguishable; non-inferior"
+      }
+    }
+  ]
+}

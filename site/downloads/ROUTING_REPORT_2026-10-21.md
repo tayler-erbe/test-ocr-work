@@ -1,6 +1,6 @@
 # OCR routing report, 21 October 2026
 
-Source: `merged/final/MERGED_REPORT.md`, produced by `tools/merge_results.py --round2` from the desktop export (22,731 rows) and the validated laptop export (18,244 rows, SHA-256 `ebc69a53...f5da753`, matches). Merged: 40,975 rows, 26 same-model comparison groups. Both exports passed `check_conformance.py --round2` (CONFORMANT). Everything below is scores and counts from code. No model output was read by a person or by Claude. Failed cases count as zero.
+Source: `merged/final/MERGED_REPORT.md`, produced by `tools/merge_results.py --round2` from the desktop export (22,731 rows) and the validated laptop export (18,244 rows, SHA-256 `ebc69a53...f5da753`, matches). Merged: 40,975 rows, 26 same-model comparison groups. Both exports passed `check_conformance.py --round2` (CONFORMANT). Everything below is scores and counts from code. No model output was read by a person or by the desktop operator. Failed cases count as zero.
 
 ## Status: prototype routing, not production approval
 

@@ -15,8 +15,8 @@ Verified 26 October 2026 on the work laptop:
 
 | Machine | Model/work | Gate |
 |---|---|---|
-| Desktop / Claude | GPT-OSS 20B, Qwen3 32B, local Nemotron Nano legal comparisons | GPU availability; adapter fixes; full input packs now supplied |
-| Desktop / Claude | Nemotron 3.5 Parse, PaddleOCR-VL-1.6, olmOCR 2 | Working native parser pipelines, accurate adapters and pinned revisions |
+| Desktop / the desktop operator | GPT-OSS 20B, Qwen3 32B, local Nemotron Nano legal comparisons | GPU availability; adapter fixes; full input packs now supplied |
+| Desktop / the desktop operator | Nemotron 3.5 Parse, PaddleOCR-VL-1.6, olmOCR 2 | Working native parser pipelines, accurate adapters and pinned revisions |
 | Laptop / Codex | Public pack verification and export | Complete; see PACK_VERIFICATION.json |
 | Laptop / Codex | Qwen3-VL 8B held-out tables, numeric miss analysis, 7B/8B masking-v2 development | Frozen conformance gates; new variants in new runners; no frozen selection changes |
 | Laptop / Codex | Qwen3 14B legal campaign | Conditional on measured full GPU fit at the actual context/output budget; not yet started |

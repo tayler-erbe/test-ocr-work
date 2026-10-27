@@ -1,6 +1,6 @@
 # Vision evaluation, round 2: improvements (20 Oct 2026)
 
-All reading was done by local models (Qwen3-VL-32B AWQ on vLLM, DocLayout-YOLO). No Claude model saw any image or document; Claude wrote code and orchestrated only.
+All reading was done by local models (Qwen3-VL-32B AWQ on vLLM, DocLayout-YOLO). No the desktop operator model saw any image or document; the desktop operator wrote code and orchestrated only.
 
 ## Verdict
 

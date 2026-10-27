@@ -1,6 +1,6 @@
 # Round 3 runbook: pause, resume, status
 
-All commands run from `C:/dev/test-ocr-work/benchmarks/harness`. In a Claude Code prompt, prefix with `!`.
+All commands run from `C:/dev/test-ocr-work/benchmarks/harness`. In a the desktop operator Code prompt, prefix with `!`.
 
 | Want | Command |
 |---|---|

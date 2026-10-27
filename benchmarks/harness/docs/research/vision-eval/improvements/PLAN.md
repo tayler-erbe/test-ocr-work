@@ -1,7 +1,7 @@
 # Vision evaluation, round 2: improvement plan (pre-registered 20 Oct 2026, before any v2 data was frozen or run)
 
 Production model: Qwen3-VL-32B-Instruct AWQ on vLLM (`openai:qwen3vl32b`). Every reading, extraction and judgement is
-done by local models and plain-code scorers; no Claude model sees any image or document.
+done by local models and plain-code scorers; no the desktop operator model sees any image or document.
 
 ## Where round 1 lost points (from stored scores, not from looking at images)
 

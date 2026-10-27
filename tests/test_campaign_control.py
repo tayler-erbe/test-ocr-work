@@ -71,7 +71,7 @@ class PauseTests(unittest.TestCase):
                     (flag / "PAUSE").touch()
                 return {"content": "bad json", "done_reason": "stop", "usage": {}, "reasoning_present": True, "think_sent": "low"}
             argv = ["local", "--out", str(out), "--arms", "baseline", "--control-dir", str(flag), "--run"]
-            with patch.dict(os.environ, {"OLLAMA_MODEL": "gpt-oss:20b"}), patch.object(legal, "snapshot", return_value=({"model": "fixed"}, "fixed")), patch.object(legal, "measure_prompt", return_value=5), patch.object(legal, "residency", return_value={"fully_on_gpu": True}), patch.object(legal, "acquire_lock"), patch.object(legal, "call", side_effect=fake_call), contextlib.redirect_stdout(io.StringIO()):
+            with patch.dict(os.environ, {"OLLAMA_MODEL": "gpt-oss:20b"}), patch.object(legal, "snapshot", return_value=({"model": "fixed"}, "fixed")), patch.object(legal, "measure_prompt", return_value=5), patch.object(legal, "residency", return_value={"fully_on_gpu": True}), patch.object(legal, "acquire_lock"), patch.object(legal, "ollama", return_value={}), patch.object(legal, "call", side_effect=fake_call), contextlib.redirect_stdout(io.StringIO()):
                 with patch.object(sys, "argv", argv):
                     legal.main()
                 self.assertEqual(len(calls), 1)

@@ -51,4 +51,4 @@ These controls must be installed BEFORE starting the new scored run. Existing ru
 
 ## Validation
 
-Provider-free tests cover pause before dispatch, a pause after the first request, preservation of failed attempts, changed-plan and duplicate refusal, and a parser pause/resume integration with no repeated case. They do not prove live desktop server shutdown, VRAM release or service restart. Claude must smoke-test those ownership-specific operations on the desktop.
+Provider-free tests cover pause before dispatch, a pause after the first request, preservation of failed attempts, changed-plan and duplicate refusal, and a parser pause/resume integration with no repeated case. They do not prove live desktop server shutdown, VRAM release or service restart. the desktop operator must smoke-test those ownership-specific operations on the desktop.
