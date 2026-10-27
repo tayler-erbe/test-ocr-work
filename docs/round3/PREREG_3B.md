@@ -32,3 +32,9 @@ Comparator weights: the same Qwen3-VL 32B AWQ build and the same vLLM serving as
 ## What 3b does not do
 
 No target-domain documents, no field-bound numeric metric, no structure-preserving table score. Those remain the stated boundary of the claim. Any statement about proposals or contracts still needs its own labelled set.
+
+## Amendments after launch (26 October, evening)
+
+1. The 16,384-token recovery arm cannot be served: every parser server runs with a 16,384-token context window, so prompt plus budget exceeds it and every request was rejected before inference (HTTP 400). Those rows are harness errors, not model failures; they are deleted (logged in `results/vision/round3/PURGED.json`) and the recovery arm is rerun at 12,288 tokens. Nothing about the confirmatory hypotheses changes.
+2. The Nemotron Parse double and triple passes failed on a missing import in the runner before any model call. Same treatment: deleted, logged, rerun unchanged.
+
