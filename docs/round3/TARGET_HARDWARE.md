@@ -23,7 +23,7 @@ Both cards are Ada generation with FP8 support. Two models can share one L40S (f
 
 ## What does not transfer from the desktop
 
-Accuracy transfers (same weights, same decoding, temperature 0), subject to a reproduction check. Speed does not. Token generation is limited by memory bandwidth: the RTX 5090 has about 1.8 TB/s, the L40S about 0.86 TB/s and the L4 about 0.3 TB/s. Expect the L40S at roughly half the desktop's decode speed and the L4 at roughly a sixth, worst for the 32B models. Every throughput number in `RESULTS_3B.md` is desktop-only until measured on the target cards.
+Accuracy transfers (same weights, same decoding, temperature 0), subject to a reproduction check. Speed does not. Token generation is limited by memory bandwidth: the RTX 5090 has about 1.8 TB/s, the L40S about 0.86 TB/s and the L4 about 0.3 TB/s. Expect the L40S at roughly half the desktop's decode speed and the L4 at roughly a sixth, worst for the 32B models. Every throughput number in `RESULTS_3B.md` is a desktop measurement, valid as a relative comparison (see the decision below).
 
 ## Decision (Tayler, 27 October 2026): no target-hardware run
 
