@@ -1,5 +1,7 @@
 # Round 3: laptop tasks (Codex)
 
+**Scope change, 26 October evening:** round 3 is new candidates only. Section 0 is done. Sections 1 to 5 are deferred and not requested unless Tayler asks again.
+
 Read `docs/round3/PLAN.md` first. Everything here runs on the 12 GB laptop with Ollama; nothing needs the desktop. Report back on this branch (`round3-2026-10-26`) with aggregate files only: no model responses, no crops, no private documents.
 
 ## 0. Deliverables the desktop is waiting on (do these first)
