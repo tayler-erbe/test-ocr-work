@@ -1,0 +1,85 @@
+"""Reproducibility replay (round 3b): rerun the two same-weight Qwen2.5-VL 7B comparison groups that did not
+reproduce between the desktop and the laptop (routing report: chart_qa expert, +3.0 points; chart_table upscale,
+-14.8 points), on this machine, with vision_eval.run_case unchanged. Rows are stored under protocol vision-v1-replay
+and the label suffix [replay], so the original rows are untouched and the two runs can be compared case by case.
+
+  python -X utf8 tools/replay_7b.py --root C:/dev/ocr-lab --control-dir C:/dev/ocr-lab/round3-control
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent))
+sys.path.insert(0, str(HERE))
+import vision_eval as ve  # noqa: E402
+import vlm_client  # noqa: E402
+from document_lab import connect, now  # noqa: E402
+from campaign_control import paused, bounded_results, acquire_lock  # noqa: E402
+
+MODEL = "ollama:qwen2.5vl:7b"
+GROUPS = [("chart_qa", "expert"), ("chart_table", "upscale")]
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--control-dir", type=Path, required=True)
+    parser.add_argument("--workers", type=int, default=1)
+    args = parser.parse_args()
+    if paused(args.control_dir):
+        print("PAUSED")
+        return
+    acquire_lock(args.root / "evaluation" / "replay-runner.LOCAL_ONLY.lock")
+    weights = vlm_client.model_digest(MODEL)
+    if not weights:
+        raise SystemExit(f"{MODEL} is not being served right now")
+    db = connect(args.root)
+    db.execute(ve.RESULT_SCHEMA)
+    manifest = ve.load_cases(args.root, "v1")
+    for task, variant in GROUPS:
+        if paused(args.control_dir):
+            break
+        label = f"{MODEL} [{variant}] [replay]"
+        config = {"protocol": "vision-v1-replay", "cases_sha256": manifest["cases_sha256"], "task": task, "model": MODEL, "weights": weights,
+                  "variant": variant, "mode": "image", "replay_of": "vision-v1 desktop rows", "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+        run_id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:24]
+        db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)", (run_id, label, now(), json.dumps(config), "running"))
+        done = {c for (c,) in db.execute("SELECT case_id FROM vision_results WHERE run_id=?", (run_id,))}
+        cases = [c for c in manifest["cases"] if c["task"] == task and c["id"] not in done]
+
+        def one(case):
+            started = time.perf_counter()
+            try:
+                prediction, metrics = ve.run_case(args.root, MODEL, case, variant)
+                status, error = "complete", None
+            except Exception as exc:
+                prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
+            return prediction, metrics, status, error, time.perf_counter() - started
+
+        n = 0
+        for case, (prediction, metrics, status, error, seconds) in bounded_results(cases, one, args.workers, args.control_dir):
+            n += 1
+            db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                       (run_id, case["id"], task, label, status, json.dumps(prediction), json.dumps(metrics), seconds, error, now()))
+            db.commit()
+            if n % 25 == 0 or n == len(cases):
+                print(json.dumps({"task": task, "variant": variant, "done": n, "of": len(cases)}), flush=True)
+        recorded = db.execute("SELECT COUNT(*) FROM vision_results WHERE run_id=?", (run_id,)).fetchone()[0]
+        expected = sum(c["task"] == task for c in manifest["cases"])
+        db.execute("UPDATE runs SET status=? WHERE id=?", ("complete" if recorded == expected else "partial", run_id))
+        db.commit()
+        # agreement with the stored desktop rows, case by case
+        orig = f"{MODEL} [{variant}]"
+        pairs = db.execute("SELECT a.case_id, a.metrics, b.metrics FROM vision_results a JOIN vision_results b ON a.case_id=b.case_id AND b.model=? AND b.task=a.task WHERE a.run_id=?",
+                           (orig, run_id)).fetchall()
+        key = "correct" if task == "chart_qa" else "value_recall"
+        agree = sum(1 for _, m1, m2 in pairs if m1 and m2 and json.loads(m1).get(key) == json.loads(m2).get(key))
+        print(json.dumps({"task": task, "variant": variant, "paired": len(pairs), "identical_scores": agree}))
+
+
+if __name__ == "__main__":
+    main()

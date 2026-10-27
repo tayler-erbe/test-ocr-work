@@ -38,7 +38,32 @@ import vision_eval as ve  # noqa: E402
 from document_lab import connect, now  # noqa: E402
 
 PROTOCOL = "vision-v3-parsers"
-TASK_CASES = {"page_text": "v1", "page_text_confirm2": "v2", "table": "v1", "table_confirm": "confirm", "layout": "v1"}
+TASK_CASES = {"page_text": "v1", "page_text_confirm2": "v2", "table": "v1", "table_confirm": "confirm", "layout": "v1",
+              "page_text_confirm3": "v3", "table_confirm3": "v3"}  # v3: round-3b fresh sets (tools/freeze_confirm3.py)
+
+
+def base_task(task):
+    """page_text_confirm3 -> page_text; otherwise vision_eval's rule."""
+    return task[:-len("_confirm3")] if task.endswith("_confirm3") else ve.base_task(task)
+
+
+def load_image(root, case):
+    """Round-3b cases may point at plain image files (FinTabNet); OmniDocBench and ChartQA go through vision_eval."""
+    path = Path(root) / case["image"]
+    if path.exists() and not case["image"].startswith(ve.OMNI):
+        from PIL import Image
+        image = Image.open(path).convert("RGB")
+        if case.get("crop_box"):
+            x0, y0, x1, y1 = case["crop_box"]
+            image = image.crop((max(0, x0), max(0, y0), min(image.width, x1), min(image.height, y1)))
+        return image
+    return ve.load_image(root, case)
+
+
+def load_cases(root, which):
+    if which == "v3":
+        return json.loads((Path(root) / "evaluation" / "vision_cases_v3.json").read_text(encoding="utf-8"))
+    return ve.load_cases(root, which)
 SKIP_CLASS = re.compile(r"table|picture|figure|chart|formula|equation", re.I)
 
 OLMOCR_PROMPT = ("Attached is one page of a document that you must process. Just return the plain text representation "
@@ -50,6 +75,7 @@ OLMOCR_PROMPT = ("Attached is one page of a document that you must process. Just
 PARSE_PROMPT = "</s><s><predict_bbox><predict_classes><output_markdown><predict_text_in_pic>"
 
 BACKENDS = {
+    "paddle-pipeline": {"side": None, "max_tokens": None, "prompts": {}, "imported": "PaddleOCR-VL official pipeline (layout + element recognition) run under WSL by tools/paddle_pipeline_v3.py; markdown imported here"},
     "olmocr2": {"side": 1288, "max_tokens": 8192, "prompts": {"page": OLMOCR_PROMPT, "table": OLMOCR_PROMPT}},
     "paddleocrvl": {"side": 1800, "max_tokens": 8192, "prompts": {"page": "OCR:", "table": "Table Recognition:"}},
     "nemotron-parse": {"side": 2048, "max_tokens": 8744, "prompts": {"page": PARSE_PROMPT, "table": PARSE_PROMPT, "layout": PARSE_PROMPT},
@@ -170,11 +196,40 @@ def parse_document(raw, image_size):
     return _parse_helpers["fn"](raw, image_size=image_size, options=_parse_helpers["options"])
 
 
-def adapt(backend, task, raw, image):
-    """-> (prediction stored as JSON, scorer input)."""
-    base = ve.base_task(task)
+_multipass = {}
+
+
+def parse_multipass(url, model, image, mode, max_tokens):
+    """Nemotron Parse's documented double/triple pass through its own DocumentParser (temperature 0, top-k 1)."""
+    if "parser" not in _multipass:
+        helpers = Path(os.environ.get("NEMOTRON_PARSE_HELPERS", "C:/dev/ocr-lab/models/nemotron-parse-helpers"))
+        sys.path.insert(0, str(helpers))
+        from nemotron_parse.inference import DocumentParser, GenerationSettings  # type: ignore
+        _multipass["parser"] = DocumentParser(base_url=url, model=model,
+                                              fullpage=GenerationSettings(temperature=0, top_k=1, repetition_penalty=1.1, max_tokens=max_tokens),
+                                              detection=GenerationSettings(temperature=0, top_k=1, max_tokens=4096),
+                                              crop=GenerationSettings(temperature=0, top_k=1, repetition_penalty=1.0))
+    parser = _multipass["parser"]
+    try:
+        document = parser.parse_double(image) if mode == "double" else parser.parse_triple(image, triple_regions="union")
+    except (TypeError, AttributeError):  # the helper wants a path, not a PIL image
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            image.save(tmp.name, "PNG")
+            path = tmp.name
+        try:
+            document = parser.parse_double(path) if mode == "double" else parser.parse_triple(path, triple_regions="union")
+        finally:
+            os.unlink(path)
+    usage = {"requests": (document.get("inference") or {}).get("requests"), "stages": len(document.get("stages") or [])}
+    return document, usage
+
+
+def adapt(backend, task, raw, image, document=None):
+    """-> (prediction stored as JSON, scorer input). `document` is a Parse multipass result already rendered."""
+    base = base_task(task)
     if backend == "nemotron-parse":
-        document = parse_document(raw, image.size)
+        document = document or parse_document(raw, image.size)
         blocks = document.get("blocks") or []
         if base == "page_text":
             kept = [b for b in blocks if not SKIP_CLASS.search(str(b.get("class", "")))]
@@ -208,7 +263,7 @@ def adapt(backend, task, raw, image):
 
 
 def score(task, case, scorer_input):
-    base = ve.base_task(task)
+    base = base_task(task)
     if base == "page_text":
         p, r, f = ve.f1(ve.words(case["gold"]), ve.words(scorer_input))
         _, nr, _ = ve.f1(ve.numbers(case["gold"]), ve.numbers(scorer_input))
@@ -222,21 +277,29 @@ def score(task, case, scorer_input):
 
 # ---------- run ----------
 
-def run_case(root, backend, url, model, task, case):
-    spec = BACKENDS[backend]
-    base = ve.base_task(task)
+_run_options = {}  # set by run(): budget override and Parse multipass mode, so run_case keeps its six-argument contract
+
+
+def run_case(root, backend, url, model, task, case, spec=None, mode=None):
+    spec = spec or _run_options.get("spec") or BACKENDS[backend]
+    mode = mode or _run_options.get("mode") or "single"
+    base = base_task(task)
     kind = "page" if base == "page_text" else base
     if kind not in spec["prompts"]:
         raise ValueError(f"{backend} has no prompt for {task}")
-    image = ve.load_image(root, case)
+    image = load_image(root, case)
     ve.save_eval_crop(root, case, image)
-    raw, usage = chat(url, model, spec["prompts"][kind], image, spec["side"], spec["max_tokens"], spec.get("extra"))
-    prediction, scorer_input = adapt(backend, task, raw, image)
+    if backend == "nemotron-parse" and mode != "single":
+        document, usage = parse_multipass(url, model, image, mode, spec["max_tokens"])
+        prediction, scorer_input = adapt(backend, task, "", image, document=document)
+    else:
+        raw, usage = chat(url, model, spec["prompts"][kind], image, spec["side"], spec["max_tokens"], spec.get("extra"))
+        prediction, scorer_input = adapt(backend, task, raw, image)
     prediction["usage"] = usage
     return prediction, score(task, case, scorer_input)
 
 
-def run(root, backend, url, tasks, limit=None, workers=1, control=None):
+def run(root, backend, url, tasks, limit=None, workers=1, control=None, max_tokens=None, mode="single"):
     if paused(control):
         print("PAUSED: no inference or model loading performed")
         return
@@ -245,19 +308,23 @@ def run(root, backend, url, tasks, limit=None, workers=1, control=None):
     db = connect(root)
     db.execute(ve.RESULT_SCHEMA)
     spec = BACKENDS[backend]
+    if max_tokens:
+        spec = {**spec, "max_tokens": max_tokens}
+    suffix = (f" [budget{max_tokens}]" if max_tokens else "") + (f" [{mode}]" if mode != "single" else "")
+    _run_options.update(spec=spec, mode=mode)
     for task in tasks:
         if paused(control):
             break
-        manifest = ve.load_cases(root, TASK_CASES[task])
+        manifest = load_cases(root, TASK_CASES[task])
         config = {"protocol": PROTOCOL, "cases_sha256": manifest["cases_sha256"], "task": task, "model": "parser:" + backend,
-                  "weights": served, "side": spec["side"], "max_tokens": spec["max_tokens"], "prompt": spec["prompts"]["page" if ve.base_task(task) == "page_text" else ve.base_task(task)],
+                  "weights": served, "side": spec["side"], "max_tokens": spec["max_tokens"], "mode": mode, "prompt": spec["prompts"]["page" if base_task(task) == "page_text" else base_task(task)],
                   "adapter_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
         run_id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:24]
         db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)",
-                   (run_id, "parser:" + backend, now(), json.dumps(config), "running"))
+                   (run_id, "parser:" + backend + suffix, now(), json.dumps(config), "running"))
         done = {c for (c,) in db.execute("SELECT case_id FROM vision_results WHERE run_id=?", (run_id,))}
         cases = [c for c in manifest["cases"] if c["task"] == task and c["id"] not in done][:limit]
-        label = "parser:" + backend
+        label = "parser:" + backend + suffix
         markers = Path(root) / "evaluation" / "round3-control" / run_id
         markers.mkdir(parents=True, exist_ok=True)
         if any(markers.glob("*.LOCAL_ONLY.json")):
@@ -290,6 +357,45 @@ def run(root, backend, url, tasks, limit=None, workers=1, control=None):
 
 
 
+def import_rows(root, backend, jsonl):
+    """Score rows produced by an external official pipeline: {"case_id","task","markdown","seconds","error","engine"} per line."""
+    rows = [json.loads(l) for l in Path(jsonl).read_text(encoding="utf-8").splitlines() if l.strip()]
+    db = connect(root)
+    db.execute(ve.RESULT_SCHEMA)
+    by_task = {}
+    for r in rows:
+        by_task.setdefault(r["task"], []).append(r)
+    for task, items in by_task.items():
+        manifest = load_cases(root, TASK_CASES[task])
+        cases = {c["id"]: c for c in manifest["cases"] if c["task"] == task}
+        engine = items[0].get("engine", backend)
+        config = {"protocol": PROTOCOL, "cases_sha256": manifest["cases_sha256"], "task": task, "model": "parser:" + backend,
+                  "weights": {"id": engine}, "side": None, "max_tokens": None, "mode": "pipeline", "source_jsonl": Path(jsonl).name,
+                  "adapter_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+        run_id = hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()[:24]
+        db.execute("INSERT OR IGNORE INTO runs(id, model, started, config, status) VALUES(?,?,?,?,?)", (run_id, "parser:" + backend, now(), json.dumps(config), "running"))
+        n = 0
+        for r in items:
+            case = cases.get(r["case_id"])
+            if case is None:
+                continue
+            try:
+                if r.get("error"):
+                    raise ValueError("pipeline: " + str(r["error"])[:200])
+                image = load_image(root, case)
+                prediction, scorer_input = adapt(backend, task, r["markdown"], image)
+                metrics, status, error = score(task, case, scorer_input), "complete", None
+            except Exception as exc:  # failures stay in the denominator
+                prediction, metrics, status, error = None, None, "failed", f"{type(exc).__name__}: {exc}"[:500]
+            db.execute("INSERT OR REPLACE INTO vision_results VALUES(?,?,?,?,?,?,?,?,?,?)",
+                       (run_id, case["id"], task, "parser:" + backend, status, json.dumps(prediction), json.dumps(metrics), r.get("seconds"), error, now()))
+            n += 1
+        expected = len(cases)
+        db.execute("UPDATE runs SET status=? WHERE id=?", ("complete" if n == expected else "partial", run_id))
+        db.commit()
+        print(json.dumps({"task": task, "imported": n, "expected": expected, "run_id": run_id}))
+
+
 def report(root, out):
     db = connect(root)
     db.execute(ve.RESULT_SCHEMA)
@@ -299,7 +405,7 @@ def report(root, out):
         rows = [(st, json.loads(m) if m else None, s) for st, m, s in db.execute("SELECT status, metrics, seconds FROM vision_results WHERE run_id=?", (run_id,))]
         if not rows:
             continue
-        agg = ve.aggregate(cfg["task"], rows)
+        agg = ve.aggregate(base_task(cfg["task"]), rows)
         summary.append({"run_id": run_id, "model": model, "task": cfg["task"], "weights": cfg["weights"], "side": cfg["side"],
                         "max_tokens": cfg["max_tokens"], **agg})
     out = Path(out)
@@ -320,11 +426,18 @@ def main():
     r.add_argument("--limit", type=int)
     r.add_argument("--workers", type=int, default=1)
     r.add_argument("--control-dir", type=Path, required=True, help="Shared campaign pause flag directory")
+    r.add_argument("--max-tokens", type=int, help="output budget override; a separately labelled run (round 3b budget arms)")
+    r.add_argument("--mode", default="single", choices=["single", "double", "triple"], help="Nemotron Parse documented multipass modes")
+    i = sub.add_parser("import", help="score markdown produced outside this process (PaddleOCR official pipeline JSONL)")
+    i.add_argument("--backend", required=True, choices=["paddle-pipeline"])
+    i.add_argument("--jsonl", type=Path, required=True)
     p = sub.add_parser("report")
     p.add_argument("--out", required=True)
     args = parser.parse_args()
     if args.cmd == "run":
-        run(args.root, args.backend, args.url.rstrip("/"), args.task, args.limit, args.workers, args.control_dir)
+        run(args.root, args.backend, args.url.rstrip("/"), args.task, args.limit, args.workers, args.control_dir, args.max_tokens, args.mode)
+    elif args.cmd == "import":
+        import_rows(args.root, args.backend, args.jsonl)
     else:
         report(args.root, args.out)
 

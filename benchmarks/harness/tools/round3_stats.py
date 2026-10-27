@@ -77,7 +77,7 @@ def main():
         p = args.root / "evaluation" / name
         if p.exists():
             db.executemany("INSERT OR IGNORE INTO mem.case_images VALUES(?,?)",
-                           [(c["id"], c["image"]) for c in json.loads(p.read_text(encoding="utf-8"))["cases"]])
+                           [(c["id"], c.get("cluster") or c["image"]) for c in json.loads(p.read_text(encoding="utf-8"))["cases"]])
     db.execute("CREATE TEMP VIEW case_images AS SELECT * FROM mem.case_images")
     runs = {}
     for model, task in db.execute("SELECT DISTINCT model, task FROM vision_results WHERE model LIKE 'parser:%'"):

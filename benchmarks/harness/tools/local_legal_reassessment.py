@@ -55,7 +55,7 @@ def think_value(model, on):
     return bool(on)
 
 
-def translate(body, model, context=CONTEXT):
+def translate(body, model, context=CONTEXT, seed=None):
     """OpenAI-style body from make_body -> Ollama /api/chat body. Nothing else changes."""
     fmt = body["response_format"]
     native = {"model": model, "messages": body["messages"], "stream": False, "keep_alive": "10m",
@@ -63,6 +63,8 @@ def translate(body, model, context=CONTEXT):
               "format": fmt["json_schema"]["schema"] if fmt["type"] == "json_schema" else "json",
               "options": {"temperature": body["temperature"], "top_p": body["top_p"],
                           "num_predict": body["max_tokens"], "num_ctx": context}}
+    if seed is not None:
+        native["options"]["seed"] = seed  # repeat runs of the sampling arms; recorded in PLAN.json
     return native
 
 
@@ -95,8 +97,8 @@ def snapshot(model, context=CONTEXT):
     return info, sha(info)
 
 
-def call(model, body, context=CONTEXT):
-    native = translate(body, model, context)
+def call(model, body, context=CONTEXT, seed=None):
+    native = translate(body, model, context, seed)
     raw = ollama("/api/chat", native)
     message = raw.get("message", {})
     return {"content": message.get("content"), "done_reason": raw.get("done_reason"),
@@ -184,6 +186,7 @@ def main():
     parser.add_argument("--pack", type=Path, help="frozen 60-document pack directory (with --confirm)")
     parser.add_argument("--context", type=int, help="num_ctx sent to Ollama; default per family (DEFAULT_CONTEXT), recorded in PLAN.json")
     parser.add_argument("--control-dir", type=Path, required=True, help="Shared campaign pause flag directory")
+    parser.add_argument("--seed", type=int, help="sampling seed for repeat runs of the temperature-1 arms (new output directory)")
     parser.add_argument("--resume", action="store_true", help="Continue same-plan journal, never rerun completed failures")
     parser.add_argument("--run", action="store_true")
     args = parser.parse_args()
@@ -223,7 +226,7 @@ def main():
     plan.update({"model": "ollama/" + model, "transport": "ollama native /api/chat on 127.0.0.1, think field per family",
                  "thinking_control": "levels low/high" if model.startswith("gpt-oss") else "boolean",
                  "comparison_limits": "GPT-OSS contrasts low versus high reasoning, never off versus on. Local versus hosted runs confound checkpoint, quantization, runtime and context unless independently matched. Context fit is measured per request with the model's own tokenizer (one-token prefill); a request whose measured prompt plus budget exceeds the context is recorded as context_exceeded, never silently truncated, and is not model-quality evidence.",
-                 "context": context, "context_guard": "measured prompt tokens + budget + 64 <= context",
+                 "context": context, "context_guard": "measured prompt tokens + budget + 64 <= context", "seed": args.seed,
                  "script_sha256": script_sha, "request_builder_sha256": builder_sha, "scorer_sha256": scorer_sha})
     if args.run:
         info, digest = snapshot(model, context)
@@ -261,7 +264,7 @@ def main():
             # a few tokens of num_ctx; every budget here is >= 2000 tokens, so a truncated prefill can never pass.
             if tokens is None or tokens >= context - 256 or tokens + config["budget"] + 64 > context:
                 raise ValueError("context_exceeded")
-            result = call(model, body, context)
+            result = call(model, body, context, args.seed)
             row.update(retained_result(result))
             row.update(score_row(scorer, request, ref, config, visible, result))
         except urllib.error.URLError:
