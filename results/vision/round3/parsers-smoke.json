@@ -1,0 +1,251 @@
+{
+  "protocol": "vision-v3-parsers",
+  "generated": "2026-10-27T01:02:30.578617+00:00",
+  "runs": [
+    {
+      "run_id": "8a51c671db7dbc015be91810",
+      "model": "parser:nemotron-parse",
+      "task": "page_text",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8744,
+      "cases": 3,
+      "failed": 1,
+      "median_seconds": 2.29,
+      "word_f1": 0.5293233082706766,
+      "numeric_recall": 0.6515151515151515
+    },
+    {
+      "run_id": "b564f092af8d643a7b262160",
+      "model": "parser:nemotron-parse",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8744,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 3.4,
+      "word_f1": 0.9380533897371469,
+      "numeric_recall": 0.953950737057698
+    },
+    {
+      "run_id": "d0d1099aa731da5924a7377c",
+      "model": "parser:nemotron-parse",
+      "task": "table",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8744,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 0.43,
+      "teds": 0.920555223716765,
+      "teds_structure": 0.9532163742690059,
+      "cell_f1": 0.762330279539582,
+      "numeric_recall": 0.9682539682539683
+    },
+    {
+      "run_id": "c22256c51c171003e6956cbf",
+      "model": "parser:nemotron-parse",
+      "task": "table_confirm",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8744,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 0.31,
+      "teds": 0.8212565839867731,
+      "teds_structure": 1.0,
+      "cell_f1": 0.5126984126984128,
+      "numeric_recall": 1.0
+    },
+    {
+      "run_id": "219750c2be5105c2b980d933",
+      "model": "parser:nemotron-parse",
+      "task": "layout",
+      "weights": {
+        "id": "nemotronparse",
+        "root": ".",
+        "max_model_len": 16384
+      },
+      "side": 2048,
+      "max_tokens": 8744,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 1.8,
+      "figure": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_iou": 0.9893013234387038,
+        "gold": 2
+      },
+      "table": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_iou": 0.9764277826231547,
+        "gold": 1
+      }
+    },
+    {
+      "run_id": "ca0d381f9748348f4e42c2c7",
+      "model": "parser:paddleocrvl",
+      "task": "page_text",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 1,
+      "median_seconds": 2.94,
+      "word_f1": 0.4750724344720707,
+      "numeric_recall": 0.6467452300785634
+    },
+    {
+      "run_id": "546d6157c98bfb97203e9b1d",
+      "model": "parser:paddleocrvl",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 3.99,
+      "word_f1": 0.943996753577646,
+      "numeric_recall": 0.8903576144662733
+    },
+    {
+      "run_id": "e3dcfc88f43ad21a605ce0b5",
+      "model": "parser:paddleocrvl",
+      "task": "table",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 0.56,
+      "teds": 0.0,
+      "teds_structure": 0.0,
+      "cell_f1": 0.0,
+      "numeric_recall": 0.3333333333333333
+    },
+    {
+      "run_id": "746a1f00f9b888f428bd0fb0",
+      "model": "parser:paddleocrvl",
+      "task": "table_confirm",
+      "weights": {
+        "id": "paddleocrvl16",
+        "root": "PaddlePaddle/PaddleOCR-VL-1.6",
+        "max_model_len": 16384
+      },
+      "side": 1800,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 0.47,
+      "teds": 0.0,
+      "teds_structure": 0.0,
+      "cell_f1": 0.0,
+      "numeric_recall": 0.3333333333333333
+    },
+    {
+      "run_id": "d02d446b1d5a1fbecbc54068",
+      "model": "parser:olmocr2",
+      "task": "page_text",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 12.31,
+      "word_f1": 0.8807626018092441,
+      "numeric_recall": 0.907354924141495
+    },
+    {
+      "run_id": "6c55657d5a541f6eeaddf0f2",
+      "model": "parser:olmocr2",
+      "task": "page_text_confirm2",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 12.93,
+      "word_f1": 0.9263881538486416,
+      "numeric_recall": 0.6446964184655186
+    },
+    {
+      "run_id": "97021f21725408370feb80cf",
+      "model": "parser:olmocr2",
+      "task": "table",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 3.36,
+      "teds": 0.8270648464358349,
+      "teds_structure": 0.8881757238625019,
+      "cell_f1": 0.7882270985719262,
+      "numeric_recall": 0.9015873015873016
+    },
+    {
+      "run_id": "dfc00825d8f423327cd70f68",
+      "model": "parser:olmocr2",
+      "task": "table_confirm",
+      "weights": {
+        "id": "olmocr2",
+        "root": "allenai/olmOCR-2-7B-1025-FP8",
+        "max_model_len": 16384
+      },
+      "side": 1288,
+      "max_tokens": 8192,
+      "cases": 3,
+      "failed": 0,
+      "median_seconds": 1.83,
+      "teds": 0.6478360621722885,
+      "teds_structure": 0.6666666666666666,
+      "cell_f1": 0.4682539682539682,
+      "numeric_recall": 0.6666666666666666
+    }
+  ]
+}

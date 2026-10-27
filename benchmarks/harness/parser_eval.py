@@ -109,6 +109,44 @@ def html_to_grid(markup):
     return {"header": rows[0], "rows": rows[1:]}
 
 
+OTSL_TOKEN = re.compile(r"<(fcel|ecel|lcel|ucel|xcel|nl|ched|rhed|srow)>")
+
+
+def otsl_to_grid(text):
+    """PaddleOCR-VL emits tables as OTSL: <fcel> filled cell, <ecel> empty, <lcel>/<ucel>/<xcel> span
+    continuations, <nl> row end. Spans are flattened to empty cells, exactly as the vision models' flat schema."""
+    rows, row, cell = [], [], None
+    pos = 0
+    for m in OTSL_TOKEN.finditer(text):
+        if cell is not None:
+            cell.append(text[pos:m.start()])
+        tok = m.group(1)
+        if tok == "nl":
+            if cell is not None:
+                row.append("".join(cell).strip())
+            if row:
+                rows.append(row)
+            row, cell = [], None
+        elif tok in ("fcel", "ched", "rhed", "srow"):
+            if cell is not None:
+                row.append("".join(cell).strip())
+            cell = []
+        else:  # ecel, lcel, ucel, xcel: an empty or span-continuation cell
+            if cell is not None:
+                row.append("".join(cell).strip())
+                cell = None
+            row.append("")
+        pos = m.end()
+    if cell is not None:
+        row.append(("".join(cell) + text[pos:]).strip())
+    if row:
+        rows.append(row)
+    rows = [r for r in rows if any(c for c in r)]
+    if not rows:
+        return {"header": [], "rows": []}
+    return {"header": rows[0], "rows": rows[1:]}
+
+
 def first_table(text):
     m = re.search(r"<table.*?</table>", text, flags=re.S | re.I)
     if m:
@@ -164,8 +202,8 @@ def adapt(backend, task, raw, image):
         page = markdown_page_text(text)
         return {"text": page, "raw_chars": len(raw)}, page
     if base == "table":
-        grid = html_to_grid(first_table(text))
-        return grid, grid
+        grid = otsl_to_grid(text) if OTSL_TOKEN.search(text) else html_to_grid(first_table(text))
+        return {**grid, "raw_head": raw[:1500]}, grid  # public benchmark crop; the raw head makes an empty grid diagnosable
     raise ValueError(f"{backend} does not do {task}")
 
 

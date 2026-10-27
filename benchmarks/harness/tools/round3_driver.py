@@ -26,7 +26,7 @@ import urllib.request
 
 HERE = Path(__file__).resolve().parent
 HARNESS = HERE.parent
-REPO = HARNESS.parent
+REPO = HARNESS.parent.parent
 LAB = Path("C:/dev/ocr-lab")
 STATE = LAB / "round3"
 CONTROL = LAB / "round3-control"  # shared with every runner (--control-dir)
