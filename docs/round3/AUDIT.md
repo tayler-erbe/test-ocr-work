@@ -27,6 +27,22 @@ Among the candidates tested, on public benchmarks, under the stated resource env
 | 15 | Candidate coverage is incomplete against the current OmniDocBench leaders (TeleOCR, OvisOCR2, MinerU2.5, GLM-OCR) and against a hosted frontier model as a ceiling reference; the 32B vision model ran as a 4-bit AWQ build. | first review | yes per model | One run each through the existing parser adapter; the AWQ confound stays a stated limitation unless a BF16 run fits elsewhere. |
 | 16 | No failure taxonomy or scorer audit on a human-checked sample; the numeric-miss analysis is deferred. | first review | yes | The planned numeric-miss table, plus a small human audit of scorer decisions on public cases. |
 
+## Coverage of the use case by public proxies
+
+The stakeholder's documents were not available for testing, so each kind of extraction the use case needs was tested on a public stand-in. Nothing was skipped, only substituted. Item 1 above is therefore the condition for production acceptance, not a gap in what could be tested.
+
+| Use-case need | Public proxy that tested it | Where |
+|---|---|---|
+| Running text in scans and mixed pages | OmniDocBench English prose crops (50) and whole pages (40 + 80 + 80 fresh) | rounds 1, 2, 3, 3b |
+| Tables with amounts, pricing and budgets | OmniDocBench table crops (60 + 159); FinTabNet.c financial-report tables (100 fresh) | rounds 1, 3, 3b |
+| Values that exist only in a chart | ChartQA questions (200 + 2,022 + 1,322) and chart-to-table (60) | rounds 1, 2 |
+| Finding tables and figures on a page | OmniDocBench layout (120) | rounds 1, 3 |
+| Clause-level answers with evidence, absent fields | CUAD and ContractNLI (24-case pack; 60 fresh documents) | legal track, round 3, 3b |
+| Spreadsheets rendered to PDF | not directly tested; treated as the table route plus a numeric check, and native files should be parsed as data | stated limitation |
+| Multi-page packet assembly, cross-page fields | not tested; needs packet-level tasks (audit item 5) | stated limitation |
+
+When domain documents become available, the acceptance procedure is already defined: a labelled, document-disjoint set, the same frozen scorers, numeric recall as its own gate, and the same conformance checks.
+
 ## Verdict
 
 The vision-model comparison is defensible as a controlled, pre-registered, reproducible study on public data. The round-3 parser result is a strong lead, not a verdict: items 2, 3 and 4 have to be closed before "PaddleOCR-VL-1.6 is the best table reader" can stand up to review, and item 1 bounds every claim to public data. The legal track ranks configurations, not models, until item 5 is closed. A reviewer who says "they picked a winner without domain data, without intervals on the new rows, without running the vendors' own pipelines, and on unequal budgets" would be right today.
