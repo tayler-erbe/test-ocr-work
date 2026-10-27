@@ -2,7 +2,9 @@
 
 Read `docs/round3/AUDIT.md` and `docs/round3/PREREG_3B.md` first. Everything here runs on the 12 GB laptop with Ollama. Aggregates only come back on branch `round3-desktop-2026-10-26`.
 
-## 1. Feasibility sweep for the recommended configurations (audit item 9)
+## 1. WITHDRAWN 27 Oct 2026: the laptop is not a deployment target (see `TARGET_HARDWARE.md`; targets are L4 and L40S)
+
+~~Feasibility sweep for the recommended configurations (audit item 9)~~
 
 For each of: Qwen3-VL 8B Instruct baseline, Qwen3-VL 8B self-check (chart_table prompt), Qwen2.5-VL 7B self-check (chart_qa prompt), record on the laptop: peak VRAM from `nvidia-smi` sampled every second during 20 representative requests (10 pages at 1,800 px with a 6,000-token budget, 10 tables at 1,600 px), whether Ollama reports 100% GPU (`/api/ps` size equals size_vram), any CPU offload, failures, and p50/p95 request latency at concurrency 1. Write `docs/round3/LAPTOP_FEASIBILITY.md` with one table. No new scoring.
 
