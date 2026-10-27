@@ -1,0 +1,46 @@
+[
+  {
+    "arm": "off_16000",
+    "dataset": "contractnli",
+    "attempted": 30,
+    "correct": 18,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.63,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "off_16000",
+    "dataset": "cuad",
+    "attempted": 30,
+    "correct": 14,
+    "failed": 8,
+    "truncated": 0,
+    "evidence_f1": 0.5241392771217332,
+    "presence_correct": 18,
+    "presence_scored": 22
+  },
+  {
+    "arm": "on_16000",
+    "dataset": "contractnli",
+    "attempted": 30,
+    "correct": 16,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.5155555555555555,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "on_16000",
+    "dataset": "cuad",
+    "attempted": 30,
+    "correct": 15,
+    "failed": 9,
+    "truncated": 0,
+    "evidence_f1": 0.5147504537282879,
+    "presence_correct": 18,
+    "presence_scored": 21
+  }
+]

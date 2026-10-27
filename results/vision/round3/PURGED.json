@@ -1,0 +1,72 @@
+[
+  {
+    "run_id": "04981f20510ad6325a89bd4e",
+    "model": "parser:nemotron-parse [budget16384]",
+    "task": "page_text_confirm2",
+    "max_tokens": 16384,
+    "mode": "single",
+    "rows": 80,
+    "error": "HTTPError: HTTP Error 400: Bad Request",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "e01165fef6de342f5670de4c",
+    "model": "parser:nemotron-parse [budget8192] [double]",
+    "task": "page_text_confirm3",
+    "max_tokens": 8192,
+    "mode": "double",
+    "rows": 80,
+    "error": "NameError: name 'os' is not defined",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "a3cccbab3b967fc1b1b4fc24",
+    "model": "parser:nemotron-parse [budget8192] [double]",
+    "task": "table_confirm3",
+    "max_tokens": 8192,
+    "mode": "double",
+    "rows": 100,
+    "error": "NameError: name 'os' is not defined",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "6bf263100f1bda3c8b044e63",
+    "model": "parser:nemotron-parse [budget8192] [triple]",
+    "task": "page_text_confirm3",
+    "max_tokens": 8192,
+    "mode": "triple",
+    "rows": 80,
+    "error": "NameError: name 'os' is not defined",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "6bdbaf19fc099c2f5fba5f39",
+    "model": "parser:nemotron-parse [budget8192] [triple]",
+    "task": "table_confirm3",
+    "max_tokens": 8192,
+    "mode": "triple",
+    "rows": 100,
+    "error": "NameError: name 'os' is not defined",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "4f671a78ff44a530042180ba",
+    "model": "parser:paddleocrvl [budget16384]",
+    "task": "page_text_confirm2",
+    "max_tokens": 16384,
+    "mode": "single",
+    "rows": 80,
+    "error": "HTTPError: HTTP Error 400: Bad Request",
+    "reason": "harness error before any model output; rerun in round 3c"
+  },
+  {
+    "run_id": "44d5e91005c74aa5b7c55585",
+    "model": "parser:olmocr2 [budget16384]",
+    "task": "page_text_confirm2",
+    "max_tokens": 16384,
+    "mode": "single",
+    "rows": 80,
+    "error": "HTTPError: HTTP Error 400: Bad Request",
+    "reason": "harness error before any model output; rerun in round 3c"
+  }
+]

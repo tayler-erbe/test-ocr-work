@@ -1,0 +1,70 @@
+{
+  "purpose": "fixed reasoning control on a local model; no selection or tuning on these cases",
+  "arms": {
+    "off_16000": {
+      "thinking": false,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "on_16000": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "pack_receipt_sha256": "b15a5030d85572b504dcff750d136ee43c38049935036ca49af1006cc81a4129",
+  "cases": 60,
+  "documents": 60,
+  "limitations": "Unused in locally recorded runs; not proof of absence from other machines, unrecorded experiments, or model pretraining.",
+  "full": {},
+  "model": "ollama/qwen3:32b",
+  "transport": "ollama native /api/chat on 127.0.0.1, think field per family",
+  "thinking_control": "boolean",
+  "comparison_limits": "GPT-OSS contrasts low versus high reasoning, never off versus on. Local versus hosted runs confound checkpoint, quantization, runtime and context unless independently matched. Context fit is measured per request with the model's own tokenizer (one-token prefill); a request whose measured prompt plus budget exceeds the context is recorded as context_exceeded, never silently truncated, and is not model-quality evidence.",
+  "context": 40960,
+  "context_guard": "measured prompt tokens + budget + 64 <= context",
+  "seed": null,
+  "script_sha256": "e3f97a214a7978f7fe19a3b5416865621ed21c671f4770956b90d2f3c6b88c31",
+  "request_builder_sha256": "1fd163bdc4043b3aa1fcf1499f4f163b7b8738d326c0d5ffef1cf92305c7a399",
+  "scorer_sha256": "43f78d7f122a6c1c0df5a484a49569ff20858ad72f0fac784b86615ca1e0d27f",
+  "deployment_snapshot": {
+    "model": {
+      "name": "qwen3:32b",
+      "model": "qwen3:32b",
+      "modified_at": "2026-09-18T12:42:03.8261697-07:00",
+      "size": 20201253829,
+      "digest": "030ee887880fc378860c2dd35101da424377520441ae4bfe7be6deff8ade7840",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "32.8B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 40960,
+        "embedding_length": 5120
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    "runtime": {
+      "version": "0.34.4"
+    },
+    "context": 40960,
+    "thinking_control": "boolean"
+  },
+  "deployment_snapshot_sha256": "fcd410f758d5c2ca8274c400f0e5163a4f2a29ce60bb88dbd07dc256270b9a88",
+  "residency": {
+    "size": 30732095323,
+    "size_vram": 30732095323,
+    "context_length": 40960,
+    "fully_on_gpu": true
+  }
+}
