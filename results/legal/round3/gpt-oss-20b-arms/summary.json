@@ -1,0 +1,178 @@
+[
+  {
+    "arm": "baseline",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 8,
+    "failed": 2,
+    "truncated": 0,
+    "evidence_f1": 0.4793650793650794,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "baseline",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 2,
+    "truncated": 1,
+    "evidence_f1": 0.5868983957219251,
+    "presence_correct": 8,
+    "presence_scored": 10
+  },
+  {
+    "arm": "budget",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 8,
+    "failed": 2,
+    "truncated": 0,
+    "evidence_f1": 0.4793650793650794,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "budget",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 1,
+    "truncated": 0,
+    "evidence_f1": 0.5868983957219251,
+    "presence_correct": 8,
+    "presence_scored": 11
+  },
+  {
+    "arm": "definitions",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 5,
+    "failed": 4,
+    "truncated": 0,
+    "evidence_f1": 0.39166666666666666,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "definitions",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 5,
+    "failed": 4,
+    "truncated": 1,
+    "evidence_f1": 0.44345238095238093,
+    "presence_correct": 6,
+    "presence_scored": 8
+  },
+  {
+    "arm": "full_document",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 4,
+    "truncated": 0,
+    "evidence_f1": 0.42658730158730157,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "full_document",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 7,
+    "truncated": 1,
+    "evidence_f1": 0.38095238095238093,
+    "presence_correct": 5,
+    "presence_scored": 5
+  },
+  {
+    "arm": "ids",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 4,
+    "truncated": 0,
+    "evidence_f1": 0.34722222222222227,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "ids",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.4354040029692024,
+    "presence_correct": 8,
+    "presence_scored": 12
+  },
+  {
+    "arm": "reasoning",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 3,
+    "failed": 7,
+    "truncated": 4,
+    "evidence_f1": 0.25,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "reasoning",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 3,
+    "failed": 5,
+    "truncated": 3,
+    "evidence_f1": 0.2756410256410256,
+    "presence_correct": 4,
+    "presence_scored": 7
+  },
+  {
+    "arm": "sampling",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 6,
+    "failed": 2,
+    "truncated": 0,
+    "evidence_f1": 0.4148148148148148,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "sampling",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 4,
+    "failed": 3,
+    "truncated": 0,
+    "evidence_f1": 0.43011806873286945,
+    "presence_correct": 7,
+    "presence_scored": 9
+  },
+  {
+    "arm": "schema_in_prompt",
+    "dataset": "contractnli",
+    "attempted": 12,
+    "correct": 9,
+    "failed": 0,
+    "truncated": 0,
+    "evidence_f1": 0.593452380952381,
+    "presence_correct": 0,
+    "presence_scored": 0
+  },
+  {
+    "arm": "schema_in_prompt",
+    "dataset": "cuad",
+    "attempted": 12,
+    "correct": 3,
+    "failed": 4,
+    "truncated": 1,
+    "evidence_f1": 0.32425213675213677,
+    "presence_correct": 6,
+    "presence_scored": 8
+  }
+]

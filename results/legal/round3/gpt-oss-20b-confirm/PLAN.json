@@ -1,0 +1,69 @@
+{
+  "purpose": "fixed reasoning control on a local model; no selection or tuning on these cases",
+  "arms": {
+    "off_16000": {
+      "thinking": false,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "on_16000": {
+      "thinking": true,
+      "budget": 16000,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "pack_receipt_sha256": "b15a5030d85572b504dcff750d136ee43c38049935036ca49af1006cc81a4129",
+  "cases": 60,
+  "documents": 60,
+  "limitations": "Unused in locally recorded runs; not proof of absence from other machines, unrecorded experiments, or model pretraining.",
+  "full": {},
+  "model": "ollama/gpt-oss:20b",
+  "transport": "ollama native /api/chat on 127.0.0.1, think field per family",
+  "thinking_control": "levels low/high",
+  "comparison_limits": "GPT-OSS contrasts low versus high reasoning, never off versus on. Local versus hosted runs confound checkpoint, quantization, runtime and context unless independently matched. Context fit is measured per request with the model's own tokenizer (one-token prefill); a request whose measured prompt plus budget exceeds the context is recorded as context_exceeded, never silently truncated, and is not model-quality evidence.",
+  "context": 65536,
+  "context_guard": "measured prompt tokens + budget + 64 <= context",
+  "script_sha256": "2b8524172d4991713bd6cb3d496db260031f0fccc0440f3a38cb5a7de18c9990",
+  "request_builder_sha256": "1fd163bdc4043b3aa1fcf1499f4f163b7b8738d326c0d5ffef1cf92305c7a399",
+  "scorer_sha256": "43f78d7f122a6c1c0df5a484a49569ff20858ad72f0fac784b86615ca1e0d27f",
+  "deployment_snapshot": {
+    "model": {
+      "name": "gpt-oss:20b",
+      "model": "gpt-oss:20b",
+      "modified_at": "2026-10-26T17:34:48.4182306-07:00",
+      "size": 13793441566,
+      "digest": "f38aa0c53da5f8c49d08c43a99df24ff53167fe68e24664a7777288e7656fdfe",
+      "details": {
+        "parent_model": "dhiltgen/gpt-oss:20b-llamacpp",
+        "format": "gguf",
+        "family": "gpt-oss",
+        "families": [
+          "gpt-oss"
+        ],
+        "parameter_size": "20.9B",
+        "quantization_level": "MXFP4",
+        "context_length": 131072,
+        "embedding_length": 2880
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    "runtime": {
+      "version": "0.34.4"
+    },
+    "context": 65536,
+    "thinking_control": "levels low/high"
+  },
+  "deployment_snapshot_sha256": "be65629a964ee83227d2235012eb51a85c55584167c0d5c6e0bb7a51adc01a6b",
+  "residency": {
+    "size": 13319798783,
+    "size_vram": 13319798783,
+    "context_length": 65536,
+    "fully_on_gpu": true
+  }
+}
