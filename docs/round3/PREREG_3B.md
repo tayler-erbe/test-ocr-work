@@ -5,7 +5,7 @@ Round 3 found two leads on public data: PaddleOCR-VL-1.6 on tables and Nemotron 
 ## Fresh confirmation sets (frozen by `tools/freeze_confirm3.py` before any run)
 
 - `page_text_confirm3`: 80 OmniDocBench English pages with at least 300 characters of prose, none used by any earlier page task, selected by sorted content hash.
-- `table_confirm3`: 100 OmniDocBench table crops from pages not used by any earlier table task, selected by sorted content hash, with the source page recorded for clustering.
+- `table_confirm3`: 100 table images from the FinTabNet.c test split (financial-report tables with structure and word annotations; the harness's own `acquire_datasets.py` already lists this source), selected by sorted content hash, with the source document recorded for clustering. Amended before any 3b table run: every one of the 219 eligible English OmniDocBench tables is already in an earlier set, so no unused OmniDocBench table exists. Gold HTML is built from the structure annotation by code (row and column boxes, spanning cells, words by centre), and that builder is frozen with the set. This moves the table test onto a different publisher's data and closer to the target domain, which also weakens the "publishers optimise toward this benchmark" objection for tables.
 "Fresh" means unused in this project's recorded runs. It does not mean absent from any model's pretraining; OmniDocBench is public and the parser publishers report results on it.
 
 ## Equal budget
