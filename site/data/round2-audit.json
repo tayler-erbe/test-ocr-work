@@ -1,0 +1,141 @@
+{
+  "method": "Existing vision_eval.aggregate; failures score zero; median seconds excludes failed/unscored attempts. No predictions or references inspected or rescored.",
+  "export_sha256": {
+    "desktop": "89bc8c4cd4b3e9d6a294433dc682d41ec36f7aacc196d9e9a8158c17c9515515",
+    "laptop": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753"
+  },
+  "rows": [
+    {
+      "model": "Qwen2.5-VL 7B",
+      "model_id": "ollama:qwen2.5vl:7b",
+      "side": "laptop",
+      "variant": "baseline",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.7574476817899378,
+      "cases": 80,
+      "failed": 4,
+      "median_seconds": 13.44,
+      "numeric_recall": 0.7438477278945733,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753",
+      "run_ids": [
+        "8a3bb2753630f65765ee103e"
+      ]
+    },
+    {
+      "model": "Qwen2.5-VL 7B",
+      "model_id": "ollama:qwen2.5vl:7b",
+      "side": "laptop",
+      "variant": "layoutmask",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.8428284542809777,
+      "cases": 80,
+      "failed": 0,
+      "median_seconds": 17.31,
+      "numeric_recall": 0.6547923590883438,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753",
+      "run_ids": [
+        "41bb8bf73971e80f7baa45c1"
+      ]
+    },
+    {
+      "model": "Qwen3-VL 8B Instruct",
+      "model_id": "ollama:qwen3-vl:8b-instruct",
+      "side": "laptop",
+      "variant": "baseline",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.8282530788092449,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 15.45,
+      "numeric_recall": 0.8251461785049848,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753",
+      "run_ids": [
+        "dac70d86d632a40e60b4b46d"
+      ]
+    },
+    {
+      "model": "Qwen3-VL 8B Instruct",
+      "model_id": "ollama:qwen3-vl:8b-instruct",
+      "side": "laptop",
+      "variant": "layoutmask",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.8380053768219552,
+      "cases": 80,
+      "failed": 3,
+      "median_seconds": 17.92,
+      "numeric_recall": 0.6625018413188772,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "ebc69a5340a896a61230570e013176fdf68e8a5e9eaf233c542c18982f5da753",
+      "run_ids": [
+        "037143ed257154b1632addb5"
+      ]
+    },
+    {
+      "model": "Qwen3-VL 32B AWQ",
+      "model_id": "openai:qwen3vl32b",
+      "side": "desktop",
+      "variant": "baseline",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.8137798137055021,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 15.85,
+      "numeric_recall": 0.8719103980648603,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "89bc8c4cd4b3e9d6a294433dc682d41ec36f7aacc196d9e9a8158c17c9515515",
+      "run_ids": [
+        "7ee2534130fe569a7f108444"
+      ]
+    },
+    {
+      "model": "Qwen3-VL 32B AWQ",
+      "model_id": "openai:qwen3vl32b",
+      "side": "desktop",
+      "variant": "layoutmask",
+      "task": "page_text",
+      "split": "confirmation v2",
+      "metric": "Word F1",
+      "lower_is_better": false,
+      "score": 0.8805448329961519,
+      "cases": 80,
+      "failed": 1,
+      "median_seconds": 12.16,
+      "numeric_recall": 0.69401811349413,
+      "numeric_precision": null,
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts",
+      "export_sha256": "89bc8c4cd4b3e9d6a294433dc682d41ec36f7aacc196d9e9a8158c17c9515515",
+      "run_ids": [
+        "68b248447498dea4049b4938"
+      ]
+    }
+  ]
+}

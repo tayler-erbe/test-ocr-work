@@ -59,13 +59,13 @@ def main():
         raise SystemExit(1)
     env = dict(os.environ)
     env['PYTHONPATH'] = os.pathsep.join([str(ROOT / 'src'), str(HARNESS), env.get('PYTHONPATH', '')])
-    commands = [[str(HARNESS / 'quality_check.py'), '--policy-only'],
+    commands = [[str(ROOT / "tools/audit_website_data.py")], [str(HARNESS / 'quality_check.py'), '--policy-only'],
                 [str(HARNESS / 'tools/check_conformance.py'), '--root', str(ROOT / 'data/public')],
                 [str(HARNESS / 'tools/check_conformance.py'), '--root', str(ROOT / 'data/public'), '--round2', '--results', str(ROOT / 'results/vision/exports/laptop.jsonl')],
                 [str(HARNESS / 'handoff/legal-comparison-24/verify_pack.py')]]
     if args.data:
-        commands[1].append('--data')
         commands[2].append('--data')
+        commands[3].append('--data')
     for command in commands:
         subprocess.run([sys.executable, '-X', 'utf8', *command], cwd=HARNESS, env=env, check=True)
     print('PROJECT CHECKS PASSED', flush=True)
