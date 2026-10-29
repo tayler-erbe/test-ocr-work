@@ -1,0 +1,2087 @@
+{
+ "generated_from": [
+  "data/benchmark.json",
+  "downloads/MERGED_REPORT.md",
+  "downloads/stats.json",
+  "results/legal/round3"
+ ],
+ "comparisons": [
+  {
+   "id": "tables-final",
+   "track": "Tables",
+   "title": "Final table test: 100 financial-report tables",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "table",
+   "stage": "Pre-registered confirmation, round 3",
+   "stage_note": "Fresh examples, the same 8,192-token output limit for every model, and a pass rule written down before scoring.",
+   "confirmatory": true,
+   "question": "Does a small specialised table reader beat the strongest earlier model on tables it has never seen?",
+   "metric": "Table similarity (TEDS, 0 to 1)",
+   "metric_note": "How closely the recovered table's rows, columns and cell text match the reference table. 1 means identical. It is a similarity score, not the share of tables that were fully correct.",
+   "lower_is_better": false,
+   "items": "tables",
+   "meaning": "PaddleOCR-VL-1.6 passed the planned test: higher table similarity than Qwen3-VL 32B (0.852 against 0.762) and it kept the numbers (97.4% against 93.2%). It is the table model to pilot first.",
+   "limits": "Public financial-report tables (FinTabNet.c), not your documents. 97.4% numeric recall is below a 99% bar, so amounts still need review. The table score measures structure similarity, not correct field assignment.",
+   "recommend": "paddleocrvl [budget8192]|single-pass",
+   "sources": [
+    {
+     "label": "Paired statistics",
+     "url": "downloads/stats.json"
+    },
+    {
+     "label": "Final advisory",
+     "url": "reports/final-advisory.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Nemotron 3.5 Parse (0.63B parser)",
+     "method": "called directly, one pass",
+     "key": "nemotron-parse [budget8192]|single-pass",
+     "score": 0.8035033328334349,
+     "cases": 100,
+     "failed": 0,
+     "seconds": 0.93,
+     "numbers": 0.9190434154342753,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "PaddleOCR-VL-1.6 (0.9B parser)",
+     "method": "called directly, one pass",
+     "key": "paddleocrvl [budget8192]|single-pass",
+     "score": 0.8523335903686011,
+     "cases": 100,
+     "failed": 0,
+     "seconds": 1.25,
+     "numbers": 0.9739094324891426,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "PaddleOCR-VL-1.6 official pipeline",
+     "method": "layout plus element pipeline",
+     "key": "paddle-pipeline|official-pipeline",
+     "score": 0.7847615607878388,
+     "cases": 100,
+     "failed": 0,
+     "seconds": 2.9,
+     "numbers": 0.8507660260096219,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "olmOCR-2 7B (parser)",
+     "method": "called directly, one pass",
+     "key": "olmocr2 [budget8192]|single-pass",
+     "score": 0.7050656460169178,
+     "cases": 100,
+     "failed": 0,
+     "seconds": 4.39,
+     "numbers": 0.8536929992010225,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.7625,
+     "cases": 100,
+     "failed": 4,
+     "seconds": 5.65,
+     "numbers": 0.9322,
+     "source": "round3-vlm"
+    }
+   ]
+  },
+  {
+   "id": "tables-heldout-r1",
+   "track": "Tables",
+   "title": "Round-1 held-out check: 159 tables",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "table",
+   "stage": "Held-out check, round 1",
+   "stage_note": "Examples kept aside during round 1 and scored once, to check the round-1 choices.",
+   "confirmatory": false,
+   "question": "Did round 1's tuned table method hold up on tables kept aside?",
+   "metric": "Table similarity (TEDS, 0 to 1)",
+   "metric_note": "How closely the recovered table's rows, columns and cell text match the reference table. 1 means identical. It is a similarity score, not the share of tables that were fully correct.",
+   "lower_is_better": false,
+   "items": "tables",
+   "meaning": "The tuned prompt did not beat the baseline on the held-out tables (0.841 against 0.851). Round 1 therefore kept the baseline table prompt.",
+   "limits": "Earlier tables from the same public source as development. Superseded for table choice by the final table test.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.87,
+     "cases": 159,
+     "failed": 1,
+     "seconds": 2.65,
+     "numbers": 0.948,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.851,
+     "cases": 159,
+     "failed": 0,
+     "seconds": 5.64,
+     "numbers": 0.967,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "round-1 tuned prompt",
+     "key": "Qwen3-VL 32B AWQ|tuned",
+     "score": 0.841,
+     "cases": 159,
+     "failed": 0,
+     "seconds": 5.65,
+     "numbers": 0.967,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "tables-dev-desktop",
+   "track": "Tables",
+   "title": "Table development: 60 tables, desktop models",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "table",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Which vision model and prompt read tables best during exploration?",
+   "metric": "Table similarity (TEDS, 0 to 1)",
+   "metric_note": "How closely the recovered table's rows, columns and cell text match the reference table. 1 means identical. It is a similarity score, not the share of tables that were fully correct.",
+   "lower_is_better": false,
+   "items": "tables",
+   "meaning": "Scores sat close together (about 0.72 to 0.87). Prompt variants made small differences. Model size mattered less than expected: the 8B model scored 0.819, the 32B 0.821.",
+   "limits": "Exploratory. Close scores here are not reliable differences.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 32B|baseline",
+     "score": 0.805,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.07,
+     "numbers": 0.972,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 32B|expert",
+     "score": 0.807,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.95,
+     "numbers": 0.967,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 32B|selfcheck",
+     "score": 0.77,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.83,
+     "numbers": 0.967,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 32B|upscale",
+     "score": 0.83,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.23,
+     "numbers": 0.973,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.724,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.52,
+     "numbers": 0.933,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.748,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.57,
+     "numbers": 0.951,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.752,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.83,
+     "numbers": 0.94,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.734,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.82,
+     "numbers": 0.938,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.819,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.88,
+     "numbers": 0.95,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.822,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.89,
+     "numbers": 0.948,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.818,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.0,
+     "numbers": 0.945,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.832,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.99,
+     "numbers": 0.947,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.852,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.64,
+     "numbers": 0.968,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "expert prompt",
+     "key": "27B local artifact*|expert",
+     "score": 0.87,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.5,
+     "numbers": 0.975,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "higher-resolution image",
+     "key": "27B local artifact*|hires",
+     "score": 0.853,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.65,
+     "numbers": 0.969,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "self-check",
+     "key": "27B local artifact*|selfcheck",
+     "score": 0.847,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.58,
+     "numbers": 0.971,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "upscaled image",
+     "key": "27B local artifact*|upscale",
+     "score": 0.852,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.37,
+     "numbers": 0.977,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.821,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.51,
+     "numbers": 0.969,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 32B AWQ|expert",
+     "score": 0.849,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.33,
+     "numbers": 0.973,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "higher-resolution image",
+     "key": "Qwen3-VL 32B AWQ|hires",
+     "score": 0.821,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.52,
+     "numbers": 0.969,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "self-check",
+     "key": "Qwen3-VL 32B AWQ|selfcheck",
+     "score": 0.828,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.7,
+     "numbers": 0.955,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 32B AWQ|upscale",
+     "score": 0.841,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.56,
+     "numbers": 0.97,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "tables-dev-laptop",
+   "track": "Tables",
+   "title": "Table development: 60 tables, laptop models",
+   "hardware": "Laptop · RTX 4000 Ada Laptop GPU, 12 GB GPU memory",
+   "side": "laptop",
+   "task": "table",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "How well do the small models that fit a 12 GB laptop GPU read tables?",
+   "metric": "Table similarity (TEDS, 0 to 1)",
+   "metric_note": "How closely the recovered table's rows, columns and cell text match the reference table. 1 means identical. It is a similarity score, not the share of tables that were fully correct.",
+   "lower_is_better": false,
+   "items": "tables",
+   "meaning": "Qwen3-VL 8B scored 0.818 at baseline, about the same as the desktop 32B. Small models are viable for tables on modest hardware.",
+   "limits": "Exploratory. The laptop 8B weights differ from the desktop 8B, so this is not a same-weight reproduction.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.724,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.25,
+     "numbers": 0.941,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.757,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.44,
+     "numbers": 0.953,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.749,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 5.78,
+     "numbers": 0.939,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.728,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 6.75,
+     "numbers": 0.925,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.818,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 8.54,
+     "numbers": 0.944,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.829,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 6.55,
+     "numbers": 0.946,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.823,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 6.32,
+     "numbers": 0.946,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.831,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 7.01,
+     "numbers": 0.946,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "pages-final",
+   "track": "Page text",
+   "title": "Final page test: 80 fresh pages",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "page_text",
+   "stage": "Pre-registered confirmation, round 3",
+   "stage_note": "Fresh examples, the same 8,192-token output limit for every model, and a pass rule written down before scoring.",
+   "confirmatory": true,
+   "question": "Do small document parsers read whole pages better than the 32B vision model, without losing numbers?",
+   "metric": "Word overlap (word F1, 0 to 1)",
+   "metric_note": "A balance between recovering the reference words and not adding extra ones. It is not overall accuracy, and it does not check that every number is right.",
+   "lower_is_better": false,
+   "items": "pages",
+   "meaning": "Nemotron 3.5 Parse recovered more of the reference words than the 32B (0.899 against 0.820) and recovered the same share of numbers on average (88.2% against 88.3%). The planned numbers test was inconclusive, so use it with a numbers check. The PaddleOCR pipeline had the highest word score but lost the most numbers after olmOCR-2.",
+   "limits": "80 public pages. A higher word score does not mean the numbers are right. The official PaddleOCR pipeline adds a layout step before reading; the other rows call each model directly.",
+   "recommend": "nemotron-parse [budget8192]|single-pass",
+   "sources": [
+    {
+     "label": "Paired statistics",
+     "url": "downloads/stats.json"
+    },
+    {
+     "label": "Final advisory",
+     "url": "reports/final-advisory.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Nemotron 3.5 Parse (0.63B parser)",
+     "method": "called directly, one pass",
+     "key": "nemotron-parse [budget8192]|single-pass",
+     "score": 0.8989394320081356,
+     "cases": 80,
+     "failed": 1,
+     "seconds": 3.06,
+     "numbers": 0.8822366455917011,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "PaddleOCR-VL-1.6 (0.9B parser)",
+     "method": "called directly, one pass",
+     "key": "paddleocrvl [budget8192]|single-pass",
+     "score": 0.7371488847773222,
+     "cases": 80,
+     "failed": 9,
+     "seconds": 3.17,
+     "numbers": 0.7815797361235289,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "PaddleOCR-VL-1.6 official pipeline",
+     "method": "layout plus element pipeline",
+     "key": "paddle-pipeline|official-pipeline",
+     "score": 0.9217927012426482,
+     "cases": 80,
+     "failed": 0,
+     "seconds": 4.01,
+     "numbers": 0.7705717349105086,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "olmOCR-2 7B (parser)",
+     "method": "called directly, one pass",
+     "key": "olmocr2 [budget8192]|single-pass",
+     "score": 0.8978847195699757,
+     "cases": 80,
+     "failed": 0,
+     "seconds": 11.4,
+     "numbers": 0.7056827748530026,
+     "source": "round3-parsers"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.8195,
+     "cases": 80,
+     "failed": 3,
+     "seconds": 21.59,
+     "numbers": 0.8834,
+     "source": "round3-vlm"
+    }
+   ]
+  },
+  {
+   "id": "pages-masking-desktop",
+   "track": "Page text",
+   "title": "Layout masking check: 80 pages, desktop",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "page_text",
+   "stage": "Pre-registered check, round 2",
+   "stage_note": "Examples no earlier run had used. The method to confirm and the decision rule were written down before scoring.",
+   "confirmatory": false,
+   "question": "Does blanking out figures and tables before reading a page help?",
+   "metric": "Word overlap (word F1, 0 to 1)",
+   "metric_note": "A balance between recovering the reference words and not adding extra ones. It is not overall accuracy, and it does not check that every number is right.",
+   "lower_is_better": false,
+   "items": "pages",
+   "meaning": "Masking raised word overlap (0.881 against 0.814) but dropped recovered numbers from 87.2% to 69.4%. For documents with amounts, keep the baseline.",
+   "limits": "Same 32B model, two ways of preparing the page. Masking removes tables, which is where many numbers are.",
+   "recommend": "Qwen3-VL 32B AWQ|baseline",
+   "sources": [
+    {
+     "label": "Routing report",
+     "url": "reports/routing-report.html"
+    },
+    {
+     "label": "Round-2 export audit",
+     "url": "data/round2-audit.json"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.8137798137055021,
+     "cases": 80,
+     "failed": 1,
+     "seconds": 15.85,
+     "numbers": 0.8719103980648603,
+     "source": "round2-audit"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "layout masking",
+     "key": "Qwen3-VL 32B AWQ|layoutmask",
+     "score": 0.8805448329961519,
+     "cases": 80,
+     "failed": 1,
+     "seconds": 12.16,
+     "numbers": 0.69401811349413,
+     "source": "round2-audit"
+    }
+   ]
+  },
+  {
+   "id": "pages-masking-laptop",
+   "track": "Page text",
+   "title": "Layout masking check: 80 pages, laptop",
+   "hardware": "Laptop · RTX 4000 Ada Laptop GPU, 12 GB GPU memory",
+   "side": "laptop",
+   "task": "page_text",
+   "stage": "Pre-registered check, round 2",
+   "stage_note": "Examples no earlier run had used. The method to confirm and the decision rule were written down before scoring.",
+   "confirmatory": false,
+   "question": "Does masking help the small laptop models read pages?",
+   "metric": "Word overlap (word F1, 0 to 1)",
+   "metric_note": "A balance between recovering the reference words and not adding extra ones. It is not overall accuracy, and it does not check that every number is right.",
+   "lower_is_better": false,
+   "items": "pages",
+   "meaning": "Same trade-off as on the desktop: masking raised word overlap and lowered recovered numbers for both small models. The 8B baseline kept the most numbers (82.5%).",
+   "limits": "Two models, each with two preparations. Not a hardware comparison.",
+   "recommend": "Qwen3-VL 8B Instruct|baseline",
+   "sources": [
+    {
+     "label": "Routing report",
+     "url": "reports/routing-report.html"
+    },
+    {
+     "label": "Round-2 export audit",
+     "url": "data/round2-audit.json"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.7574476817899378,
+     "cases": 80,
+     "failed": 4,
+     "seconds": 13.44,
+     "numbers": 0.7438477278945733,
+     "source": "round2-audit"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "layout masking",
+     "key": "Qwen2.5-VL 7B|layoutmask",
+     "score": 0.8428284542809777,
+     "cases": 80,
+     "failed": 0,
+     "seconds": 17.31,
+     "numbers": 0.6547923590883438,
+     "source": "round2-audit"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.8282530788092449,
+     "cases": 80,
+     "failed": 1,
+     "seconds": 15.45,
+     "numbers": 0.8251461785049848,
+     "source": "round2-audit"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "layout masking",
+     "key": "Qwen3-VL 8B Instruct|layoutmask",
+     "score": 0.8380053768219552,
+     "cases": 80,
+     "failed": 3,
+     "seconds": 17.92,
+     "numbers": 0.6625018413188772,
+     "source": "round2-audit"
+    }
+   ]
+  },
+  {
+   "id": "pages-dev-desktop",
+   "track": "Page text",
+   "title": "Page development: 40 pages, desktop",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "page_text",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Is layout masking worth testing on fresh pages?",
+   "metric": "Word overlap (word F1, 0 to 1)",
+   "metric_note": "A balance between recovering the reference words and not adding extra ones. It is not overall accuracy, and it does not check that every number is right.",
+   "lower_is_better": false,
+   "items": "pages",
+   "meaning": "On development pages masking raised word overlap (0.895 against 0.809) and dropped numbers (72.0% against 90.9%). That led to the round-2 check.",
+   "limits": "Exploratory, 40 pages.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.809,
+     "cases": 40,
+     "failed": 0,
+     "seconds": 16.5,
+     "numbers": 0.909,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "layout masking",
+     "key": "Qwen3-VL 32B AWQ|layoutmask",
+     "score": 0.895,
+     "cases": 40,
+     "failed": 0,
+     "seconds": 11.87,
+     "numbers": 0.72,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "charts-r2",
+   "track": "Charts",
+   "title": "Round-2 chart check: 1,322 questions on 722 charts",
+   "hardware": "7B and 8B on the laptop (12 GB); 32B on the desktop (32 GB)",
+   "side": "mixed",
+   "task": "chart_qa",
+   "stage": "Pre-registered check, round 2",
+   "stage_note": "Examples no earlier run had used. The method to confirm and the decision rule were written down before scoring.",
+   "confirmatory": false,
+   "question": "Do vote3 and self-check really help on charts no model had seen?",
+   "metric": "Questions answered correctly",
+   "metric_note": "Share of chart questions answered to match the reference, allowing 5% tolerance on numbers.",
+   "lower_is_better": false,
+   "items": "questions",
+   "meaning": "Vote3 helped the 7B model (55.8% to 60.3%) and the 32B (82.0% to 84.6%) but not the 8B. Self-check lifted the 7B to 73.5% but cut the 8B to 32.3%. The best result overall is still the 32B (84.6%). A larger gain for 7B does not mean 7B beats 32B.",
+   "limits": "Questions about the same chart are related, so the effective sample is smaller than 1,322. Vote3 needs three answers per question. Small models ran on the laptop and the 32B on the desktop.",
+   "recommend": "Qwen3-VL 32B AWQ|vote3",
+   "sources": [
+    {
+     "label": "Routing report",
+     "url": "reports/routing-report.html"
+    },
+    {
+     "label": "Round-2 export audit",
+     "url": "data/round2-audit.json"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.5575,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "vote3 (majority of three answers)",
+     "key": "Qwen2.5-VL 7B|vote3",
+     "score": 0.6029,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.7352,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.5197,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.7496,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "vote3 (majority of three answers)",
+     "key": "Qwen3-VL 8B Instruct|vote3",
+     "score": 0.7481,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.323,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.7648,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "laptop"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.82,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "desktop"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "vote3 (majority of three answers)",
+     "key": "Qwen3-VL 32B AWQ|vote3",
+     "score": 0.8457,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "desktop"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "self-check",
+     "key": "Qwen3-VL 32B AWQ|selfcheck",
+     "score": 0.8449,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "desktop"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 32B AWQ|upscale",
+     "score": 0.8351,
+     "cases": 1322,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "merged-report",
+     "machine": "desktop"
+    }
+   ]
+  },
+  {
+   "id": "charts-dev-laptop",
+   "track": "Charts",
+   "title": "Chart questions development: 200 questions, laptop",
+   "hardware": "Laptop · RTX 4000 Ada Laptop GPU, 12 GB GPU memory",
+   "side": "laptop",
+   "task": "chart_qa",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Which small model and method answer chart questions best on a 12 GB GPU?",
+   "metric": "Questions answered correctly",
+   "metric_note": "Share of chart questions answered to match the reference, allowing 5% tolerance on numbers.",
+   "lower_is_better": false,
+   "items": "questions",
+   "meaning": "Qwen3-VL 8B at baseline (79.5%) or with upscaled images (80.0%). Self-check works for 7B (79.0%) and badly hurts 8B (36.0%).",
+   "limits": "Exploratory, 200 questions.",
+   "recommend": "Qwen3-VL 8B Instruct|baseline",
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.525,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.88,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.475,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.9,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.79,
+     "cases": 200,
+     "failed": 1,
+     "seconds": 1.48,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.475,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 2.19,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.795,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.43,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.75,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.09,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.36,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.65,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.8,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 2.13,
+     "numbers": "",
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "charts-dev-desktop",
+   "track": "Charts",
+   "title": "Chart questions development: 200 questions, desktop",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "chart_qa",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Which model and method answer chart questions best with more GPU memory?",
+   "metric": "Questions answered correctly",
+   "metric_note": "Share of chart questions answered to match the reference, allowing 5% tolerance on numbers.",
+   "lower_is_better": false,
+   "items": "questions",
+   "meaning": "Qwen3-VL 32B with self-check scored highest (91.0%). The same method hurt the 8B and the 27B build.",
+   "limits": "Exploratory, 200 questions.",
+   "recommend": "Qwen3-VL 32B AWQ|selfcheck",
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 32B|baseline",
+     "score": 0.82,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.88,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 32B|expert",
+     "score": 0.82,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.9,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 32B|selfcheck",
+     "score": 0.87,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.61,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 32B|upscale",
+     "score": 0.765,
+     "cases": 200,
+     "failed": 1,
+     "seconds": 1.58,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.535,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.46,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.445,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.48,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.8,
+     "cases": 200,
+     "failed": 1,
+     "seconds": 0.64,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.49,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.86,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.78,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.52,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.76,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.53,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.325,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.71,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.795,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.79,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.855,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.64,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "expert prompt",
+     "key": "27B local artifact*|expert",
+     "score": 0.87,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.68,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "higher-resolution image",
+     "key": "27B local artifact*|hires",
+     "score": 0.855,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.67,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "self-check",
+     "key": "27B local artifact*|selfcheck",
+     "score": 0.395,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.96,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "upscaled image",
+     "key": "27B local artifact*|upscale",
+     "score": 0.88,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.33,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.85,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.52,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 32B AWQ|expert",
+     "score": 0.84,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.48,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "higher-resolution image",
+     "key": "Qwen3-VL 32B AWQ|hires",
+     "score": 0.85,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.5,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "self-check",
+     "key": "Qwen3-VL 32B AWQ|selfcheck",
+     "score": 0.91,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.4,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "read the table first",
+     "key": "Qwen3-VL 32B AWQ|table only",
+     "score": 0.81,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 0.36,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 32B AWQ|upscale",
+     "score": 0.895,
+     "cases": 200,
+     "failed": 0,
+     "seconds": 1.09,
+     "numbers": "",
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "charts-heldout-r1",
+   "track": "Charts",
+   "title": "Round-1 held-out check: 2,022 questions",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "chart_qa",
+   "stage": "Held-out check, round 1",
+   "stage_note": "Examples kept aside during round 1 and scored once, to check the round-1 choices.",
+   "confirmatory": false,
+   "question": "Did round 1's tuned chart method hold on unseen questions?",
+   "metric": "Questions answered correctly",
+   "metric_note": "Share of chart questions answered to match the reference, allowing 5% tolerance on numbers.",
+   "lower_is_better": false,
+   "items": "questions",
+   "meaning": "The tuned method was slightly higher than baseline for the 32B (88.3% against 86.4%).",
+   "limits": "Superseded by the larger, pre-registered round-2 check.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.833,
+     "cases": 2022,
+     "failed": 0,
+     "seconds": 0.64,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.8640000000000001,
+     "cases": 2022,
+     "failed": 0,
+     "seconds": 0.49,
+     "numbers": "",
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "round-1 tuned prompt",
+     "key": "Qwen3-VL 32B AWQ|tuned",
+     "score": 0.883,
+     "cases": 2022,
+     "failed": 0,
+     "seconds": 1.46,
+     "numbers": "",
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "charttable-dev-laptop",
+   "track": "Charts",
+   "title": "Chart to table: 60 charts, laptop",
+   "hardware": "Laptop · RTX 4000 Ada Laptop GPU, 12 GB GPU memory",
+   "side": "laptop",
+   "task": "chart_table",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Can a small model rebuild the data table behind a chart?",
+   "metric": "Chart values recovered (value recall, 0 to 1)",
+   "metric_note": "Share of the chart's reference values recovered within 5% when the model rebuilds the chart's data table.",
+   "lower_is_better": false,
+   "items": "charts",
+   "meaning": "Qwen3-VL 8B with self-check recovered 93.0% of values, up from 41.8% at baseline.",
+   "limits": "Exploratory, 60 charts. Needs a larger held-out check before it is trusted.",
+   "recommend": "Qwen3-VL 8B Instruct|selfcheck",
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.65,
+     "cases": 60,
+     "failed": 2,
+     "seconds": 2.58,
+     "numbers": 0.65,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.541,
+     "cases": 60,
+     "failed": 4,
+     "seconds": 2.86,
+     "numbers": 0.541,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.626,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.79,
+     "numbers": 0.626,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.636,
+     "cases": 60,
+     "failed": 2,
+     "seconds": 3.87,
+     "numbers": 0.636,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.418,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.75,
+     "numbers": 0.418,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.9,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.18,
+     "numbers": 0.9,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.93,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.42,
+     "numbers": 0.93,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.63,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.49,
+     "numbers": 0.63,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "charttable-dev-desktop",
+   "track": "Charts",
+   "title": "Chart to table: 60 charts, desktop",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "chart_table",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Can the larger models rebuild chart data more reliably?",
+   "metric": "Chart values recovered (value recall, 0 to 1)",
+   "metric_note": "Share of the chart's reference values recovered within 5% when the model rebuilds the chart's data table.",
+   "lower_is_better": false,
+   "items": "charts",
+   "meaning": "The 8B model again led with self-check (0.930) and the expert prompt (0.915), ahead of the 32B (about 0.90). Bigger was not better here.",
+   "limits": "Exploratory, 60 charts.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 32B|baseline",
+     "score": 0.721,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.29,
+     "numbers": 0.721,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 32B|expert",
+     "score": 0.723,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.73,
+     "numbers": 0.723,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 32B|selfcheck",
+     "score": 0.742,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.2,
+     "numbers": 0.742,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 32B|upscale",
+     "score": 0.683,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.0,
+     "numbers": 0.683,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.715,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 0.99,
+     "numbers": 0.715,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "expert prompt",
+     "key": "Qwen2.5-VL 7B|expert",
+     "score": 0.533,
+     "cases": 60,
+     "failed": 3,
+     "seconds": 1.04,
+     "numbers": 0.533,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "self-check",
+     "key": "Qwen2.5-VL 7B|selfcheck",
+     "score": 0.708,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.11,
+     "numbers": 0.708,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "upscaled image",
+     "key": "Qwen2.5-VL 7B|upscale",
+     "score": 0.784,
+     "cases": 60,
+     "failed": 3,
+     "seconds": 1.43,
+     "numbers": 0.784,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.483,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.0,
+     "numbers": 0.483,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 8B Instruct|expert",
+     "score": 0.915,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.5,
+     "numbers": 0.915,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "self-check",
+     "key": "Qwen3-VL 8B Instruct|selfcheck",
+     "score": 0.93,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.61,
+     "numbers": 0.93,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 8B Instruct|upscale",
+     "score": 0.643,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 1.52,
+     "numbers": 0.643,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.864,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.1,
+     "numbers": 0.864,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "expert prompt",
+     "key": "27B local artifact*|expert",
+     "score": 0.73,
+     "cases": 60,
+     "failed": 1,
+     "seconds": 2.05,
+     "numbers": 0.73,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "higher-resolution image",
+     "key": "27B local artifact*|hires",
+     "score": 0.864,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.16,
+     "numbers": 0.864,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "self-check",
+     "key": "27B local artifact*|selfcheck",
+     "score": 0.817,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 2.24,
+     "numbers": 0.817,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "upscaled image",
+     "key": "27B local artifact*|upscale",
+     "score": 0.884,
+     "cases": 60,
+     "failed": 2,
+     "seconds": 2.72,
+     "numbers": 0.884,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.901,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.94,
+     "numbers": 0.901,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "expert prompt",
+     "key": "Qwen3-VL 32B AWQ|expert",
+     "score": 0.893,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.75,
+     "numbers": 0.893,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "higher-resolution image",
+     "key": "Qwen3-VL 32B AWQ|hires",
+     "score": 0.901,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 3.78,
+     "numbers": 0.901,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "self-check",
+     "key": "Qwen3-VL 32B AWQ|selfcheck",
+     "score": 0.902,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.11,
+     "numbers": 0.902,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "upscaled image",
+     "key": "Qwen3-VL 32B AWQ|upscale",
+     "score": 0.902,
+     "cases": 60,
+     "failed": 0,
+     "seconds": 4.6,
+     "numbers": 0.902,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "crops-dev-laptop",
+   "track": "Text regions",
+   "title": "Text-region OCR: 50 cropped paragraphs, laptop",
+   "hardware": "Laptop · RTX 4000 Ada Laptop GPU, 12 GB GPU memory",
+   "side": "laptop",
+   "task": "ocr_crop",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "How accurately do small models read a cropped block of text?",
+   "metric": "Character error rate",
+   "metric_note": "Share of characters that would need to change to match the reference text. Lower is better.",
+   "lower_is_better": true,
+   "items": "text regions",
+   "meaning": "Qwen3-VL 8B made 1.2% character errors, the same as the 32B models on the desktop.",
+   "limits": "Exploratory. These are cropped paragraphs, not whole mixed pages. Every model recovered about 96.5% of the numbers.",
+   "recommend": "Qwen3-VL 8B Instruct|baseline",
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.02,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 1.76,
+     "numbers": 0.965,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.012,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 2.56,
+     "numbers": 0.965,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "crops-dev-desktop",
+   "track": "Text regions",
+   "title": "Text-region OCR: 50 cropped paragraphs, desktop",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "ocr_crop",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Does a bigger model read cropped text better?",
+   "metric": "Character error rate",
+   "metric_note": "Share of characters that would need to change to match the reference text. Lower is better.",
+   "lower_is_better": true,
+   "items": "text regions",
+   "meaning": "No meaningful difference: 1.1% to 1.8% character error across models.",
+   "limits": "Exploratory, 50 crops.",
+   "recommend": null,
+   "sources": [
+    {
+     "label": "Merged results",
+     "url": "reports/merged-results.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen2.5-VL 32B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 32B|baseline",
+     "score": 0.012,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 1.45,
+     "numbers": 0.965,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen2.5-VL 7B",
+     "method": "baseline prompt",
+     "key": "Qwen2.5-VL 7B|baseline",
+     "score": 0.018,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 0.51,
+     "numbers": 0.965,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 8B Instruct",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 8B Instruct|baseline",
+     "score": 0.012,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 0.61,
+     "numbers": 0.965,
+     "source": "merged-report"
+    },
+    {
+     "model": "27B local build (identity unverified)",
+     "method": "baseline prompt",
+     "key": "27B local artifact*|baseline",
+     "score": 0.011,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 0.71,
+     "numbers": 0.965,
+     "source": "merged-report"
+    },
+    {
+     "model": "Qwen3-VL 32B AWQ",
+     "method": "baseline prompt",
+     "key": "Qwen3-VL 32B AWQ|baseline",
+     "score": 0.012,
+     "cases": 50,
+     "failed": 0,
+     "seconds": 1.0,
+     "numbers": 0.965,
+     "source": "merged-report"
+    }
+   ]
+  },
+  {
+   "id": "layout",
+   "track": "Layout",
+   "title": "Finding figures on a page: 120 pages",
+   "hardware": "Desktop · RTX 5090, 32 GB GPU memory",
+   "side": "desktop",
+   "task": "layout",
+   "stage": "Development",
+   "stage_note": "Examples used to explore methods and choose what to test next. Exploratory: a good result here is a lead, not a confirmed finding.",
+   "confirmatory": false,
+   "question": "Can a page parser also find the figures on a page, or is a dedicated detector still needed?",
+   "metric": "Figures found (figure F1, 0 to 1)",
+   "metric_note": "A balance between finding every reference figure and not marking things that are not figures.",
+   "lower_is_better": false,
+   "items": "pages",
+   "meaning": "The dedicated detector found figures far more reliably (0.876 against 0.612). Keep it for layout.",
+   "limits": "Figure detection only. For tables the two were not clearly different.",
+   "recommend": "DocLayout-YOLO (layout detector)",
+   "sources": [
+    {
+     "label": "Paired statistics",
+     "url": "downloads/stats.json"
+    },
+    {
+     "label": "Final advisory",
+     "url": "reports/final-advisory.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "DocLayout-YOLO (layout detector)",
+     "method": "detect tables and figures",
+     "key": "DocLayout-YOLO (layout detector)",
+     "score": 0.8761,
+     "cases": 120,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "round3-stats"
+    },
+    {
+     "model": "Nemotron 3.5 Parse (0.63B parser)",
+     "method": "detect tables and figures",
+     "key": "Nemotron 3.5 Parse (0.63B parser)",
+     "score": 0.6115,
+     "cases": 120,
+     "failed": null,
+     "seconds": null,
+     "numbers": null,
+     "source": "round3-stats"
+    }
+   ]
+  },
+  {
+   "id": "legal-final",
+   "track": "Contracts",
+   "title": "Contract questions: the same 60 public documents",
+   "hardware": "Desktop for local models; hosted API for Nemotron",
+   "side": "desktop",
+   "task": "legal",
+   "stage": "Final comparison",
+   "stage_note": "The same 60 documents and requests for every configuration, with a 16,000-token output limit.",
+   "confirmatory": false,
+   "question": "Which local language model best answers contract questions with supporting evidence?",
+   "metric": "Correct out of 30, per task",
+   "metric_note": "Strict correctness: the answer and its evidence must pass the frozen checks. Failed or cut-off answers count as wrong.",
+   "lower_is_better": false,
+   "items": "questions",
+   "meaning": "On ContractNLI, Qwen3 32B with thinking off did best (18 of 30). On CUAD no configuration beat simply answering 'absent' every time (15 of 30), so CUAD does not separate these models. gpt-oss-20b at low reasoning is a smaller alternative that fits a 24 GB GPU.",
+   "limits": "30 questions per task, so a difference of a few is noise. These rank configurations on public contracts, not legal accuracy on your documents. Human review is required.",
+   "recommend": "Qwen3 32B, thinking off",
+   "sources": [
+    {
+     "label": "Final advisory",
+     "url": "reports/final-advisory.html"
+    },
+    {
+     "label": "Nemotron reassessment",
+     "url": "reports/nemotron-reassessment.html"
+    }
+   ],
+   "rows": [
+    {
+     "model": "Qwen3 32B, thinking off",
+     "method": "",
+     "key": "Qwen3 32B, thinking off",
+     "score": 0.4666666666666667,
+     "nli": 0.6,
+     "cuad": 14,
+     "nli_n": 18,
+     "truncated": 0,
+     "cases": 30
+    },
+    {
+     "model": "Qwen3 32B, thinking on",
+     "method": "",
+     "key": "Qwen3 32B, thinking on",
+     "score": 0.5,
+     "nli": 0.5333333333333333,
+     "cuad": 15,
+     "nli_n": 16,
+     "truncated": 0,
+     "cases": 30
+    },
+    {
+     "model": "gpt-oss-20b, low reasoning",
+     "method": "",
+     "key": "gpt-oss-20b, low reasoning",
+     "score": 0.5,
+     "nli": 0.4666666666666667,
+     "cuad": 15,
+     "nli_n": 14,
+     "truncated": 0,
+     "cases": 30
+    },
+    {
+     "model": "gpt-oss-20b, high reasoning",
+     "method": "",
+     "key": "gpt-oss-20b, high reasoning",
+     "score": 0.36666666666666664,
+     "nli": 0.13333333333333333,
+     "cuad": 11,
+     "nli_n": 4,
+     "truncated": 19,
+     "cases": 30
+    },
+    {
+     "model": "Nemotron 3 Nano 30B (hosted API), reasoning on",
+     "method": "",
+     "key": "Nemotron 3 Nano 30B (hosted API), reasoning on",
+     "score": 0.43333333333333335,
+     "nli": 0.4,
+     "cuad": 13,
+     "nli_n": 12,
+     "truncated": 2,
+     "cases": 30
+    }
+   ]
+  }
+ ]
+}
