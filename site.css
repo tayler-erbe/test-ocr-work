@@ -150,3 +150,11 @@ code{font-size:.9em;background:#eef0e9;padding:1px 4px}
 @media print{.print-tiers{display:block;margin-top:20px}}
 .hardware-detail .price{color:var(--ink)!important}.hardware-detail .mem{color:var(--muted)}
 .results-table td .tag{display:table;margin-top:6px}
+.head-visual{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-bottom:45px}
+.head-visual .section-head{margin-bottom:0}
+.visual{margin:0}.visual img{display:block;width:100%;height:auto;box-shadow:16px 16px 0 #e2e9de}
+.visual.on-dark img{box-shadow:none;border:1px solid #2c4651}
+.choose-note .visual{margin-top:28px;max-width:440px}.choose-note .visual img{box-shadow:12px 12px 0 #d3ddd6}
+.use-layout .visual{margin-top:30px}.use-layout .visual img{box-shadow:16px 16px 0 #d8d3c4}
+@media(max-width:800px){.head-visual{grid-template-columns:1fr;gap:30px}.visual img{box-shadow:8px 8px 0 #e2e9de}}
+@media print{.visual{max-width:60%;break-inside:avoid}.visual img{box-shadow:none}}

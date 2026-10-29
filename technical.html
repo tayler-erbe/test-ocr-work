@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142b36">
 <meta name="description" content="The evidence behind the decision brief: what was tested, every comparison, what each task looks like, the contract track, hardware fit and the methods. Public benchmarks only.">
 <title>Document Intelligence Lab: evidence and methods · Tayler Erbe</title>
+<meta property="og:type" content="website"><meta property="og:url" content="https://tayler-erbe.github.io/test-ocr-work/technical.html"><meta property="og:title" content="Evidence and methods: open-weight document AI"><meta property="og:description" content="Every comparison behind the decision brief: the explorer, the contract track, hardware fit and methods. By Tayler Erbe."><meta property="og:image" content="https://tayler-erbe.github.io/test-ocr-work/assets/og-image.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="628"><meta property="og:image:alt" content="Two document pages feeding into four result bars, the top bar highlighted in lime."><meta name="twitter:card" content="summary_large_image"><meta name="author" content="Tayler Erbe">
 <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="site.css"><script src="explorer.js" defer></script></head>
 <body><a href="#main" class="skip">Skip to content</a>
 <header class="site-header"><a href="index.html" class="brand" aria-label="Document Intelligence Lab home"><span class="brand-mark">DI<span>↗</span></span><span>Document<br><strong>Intelligence Lab</strong></span></a>
@@ -67,7 +68,7 @@
 </div></div></section>
 
 <section class="explorer-section" id="explorer"><div class="wrap">
-<div class="section-head light"><p class="eyebrow">03 / INTERACTIVE RESULTS EXPLORER</p><h2>Every comparison,<br>one question at a time.</h2><p>Choose a job, a machine and an evaluation set. Each choice only offers combinations that were actually run, so every view has results. Each comparison states its question, sample, measure, what it means and its limits.</p></div>
+<div class="head-visual"><div class="section-head light"><p class="eyebrow">03 / INTERACTIVE RESULTS EXPLORER</p><h2>Every comparison,<br>one question at a time.</h2><p>Choose a job, a machine and an evaluation set. Each choice only offers combinations that were actually run, so every view has results. Each comparison states its question, sample, measure, what it means and its limits.</p></div><figure class="visual on-dark"><img src="assets/visual-results.jpg" width="1200" height="800" loading="lazy" alt="Two document pages, a chart and a table, feeding into four result bars with the top bar highlighted in lime."></figure></div>
 <form class="filters dyn" id="filters" onsubmit="return false">
 <label id="w-task">Job<select id="f-task"></select></label>
 <label id="w-machine"><span>Machine</span><select id="f-machine"></select><div class="static-choice" hidden></div></label>
@@ -174,7 +175,7 @@ ContractNLI-style: "Can be ended without cause"  →  Supported · B12</pre>
 </section>
 
 <section class="use-section" id="next"><div class="wrap">
-<div class="use-layout"><h2>Building the<br>routed service.</h2><div><p class="large-copy">The proposed service sends each part of a document to the tool that did best on that kind of reading. None of it is built or measured yet; these are its requirements.</p></div></div>
+<div class="use-layout"><h2>Building the<br>routed service.</h2><div><p class="large-copy">The proposed service sends each part of a document to the tool that did best on that kind of reading. None of it is built or measured yet; these are its requirements.</p><figure class="visual"><img src="assets/visual-routes.jpg" width="1200" height="800" loading="lazy" alt="One document page branching into four routes: a table, text lines, a bar chart and a paragraph, with the table route in lime, above a slim server."></figure></div></div>
 <div class="roadmap" style="margin-top:40px">
 <article><span>01 / PRESERVE</span><h3>Keep the source</h3><p>Never overwrite the original file. Add each derived result as a new version, with document, page and region identity so results can be recombined and checked.</p></article>
 <article><span>02 / REUSE</span><h3>Read native data</h3><p>Use native text and spreadsheet data where it exists instead of sending everything through a vision model.</p></article>
