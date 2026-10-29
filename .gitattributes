@@ -5,3 +5,7 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.pdf binary
 *.pptx binary
+
+# website images are served by GitHub Pages, which cannot serve LFS objects
+site/assets/*.png !filter !diff !merge -text
+site/assets/*.jpg !filter !diff !merge -text
