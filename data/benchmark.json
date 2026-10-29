@@ -1924,14 +1924,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.757,
+      "score": 0.7574476817899378,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": null,
+      "failed": 4,
+      "median_seconds": 13.44,
+      "numeric_recall": 0.7438477278945733,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "Qwen2.5-VL 7B",
@@ -1942,14 +1942,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.843,
+      "score": 0.8428284542809777,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": null,
+      "failed": 0,
+      "median_seconds": 17.31,
+      "numeric_recall": 0.6547923590883438,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "Qwen3-VL 8B Instruct",
@@ -1960,14 +1960,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.828,
+      "score": 0.8282530788092449,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": null,
+      "failed": 1,
+      "median_seconds": 15.45,
+      "numeric_recall": 0.8251461785049848,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "Qwen3-VL 8B Instruct",
@@ -1978,14 +1978,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.838,
+      "score": 0.8380053768219552,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": null,
+      "failed": 3,
+      "median_seconds": 17.92,
+      "numeric_recall": 0.6625018413188772,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "Qwen3-VL 32B AWQ",
@@ -1996,14 +1996,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.814,
+      "score": 0.8137798137055021,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": 0.872,
+      "failed": 1,
+      "median_seconds": 15.85,
+      "numeric_recall": 0.8719103980648603,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "Qwen3-VL 32B AWQ",
@@ -2014,14 +2014,14 @@
       "split": "confirmation v2",
       "metric": "Word F1",
       "lower_is_better": false,
-      "score": 0.881,
+      "score": 0.8805448329961519,
       "cases": 80,
-      "failed": null,
-      "median_seconds": null,
-      "numeric_recall": 0.694,
+      "failed": 1,
+      "median_seconds": 12.16,
+      "numeric_recall": 0.69401811349413,
       "numeric_precision": null,
-      "source": "routing-report",
-      "source_section": "Page masking (word F1)"
+      "source": "round2-audit",
+      "source_section": "80 attempts; failures score zero; latency median over completed scored attempts"
     },
     {
       "model": "nemotron-parse [budget8192]",
@@ -2233,6 +2233,10 @@
       "label": "32B comparator failures and latency (scores in stats.json)",
       "url": "downloads/vlm_v3.json",
       "sha256": "b53fedad0d186c0ad2411c9866d0f10ec6ea573ac1c5ed23060613575da13f87"
+    },
+    "round2-audit": {
+      "url": "data/round2-audit.json",
+      "title": "Round-2 export audit"
     }
   },
   "legal_screening": [
