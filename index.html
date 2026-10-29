@@ -1,27 +1,192 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="A leadership briefing on local document AI: which models to pilot, what the evaluation established, and the next decision."><title>Document AI · Leadership Briefing · Tayler Erbe</title><link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="leadership.css"></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Which open-weight AI model should read each part of a private document, what hardware it needs and what that costs. A decision brief by Tayler Erbe, based on a pre-registered public-benchmark evaluation.">
+<title>Decision brief: open-weight document AI · Tayler Erbe</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="site.css"></head>
 <body><a class="skip" href="#main">Skip to content</a><div class="wrap">
-<header><strong>TAYLER ERBE / DOCUMENT AI</strong><nav aria-label="Page navigation"><a href="#recommendations">Recommendations</a><a href="#next">Next step</a><a href="technical.html">Detailed case study ↗</a></nav></header>
+<header class="site-header"><a class="brand" href="index.html">TAYLER ERBE / DOCUMENT AI</a>
+<nav aria-label="Page sections"><a href="#findings">Findings</a><a href="#hardware">Hardware</a><a href="#results">Results</a><a href="#method">Method</a><a href="#next">Next steps</a><a href="#resources">Reports</a><a href="technical.html">Evidence ↗</a></nav></header>
 <main id="main">
-<section class="hero"><p class="eyebrow">Leadership briefing · Public benchmark evaluation</p><h1>Turn difficult PDFs into information people can use.</h1><p class="deck">Local AI can help recover text, tables and evidence from mixed document packets. The evaluation points to different models for different jobs—and a reviewed pilot before operational use.</p><div class="decision"><strong>The recommendation</strong><p>Start with PaddleOCR-VL-1.6 for financial tables. Trial Nemotron 3.5 Parse for page text, with checks on numbers. Keep people in control of contract and award decisions.</p></div></section>
 
-<section class="section" id="problem"><p class="eyebrow">01 / Why this matters</p><h2>The information exists.<br>It is difficult to retrieve.</h2><p class="section-intro">Research proposals, award packets and procurement submissions often combine narrative, scans, budget tables, charts and attachments. Searching or moving this information into a new system becomes manual work when it is flattened into PDFs.</p><ol class="flow" aria-label="Proposed document workflow"><li><b>Receive</b><span>Bring in the packet and preserve the original.</span></li><li><b>Read</b><span>Use the right tool for text, tables or charts.</span></li><li><b>Review</b><span>Show proposed values beside their source page.</span></li><li><b>Use</b><span>Export approved data for search, reporting or system intake.</span></li></ol><p class="note">This is the proposed application. These document workflows have not been validated end to end in this evaluation. Local processing can keep documents within controlled infrastructure; security still needs implementation and verification.</p></section>
+<section class="hero">
+<p class="eyebrow">Decision brief · Open-weight document AI on your own hardware</p>
+<h1>Which open-weight model should read your documents, and what will it cost to run?</h1>
+<p class="lead">Research proposals, procurement packets, contracts and reports keep their most useful facts in tables, charts, scans and clauses. I tested eleven open-weight models on public stand-ins for that work, confirmed the leaders on data they had never seen, and priced the hardware to run them privately.</p>
+<div class="answer"><strong>The short answer</strong>
+<p>Use small specialised models, not one big one. A 0.9-billion-parameter table reader beat a 32-billion-parameter vision model on financial tables. The recommended document-reading models all fit on one 24 GB data-centre GPU, an L4-class server planned at about $6,000 to $10,000. Keep a person reviewing amounts and contract answers: no model recovered 99% of the numbers.</p></div>
+<div class="hero-actions"><a class="button" href="#findings">See the recommendations</a><a class="button ghost" href="downloads/decision-brief.pdf" download>Download this brief (PDF)</a><a href="technical.html#explorer">Explore every comparison →</a></div>
+<p class="author"><span><b>Tayler Erbe</b> · Data scientist, applied AI. I design model evaluations that end in a decision: which model, on what hardware, at what cost. <a href="#about">About this work</a></span></p>
+</section>
 
-<section class="section" id="recommendations"><p class="eyebrow">02 / Which models to use, and why</p><h2>Choose by task.<br>There is no single best model.</h2><div class="recommendations">
-<article class="recommendation"><div class="task">Budget and financial tables</div><div><h3>PaddleOCR-VL-1.6</h3><p>The strongest confirmed table result in this comparison. It preserved table structure better than the tested 32B vision baseline, without a material numeric-recall loss under the test rule.</p></div><span class="status good">First pilot choice</span></article>
-<article class="recommendation"><div class="task">Full-page text</div><div><h3>Nemotron 3.5 Parse</h3><p>Recovered more reference words than the baseline. The numeric test remained inconclusive, so amounts and dates need separate checks. This is a document parser, distinct from Nemotron 3 Nano.</p></div><span class="status">Trial with safeguards</span></article>
-<article class="recommendation"><div class="task">Charts and page layout</div><div><h3>Qwen3-VL / DocLayout-YOLO</h3><p>Retain the task-specific chart routes and layout detector from the earlier evaluation. Extra self-check instructions helped some models and hurt others; use the tested method for each configuration.</p></div><span class="status">Keep tested routes</span></article>
-<article class="recommendation"><div class="task">Contract clauses and field proposals</div><div><h3>Qwen3 32B; GPT-OSS 20B as a smaller candidate</h3><p><strong>No tested configuration beat the CUAD baseline of 15 out of 30.</strong> Simply answering “absent” on every question achieves that score on this balanced set. For ContractNLI, Qwen3 32B with thinking off had the highest observed count: 18 out of 30, compared with 12 for hosted Nemotron. These counts do not establish a statistically reliable cross-model ranking or readiness for unattended extraction.</p><p>These remain candidates for review-assisted proposals. Strict legal scores were modest across the tested models, including Nemotron 3 Nano. None earned approval for unattended legal extraction.</p></div><span class="status">Human review required</span></article>
-</div><p class="note">Recommendations apply to the tested configurations. They are starting points for a pilot, not a universal ranking. <a href="technical.html#explorer">See models, settings and task-level results →</a></p></section>
+<section class="section" id="findings">
+<p class="eyebrow">01 / Findings</p>
+<h2>What to use for each job</h2>
+<p class="intro">Each recommendation names the job, the model, why it was chosen, the evidence and the main limit. Every card links to the comparison behind it.</p>
+<div class="findings">
 
-<section class="section" id="results"><p class="eyebrow">03 / The clearest result</p><h2>A specialized table model<br>beat the larger vision baseline.</h2>
-<div class="chart" role="img" aria-label="Table structure similarity on a zero to one scale: PaddleOCR-VL-1.6 scored 0.852; Qwen3-VL 32B scored 0.763. Higher is better. Based on 100 financial-report tables from 87 source clusters."><h3>Table structure similarity</h3><p class="note">Higher is better · scale 0–1 · 100 financial-report tables / 87 source clusters</p><div class="bar-row"><span>PaddleOCR-VL-1.6</span><div class="track"><div class="fill" style="width:85.2%"></div></div><span class="value">0.852</span></div><div class="bar-row"><span>Qwen3-VL 32B</span><div class="track"><div class="fill baseline" style="width:76.25%"></div></div><span class="value">0.763</span></div><p class="chart-key">A confirmed improvement in this test. Both models had the same output-token limit. This measures table structure similarity (TEDS), not the percentage of fully correct tables.</p></div>
-<div class="tradeoff"><article><p class="eyebrow">What supports the choice</p><h3>97.4% numeric recall</h3><p>PaddleOCR-VL-1.6 recovered most reference numbers. The table recommendation passed the planned improvement and numeric-preservation tests.</p><p class="note">Recall does not show that every number is correct or assigned to the right row. Amounts still need validation.</p></article><article><p class="eyebrow">What still needs caution</p><h3>Better text ≠ trusted numbers</h3><p>Nemotron Parse improved word overlap, but recovered about 88.2% of reference numbers. The test could not rule out a meaningful numeric loss versus the baseline.</p><p class="note">Do not use the page-text result as approval for unattended budget extraction.</p></article></div>
-<p class="note">Table improvement: +0.090; multiplicity-adjusted 95% interval +0.048 to +0.139. Results use public benchmarks, not a representative sample of research proposals or awards. <a href="downloads/EVALUATION.md">Read the evidence and limitations →</a></p></section>
+<article class="finding"><span class="job">Budget and financial tables</span><h3>PaddleOCR-VL-1.6 <span class="badge good">Confirmed · pilot first</span></h3>
+<p class="why">Rebuilt financial tables more faithfully than a 32B vision model, and kept the numbers.</p>
+<dl><dt>Evidence</dt><dd>Table similarity 0.852 against 0.762, and 97.4% of reference numbers recovered against 93.2%, on 100 unseen financial-report tables. It passed a test written down before scoring.</dd>
+<dt>Limit</dt><dd>97.4% is below a 99% bar, so amounts still need review.</dd>
+<dt>Next</dt><dd>Check it on your own budget tables.</dd></dl>
+<a class="evidence" href="technical.html#cmp=tables-final">See the table comparison →</a></article>
 
-<section class="section" id="readiness"><p class="eyebrow">04 / What is ready</p><h2>The evaluation is complete.<br>Production validation is next.</h2><div class="tradeoff"><article><h3>Ready to inform a pilot</h3><p>Task-specific recommendations, measured results, failure analysis and software checks are available. The next step is a practical prototype that presents source-linked proposals for review.</p></article><article><h3>Not yet established</h3><p>Accuracy on the actual business documents, sustained throughput on the target server, reviewer workload, operating cost and production security have not been demonstrated.</p></article></div><p class="section-intro">Deployment planning targets one NVIDIA L4 (24 GB) or L40S (48 GB). Round 3 was measured on an RTX 5090; target-server speed and memory headroom must be tested before rollout. This evidence alone does not justify a hardware purchase.</p><p class="note">Fine-tuning may help once representative labels exist. It was not tested here and cannot be assumed to fix missing OCR text or poor retrieval.</p></section>
+<article class="finding"><span class="job">Whole-page text</span><h3>Nemotron 3.5 Parse <span class="badge caution">Lead · check numbers</span></h3>
+<p class="why">The most accurate page text of the models tested, and the fastest.</p>
+<dl><dt>Evidence</dt><dd>Word overlap 0.899 against 0.820 for the 32B model, the same share of numbers (88.2% against 88.3%), and 140 items a minute against 9.</dd>
+<dt>Limit</dt><dd>On 80 pages, the planned numbers test could not rule out a small loss. That makes it a lead, not a confirmed win.</dd>
+<dt>Next</dt><dd>Pair it with a numbers check on pilot documents.</dd></dl>
+<a class="evidence" href="technical.html#cmp=pages-final">See the page comparison →</a></article>
 
-<section class="section" id="next"><p class="eyebrow">05 / The next decision</p><h2>Approve a bounded pilot,<br>not an automated rollout.</h2><ol class="steps"><li><strong>Agree on the useful output.</strong><p>Which fields matter, where do the documents come from, and should approved data feed search, a spreadsheet or an enterprise system?</p></li><li><strong>Build a representative review set.</strong><p>A small convenience sample is not enough to establish readiness. Plan an initial set of about 100 representative documents, with difficult scans, tables and missing fields included. Have two reviewers independently label a subset; confirm the final sample size against the acceptance targets.</p></li><li><strong>Test the recommended routes on the real workflow.</strong><p>Measure field correctness, numeric preservation, source traceability, processing time and human correction effort on the target server.</p></li><li><strong>Decide whether to scale or adapt.</strong><p>Set acceptance thresholds before scoring. Improve retrieval, prompts or training only where the measured errors justify it, and confirm changes on untouched documents.</p></li></ol><div class="ask"><h3>The leadership ask</h3><p>Identify a workflow owner, a domain reviewer and an approved document source. Agree on the first fields and success criteria. Use the pilot evidence to decide the next investment.</p></div></section>
+<article class="finding"><span class="job">Charts</span><h3>Qwen3-VL, with the method chosen per model <span class="badge neutral">Method matters</span></h3>
+<p class="why">The same instruction helped one model and cut another's accuracy by about 43 percentage points.</p>
+<dl><dt>Evidence</dt><dd>On 1,322 unseen chart questions: Qwen3-VL 32B with three-answer voting 84.6%. The 8B model 75.0% at baseline, but 32.3% when asked to re-check itself.</dd>
+<dt>Limit</dt><dd>Public charts. Questions about the same chart are related.</dd>
+<dt>Next</dt><dd>On 24 GB or less, use the 8B at baseline. With 48 GB, use the 32B with voting.</dd></dl>
+<a class="evidence" href="technical.html#cmp=charts-r2">See the chart comparison →</a></article>
 
-<section class="section" id="evidence"><p class="eyebrow">Keep the detail available</p><h2>A short briefing.<br>A complete evidence trail.</h2><p class="section-intro">This page is the meeting version. The detailed case study is preserved separately, including the interactive results explorer, methods, hardware guidance and limitations.</p><div class="resources"><a href="technical.html">Open the detailed case study →</a><a href="downloads/EVALUATION.md">Read the final advisory →</a><a href="https://github.com/tayler-erbe/test-ocr-work">Browse the repository →</a></div><button class="print" type="button" onclick="window.print()">Print / save this briefing as PDF</button></section>
-</main><footer><span>Tayler Erbe · Leadership view · 29 October 2026</span><span>Public-data evaluation. Pilot recommendations, not production approval.</span></footer></div></body></html>
+<article class="finding"><span class="job">Contract clauses</span><h3>Qwen3 32B; gpt-oss-20b for smaller GPUs <span class="badge caution">Human review required</span></h3>
+<p class="why">Best on contract questions that ask whether a document supports a statement.</p>
+<dl><dt>Evidence</dt><dd>ContractNLI: 18 of 30 correct, against 14 for gpt-oss-20b and 12 for a hosted model. On CUAD, none beat the 15 of 30 scored by always answering "absent".</dd>
+<dt>Limit</dt><dd>Modest scores on 30 questions per task. Not legal advice.</dd>
+<dt>Next</dt><dd>Decide whether the gap justifies the larger GPU. See Hardware.</dd></dl>
+<a class="evidence" href="technical.html#cmp=legal-final">See the contract comparison →</a></article>
+
+<article class="finding"><span class="job">Cropped text regions</span><h3>Qwen3-VL 8B <span class="badge good">Small is enough</span></h3>
+<p class="why">Read cropped paragraphs as accurately as the 32B models.</p>
+<dl><dt>Evidence</dt><dd>1.2% character error on 50 cropped paragraphs, on a 12 GB laptop GPU.</dd>
+<dt>Limit</dt><dd>Exploratory set of 50 crops.</dd></dl>
+<a class="evidence" href="technical.html#cmp=crops-dev-laptop">See the text-region comparison →</a></article>
+
+<article class="finding"><span class="job">Finding tables and figures</span><h3>DocLayout-YOLO <span class="badge good">Keep the detector</span></h3>
+<p class="why">A dedicated layout detector found figures far more reliably than the page parser.</p>
+<dl><dt>Evidence</dt><dd>Figure-finding score 0.876 against 0.612 on 120 pages.</dd>
+<dt>Limit</dt><dd>For tables, the two were not clearly different.</dd></dl>
+<a class="evidence" href="technical.html#cmp=layout">See the layout comparison →</a></article>
+</div>
+<div class="callout"><h4>Why the top score is not always the recommendation</h4>
+<p>In some comparisons another setup has a higher text score. The PaddleOCR official pipeline, for example, had the best word overlap on pages (0.922), but it recovered only 77.1% of the numbers. These recommendations favour keeping numbers, because budgets, awards and invoices fail on numbers first.</p></div>
+</section>
+
+<section class="section" id="hardware">
+<p class="eyebrow">02 / Hardware and budget</p>
+<h2>Start from the budget</h2>
+<p class="intro">Each tier shows what it can run, whether that was measured or estimated, and a dated price range for a complete system, not just the graphics card. Prices were checked in October 2026 and move quickly. Refresh them before buying.</p>
+<div class="tiers">
+<article class="tier"><p class="eyebrow">Existing computer, no GPU</p><p class="price">$0 extra</p><p class="mem">Uses what you have</p>
+<ul><li>Read text and spreadsheets directly when the original file exists</li><li>Basic OCR and the review screens</li></ul><p class="basis">Not benchmarked here. A starting point, not a scanned-document solution.</p></article>
+<article class="tier"><p class="eyebrow">16 GB GPU workstation</p><p class="price">$1,500 to $2,500</p><p class="mem">One small model at a time</p>
+<ul><li>Either parser (about 1 to 2 GB of weights)</li><li>Qwen3-VL 8B (about 10 GB)</li></ul><p class="basis">Fit estimated from weight sizes; not tested. Planning allowance from the hardware guide.</p></article>
+<article class="tier"><p class="eyebrow">12 GB mobile workstation · tested</p><p class="price">About $4,650 new</p><p class="mem">RTX 4000 Ada Laptop GPU, 64 GB RAM</p>
+<ul><li>Measured: Qwen3-VL 8B and Qwen2.5-VL 7B on tables, charts, text regions and pages, one model at a time</li></ul><p class="basis">Retail list price for a comparable configuration, October 2026. Refurbished units cost far less.</p></article>
+<article class="tier"><p class="eyebrow">32 GB desktop, RTX 5090 · tested</p><p class="price">About $3,600 to $5,300</p><p class="mem">Where every final-round model was measured</p>
+<ul><li>Measured: all parsers and vision models, the 32B models, gpt-oss-20b</li><li>The two recommended parsers handled 73 to 140 items a minute; the 32B vision model 9</li></ul><p class="basis">Complete prebuilt systems listed in 2026. Graphics-card shortages move these prices.</p></article>
+<article class="tier target"><p class="eyebrow">Single L4 server, 24 GB · target</p><p class="price">$6,000 to $10,000</p><p class="mem">Data-centre card, low power</p>
+<ul><li>Fits: both parsers, Qwen3-VL 8B, gpt-oss-20b for contracts</li><li>Tight: any 32B model</li></ul><p class="basis">Fit from weight sizes; not benchmarked. Dated planning allowance, not a quote.</p></article>
+<article class="tier target"><p class="eyebrow">Single L40S server, 48 GB · target</p><p class="price">$16,000 to $21,000</p><p class="mem">Room for a large model beside a parser</p>
+<ul><li>Fits: everything recommended, including Qwen3 32B for contracts</li><li>Headroom for several requests at once</li></ul><p class="basis">Fit from weight sizes; not benchmarked. Dated planning allowance, not a quote.</p></article>
+</div>
+<div class="callout"><h4>L4 or L40S?</h4>
+<p>The L4 covers the document-reading routes: tables, pages, charts, text regions and layout. The L40S mainly buys the 32B contract model and headroom. On the public contract questions the 32B led the 20B on ContractNLI (18 against 14 of 30) and they tied on CUAD. Whether that gap is worth about $10,000 more depends on your contract fields and the volume you need to process. A short pilot can measure both before you buy.</p></div>
+<p class="note">Speeds were measured on the 32 GB desktop. They compare models fairly but are not speeds for an L4 or L40S. Purchase price leaves out engineering, review time, maintenance and energy. Running models on your own hardware keeps documents in your environment, but it does not make the system secure by itself. Details: <a href="reports/hardware-and-budget.html">hardware and budget guide</a>.</p>
+</section>
+
+<section class="section" id="results">
+<p class="eyebrow">03 / Results</p>
+<h2>The clearest results</h2>
+<div class="two">
+<div class="chart"><h3>Financial tables: small reader vs 32B</h3><p class="small">100 unseen financial-report tables. Same output limit for both. Higher is better.</p>
+<div class="bars" role="img" aria-label="PaddleOCR-VL-1.6 table similarity 0.852 and numbers recovered 97.4 percent; Qwen3-VL 32B 0.762 and 93.2 percent.">
+<div class="bar"><div>PaddleOCR-VL-1.6 · table similarity</div><div class="track"><div class="fill" style="width:85.2%"></div></div><div class="val">0.852</div></div>
+<div class="bar"><div>Qwen3-VL 32B · table similarity</div><div class="track"><div class="fill alt" style="width:76.2%"></div></div><div class="val">0.762</div></div>
+<div class="bar"><div>PaddleOCR-VL-1.6 · numbers recovered</div><div class="track"><div class="fill" style="width:97.4%"></div></div><div class="val">97.4%</div></div>
+<div class="bar"><div>Qwen3-VL 32B · numbers recovered</div><div class="track"><div class="fill alt" style="width:93.2%"></div></div><div class="val">93.2%</div></div></div>
+<p class="small">Passed the pre-registered test. Table similarity measures structure, not fully correct tables.</p></div>
+<div class="chart"><h3>Speed: items processed per minute</h3><p class="small">One batch of 20 pages and 20 tables, four requests at a time, same desktop.</p>
+<div class="bars" role="img" aria-label="Items per minute: Nemotron 3.5 Parse 139.7, PaddleOCR-VL-1.6 73.0, olmOCR-2 19.1, Qwen3-VL 32B 9.3.">
+<div class="bar"><div>Nemotron 3.5 Parse</div><div class="track"><div class="fill" style="width:93.1%"></div></div><div class="val">139.7</div></div>
+<div class="bar"><div>PaddleOCR-VL-1.6</div><div class="track"><div class="fill" style="width:48.7%"></div></div><div class="val">73.0</div></div>
+<div class="bar"><div>olmOCR-2 7B</div><div class="track"><div class="fill alt" style="width:12.7%"></div></div><div class="val">19.1</div></div>
+<div class="bar"><div>Qwen3-VL 32B</div><div class="track"><div class="fill alt" style="width:6.2%"></div></div><div class="val">9.3</div></div></div>
+<p class="small">Relative speeds on one machine, not a promise for other hardware.</p></div>
+</div>
+<div class="chart"><h3>Contract questions: correct out of 30</h3><p class="small">The same 60 public documents for every configuration. The dashed line is the CUAD score from always answering "absent" (15 of 30).</p>
+<p class="legend"><span><i style="background:var(--teal)"></i>ContractNLI</span><span><i style="background:var(--gray)"></i>CUAD</span></p>
+<div class="bars" role="img" aria-label="ContractNLI and CUAD correct out of 30. Qwen3 32B thinking off 18 and 14. Qwen3 32B thinking on 16 and 15. gpt-oss-20b low 14 and 15. gpt-oss-20b high 4 and 11. Hosted Nemotron 12 and 13.">
+<div class="bar"><div>Qwen3 32B, thinking off · ContractNLI</div><div class="track"><div class="fill" style="width:60%"></div></div><div class="val">18</div></div>
+<div class="bar"><div>CUAD</div><div class="track"><div class="fill alt" style="width:46.7%"></div><span class="baseline-mark" style="left:50%"></span></div><div class="val">14</div></div>
+<div class="bar"><div>gpt-oss-20b, low reasoning · ContractNLI</div><div class="track"><div class="fill" style="width:46.7%"></div></div><div class="val">14</div></div>
+<div class="bar"><div>CUAD</div><div class="track"><div class="fill alt" style="width:50%"></div><span class="baseline-mark" style="left:50%"></span></div><div class="val">15</div></div>
+<div class="bar"><div>Hosted Nemotron, reasoning on · ContractNLI</div><div class="track"><div class="fill" style="width:40%"></div></div><div class="val">12</div></div>
+<div class="bar"><div>CUAD</div><div class="track"><div class="fill alt" style="width:43.3%"></div><span class="baseline-mark" style="left:50%"></span></div><div class="val">13</div></div></div>
+<p class="small">CUAD does not separate these models. Two more configurations are in the <a href="technical.html#cmp=legal-final">full contract comparison</a>.</p></div>
+<p><a class="button" href="technical.html#explorer">Explore all 18 comparisons</a></p>
+</section>
+
+<section class="section" id="method">
+<p class="eyebrow">04 / Method</p>
+<h2>How the decision was made, and how I would make it for you</h2>
+<p class="intro">The method matters more than any single score. It is the same six steps whether the documents are research awards, procurement packets or contracts.</p>
+<ol class="method">
+<li><b>Define the jobs</b>Split the documents into the kinds of reading they need, and name the failure that matters for each. Here, that was losing numbers.</li>
+<li><b>Freeze fair tests</b>Pick public stand-ins with answer keys, fix the questions and the scoring code, and let no model grade another.</li>
+<li><b>Shortlist by budget</b>Choose candidates that fit the hardware you can afford, from small parsers to 32B models.</li>
+<li><b>Explore, then confirm</b>Explore on development data, write down what will count as a win, then test once on data no model has seen.</li>
+<li><b>Price the fit</b>Map the winning setup to a hardware tier and a dated budget, separating measured speed from estimates.</li>
+<li><b>Validate on real documents</b>Label a representative set of your own documents and measure field accuracy before approving anything.</li>
+</ol>
+<h3>Why it took several rounds</h3>
+<p class="intro">Each round answered a question the previous one raised. None of them simply reran tests until a good number appeared.</p>
+<div class="timeline">
+<div class="round"><div class="when">Round 1<span>Vision models</span></div><div><b>Question</b>Which local vision model reads each part of a document, on a 12 GB laptop and a 32 GB desktop?</div><div><b>Test</b>Five vision models and several prompting methods on frozen public sets for text, tables, charts and pages.</div><div><b>Finding</b>The 8B model matched the 32B on text and tables. Prompting methods helped some models and hurt others.</div><div><b>Decision</b>Route by model and task. Test the promising methods properly.</div></div>
+<div class="round"><div class="when">Round 2<span>Pre-registered</span></div><div><b>Question</b>Do the chosen methods hold on data no model has seen?</div><div><b>Test</b>Three-answer voting on 1,322 new chart questions and layout masking on 80 new pages, with the pass rules written first.</div><div><b>Finding</b>Voting helped the 7B and 32B, not the 8B. Masking cleaned up text but lost numbers.</div><div><b>Decision</b>Keep voting optional, keep masking experimental, and look for specialist tools.</div></div>
+<div class="round"><div class="when">Contract track<span>Text models</span></div><div><b>Question</b>Can models answer contract questions with evidence a reviewer can check?</div><div><b>Test</b>CUAD and ContractNLI public contracts, quoting versus selecting evidence by ID, and a controlled reassessment of a hosted model.</div><div><b>Finding</b>Selecting evidence by ID removed copy failures. The hosted model's poor first score was a configuration problem.</div><div><b>Decision</b>Compare every candidate on the same 60 documents.</div></div>
+<div class="round"><div class="when">Round 3<span>New candidates</span></div><div><b>Question</b>Do specialist document parsers or gpt-oss-20b beat the incumbents?</div><div><b>Test</b>Three parsers on every earlier page and table set, and gpt-oss-20b on the contract sets.</div><div><b>Finding</b>Leads emerged: PaddleOCR-VL for tables, Nemotron Parse for pages. They were found by looking, so they were not yet proof.</div><div><b>Decision</b>Write the two hypotheses down and test them on fresh data.</div></div>
+<div class="round"><div class="when">Round 3b and 3c<span>Confirmation</span></div><div><b>Question</b>Do the leads hold on unseen data, with the same output limit for every model?</div><div><b>Test</b>100 new financial tables and 80 new pages, the parsers' official pipelines, budget checks, and Qwen3 32B on the 60 contract documents. 3c reran two arms that had failed for software reasons.</div><div><b>Finding</b>The table lead was confirmed. The page lead held on text but was inconclusive on numbers. Official pipelines did not beat a single pass.</div><div><b>Decision</b>Close the evaluation, route by task, and validate on real documents.</div></div>
+</div>
+<p class="note">Why it stopped: the leads were either confirmed or bounded. More public benchmarks would add little, so the next evidence has to come from real documents. <a href="technical.html#methods">Full methods and definitions →</a></p>
+</section>
+
+<section class="section" id="next">
+<p class="eyebrow">05 / Next steps</p>
+<h2>From evaluation to a working service</h2>
+<p class="intro">A mixed PDF is not one task. The proposed service sends each part of a document to the tool that did best on that kind of reading, keeps every answer linked to its source page, and leaves the decision with a reviewer.</p>
+<ol class="pipeline">
+<li><b>Receive</b>Keep the original file untouched.</li><li><b>Identify</b>Find pages, tables, charts and text, and use native text where it exists.</li><li><b>Route</b>Send each part to its recommended model.</li><li><b>Combine</b>Assemble the results into one record, linked to source pages.</li><li><b>Review</b>Show proposed values beside the page. Flag numbers and unread parts.</li><li><b>Export</b>Send approved data to search, reports or other systems.</li></ol>
+<div class="two"><div><h3>Clearing a backlog vs keeping up</h3><p>A first pass over an existing archive can run in batches: load one model, process every waiting table, then switch, so a single GPU is never asked to hold everything at once. After that, new and changed documents arrive in smaller volumes. How long the backlog takes cannot be estimated from these tests. It depends on pages per file, how often each route is needed, the target server and review effort, and the pilot should measure it.</p></div>
+<div><h3>A bounded pilot</h3><ol><li>Agree the fields that matter and where the documents come from.</li><li>Label about 100 representative documents, including difficult scans, with two reviewers on a subset.</li><li>Run the recommended routes and measure field accuracy, numbers, traceability, time and correction effort.</li><li>Decide whether to scale, adapt or fine-tune, using the measured errors.</li></ol></div></div>
+<p class="note">Fine-tuning a model such as Qwen3-VL 8B on your own labelled documents may help. It was not tested here, and it cannot fix text that was never read in the first place.</p>
+</section>
+
+<section class="section" id="resources">
+<p class="eyebrow">06 / Reports and data</p>
+<h2>Read it, share it, check it</h2>
+<div class="resources-grid">
+<div><h3>Reports</h3><ul>
+<li><a href="reports/final-advisory.html">Final advisory</a> · <a href="downloads/final-advisory.pdf" download>PDF</a><span>Recommendations, confirmed tests, limits.</span></li>
+<li><a href="reports/hardware-and-budget.html">Hardware and budget guide</a> · <a href="downloads/hardware-and-budget.pdf" download>PDF</a><span>Tiers, dated prices, what was not measured.</span></li>
+<li><a href="reports/roadmap.html">Implementation roadmap</a> · <a href="downloads/roadmap.pdf" download>PDF</a><span>The next phase after the evaluation.</span></li>
+<li><a href="reports/nemotron-reassessment.html">Hosted model reassessment</a> · <a href="downloads/nemotron-reassessment.pdf" download>PDF</a><span>Why a poor first score was a configuration problem.</span></li>
+<li><a href="reports/routing-report.html">Routing report, rounds 1 and 2</a> · <a href="downloads/routing-report.pdf" download>PDF</a><span>Historical, 21 October 2026.</span></li></ul></div>
+<div><h3>Data</h3><ul>
+<li><a href="data/comparisons.json" download>Every comparison on this site (JSON)</a><span>The explorer's data, built from the files below.</span></li>
+<li><a href="data/final-evaluation.json" download>Final aggregates (JSON)</a><span>With source commit and checksums.</span></li>
+<li><a href="downloads/stats.json" download>Paired statistics (JSON)</a><span>Intervals and the pre-registered tests.</span></li>
+<li><a href="data/benchmark.json" download>All result rows (JSON)</a><span>Every scored configuration, with sources.</span></li>
+<li><a href="reports/data-audit.html">Data audit</a><span>How missing values were restored and checked.</span></li></ul></div>
+<div><h3>Code</h3><ul>
+<li><a href="https://github.com/tayler-erbe/test-ocr-work">Repository</a><span>Test harness, frozen protocols, scorers and tests.</span></li>
+<li><a href="technical.html">Evidence and methods page</a><span>The detailed record behind this brief.</span></li></ul></div>
+</div>
+</section>
+
+<section class="section" id="about">
+<p class="eyebrow">About this work</p>
+<h2>Tayler Erbe</h2>
+<p class="intro">I am a data scientist working in applied AI. I design evaluations that turn model results into decisions: which model to use for each job, what hardware it needs, what it costs, and what still has to be proven. This study used public benchmarks only. Local models did all of the document reading and answering. AI coding assistants helped build the test harness, and no model graded another.</p>
+<p>To talk about an evaluation for your own documents, see <a href="https://taylererbe.com/document-intelligence-evaluation.html">the case study on my site</a> or <a href="https://taylererbe.com/#contact">get in touch</a>.</p>
+<p class="note">Last updated 29 October 2026.</p>
+</section>
+</main>
+<footer class="site-footer"><span>Public benchmarks only. No private documents, labels or model responses appear on this site.</span><a href="https://github.com/tayler-erbe/test-ocr-work">Source and frozen protocols</a></footer>
+</div></body></html>
