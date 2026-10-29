@@ -1,12 +1,14 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Routing report, rounds 1 and 2 · Document Intelligence Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../site.css"></head>
-<body class="report"><a class="skip" href="#main">Skip to content</a><div class="wrap">
-<header class="site-header"><a class="brand" href="../index.html">TAYLER ERBE / DOCUMENT AI</a><nav aria-label="Site"><a href="../index.html">Decision brief</a><a href="../technical.html">Evidence</a><a href="../index.html#resources">Reports</a></nav></header>
-<main id="main" class="report-body">
-<p class="eyebrow">Report</p><h1>Routing report, rounds 1 and 2</h1>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142b36">
+<title>Routing report, rounds 1 and 2 · Document Intelligence Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../site.css"></head>
+<body><a href="#main" class="skip">Skip to content</a>
+<header class="site-header"><a href="../index.html" class="brand" aria-label="Document Intelligence Lab home"><span class="brand-mark">DI<span>↗</span></span><span>Document<br><strong>Intelligence Lab</strong></span></a>
+<nav aria-label="Main navigation"><a href="../index.html">Decision brief</a><a href="../technical.html">Evidence</a><a href="../technical.html#explorer">Results explorer</a><a href="../index.html#resources">Reports</a></nav>
+<a class="repo-link" href="https://github.com/tayler-erbe/test-ocr-work">Repository <span aria-hidden="true">↗</span></a></header>
+<main id="main" class="report-wrap">
+<p class="eyebrow">REPORT</p><h1>Routing report, rounds 1 and 2</h1>
 <p class="report-status">Historical (21 October 2026). Superseded for tables and page text by the final advisory.</p>
-<p class="report-actions"><a class="button" href="../downloads/routing-report.pdf" download>Download PDF</a><a href="../index.html">Back to the decision brief</a></p>
+<p class="report-actions"><a class="button primary" href="../downloads/routing-report.pdf" download>Download PDF <span aria-hidden="true">↓</span></a><a class="text-link" href="../index.html">Back to the decision brief</a></p>
 <p>Source: <code>merged/final/MERGED_REPORT.md</code>, produced by <code>tools/merge_results.py --round2</code> from the desktop export (22,731 rows) and the validated laptop export (18,244 rows, SHA-256 <code>ebc69a53...f5da753</code>, matches). Merged: 40,975 rows, 26 same-model comparison groups. Both exports passed <code>check_conformance.py --round2</code> (CONFORMANT). Everything below is scores and counts from code. No model output was read by a person or by the desktop operator. Failed cases count as zero.</p>
 <h3>Status: prototype routing, not production approval</h3>
 <p>These results select candidate routes for the prototype. They do not approve anything for production. The best laptop crop OCR (8B) still has about 1.23% character error and 96.5% numeric recall, below the project's existing acceptance targets. Readiness is decided by human-labelled institutional documents (the annotation pilot), not by these public benchmarks.</p>
@@ -28,5 +30,5 @@
 <ul><li>The 8B digest on the laptop (<code>70e58e37...b96eb</code>) differs from the desktop record. The merged report marks all 8B rows "different weights: not a reproduction test". The 8B comparison is a method comparison, not a reproduction. Even so, laptop and desktop 8B scores agree closely (for example crop error 0.0123 vs 0.0124).</li><li>7B and 8B results are not reproductions of the desktop 32B. The vote3 pick was made on 32B development data. On 7B and 8B it replicates the protocol with a different model, and does not count as a new selection.</li><li>Many tasks have only 50 to 60 cases, so their intervals are wide. Holm-adjusted p-values are in the merged report. Only the round-2 confirmation set is large: 1,322 questions across 722 charts (questions cluster by chart, so the effective sample is smaller than 1,322) and 80 pages.</li><li>Page masking stays experimental per the round-2 contract, and needs a numeric-recall check before use.</li><li>Self-check's effect depends on the model and task. It helps 7B and the desktop 32B on chart answering, but hurts 8B. Route it per model and task, not globally.</li></ul>
 <p>Corrections, 21 Oct 2026 (Codex review): confirmation-set size stated as questions across charts; masking numeric-recall figures labelled by page set (40 development vs 80 confirmation); self-check wording changed to model- and task-dependent; prototype-not-production status added.</p>
 </main>
-<footer class="site-footer"><span>Public benchmarks only. No private documents, labels or model responses.</span><a href="https://github.com/tayler-erbe/test-ocr-work">Source and frozen protocols</a></footer>
-</div></body></html>
+<footer class="wrap"><div><strong>Document Intelligence Lab</strong><p>Tayler Erbe · Public benchmarks only. No private documents, labels or model responses.</p></div><a href="https://github.com/tayler-erbe/test-ocr-work">Source and frozen protocols ↗</a></footer>
+</body></html>

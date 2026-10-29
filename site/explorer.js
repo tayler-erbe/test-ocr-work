@@ -1,19 +1,25 @@
-/* Results explorer: named comparisons from data/comparisons.json (built by tools/build_site.py from committed results).
-   Every listed comparison has recorded rows, so no choice leads to an empty view. Aggregates only. */
+/* Results explorer, in the original design: dependent dropdown filters over the named comparisons in
+   data/comparisons.json (built by tools/build_site.py from committed results). Each filter offers only choices that
+   have recorded results, so no combination leads to an empty view. Aggregates only. */
 'use strict';
 (function () {
   const $ = id => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
   const NR = 'not reported';
-  let comps = [], current = null, machine = 'all';
+  const TASKS = [['table', 'Tables'], ['page_text', 'Whole-page text'], ['chart_qa', 'Chart questions'], ['chart_table', 'Chart to table'],
+    ['ocr_crop', 'Cropped text regions'], ['layout', 'Finding tables and figures'], ['legal', 'Contract questions']];
+  const MACHINE = { desktop: 'Desktop · RTX 5090, 32 GB', laptop: 'Laptop · RTX 4000 Ada, 12 GB', mixed: 'Laptop (7B, 8B) and desktop (32B)' };
+  let comps = [], cur = null, method = 'all', legalView = 'nli';
 
   const isPct = c => c.task === 'chart_qa' || c.task === 'ocr_crop';
   const fmtScore = (c, v) => !Number.isFinite(v) ? NR : isPct(c) ? (100 * v).toFixed(1) + '%' : v.toFixed(3);
   const fmtPct = v => Number.isFinite(v) ? (100 * v).toFixed(1) + '%' : NR;
   const fmtSec = v => Number.isFinite(v) ? v.toFixed(2) + ' s' : NR;
   const num = v => (v === null || v === undefined || v === '') ? NaN : Number(v);
+  const label = r => r.method ? r.model + ', ' + r.method : r.model;
+  const machineOf = c => c.task === 'legal' ? 'Desktop and hosted API' : (MACHINE[c.side] || c.side);
 
-  // Old explorer links (#explorer?task=..&side=..&split=..) land on the closest named comparison.
+  // Old explorer links (#explorer?task=..&side=..&split=..) land on the closest comparison.
   const LEGACY = { 'table|confirmation v3': 'tables-final', 'table|confirmation v1': 'tables-heldout-r1', 'table|development|laptop': 'tables-dev-laptop', 'table|development': 'tables-dev-desktop',
     'page_text|confirmation v3': 'pages-final', 'page_text|confirmation v2|laptop': 'pages-masking-laptop', 'page_text|confirmation v2': 'pages-masking-desktop', 'page_text|development': 'pages-dev-desktop',
     'chart_qa|confirmation v1': 'charts-heldout-r1', 'chart_qa|development|laptop': 'charts-dev-laptop', 'chart_qa|development': 'charts-dev-desktop',
@@ -22,164 +28,154 @@
     const p = new URLSearchParams(q), t = p.get('task'), s = p.get('split'), side = p.get('side');
     return LEGACY[[t, s, side].join('|')] || LEGACY[[t, s].join('|')] || LEGACY[t] || ({ table: 'tables-final', page_text: 'pages-final', chart_qa: 'charts-r2', chart_table: 'charttable-dev-laptop' })[t] || null;
   }
-  function idFromHash() {
-    const h = decodeURIComponent(location.hash.slice(1));
-    if (h.startsWith('cmp=')) return h.slice(4);
-    if (h.startsWith('explorer?')) return legacyId(h.split('?')[1]);
-    return null;
+
+  function fillSelect(sel, opts, value) {
+    sel.replaceChildren(...opts.map(([v, t]) => { const o = el('option', '', t); o.value = v; return o; }));
+    sel.value = value;
+  }
+  function choice(wrapId, selId, opts, value) {
+    const wrap = $(wrapId), sel = $(selId), stat = wrap.querySelector('.static-choice');
+    if (opts.length === 1) { sel.hidden = true; stat.hidden = false; stat.textContent = opts[0][1]; }
+    else { sel.hidden = false; stat.hidden = true; fillSelect(sel, opts, value); }
   }
 
-  function renderList() {
-    const list = $('cmp-list'); list.replaceChildren();
-    let track = null;
-    comps.filter(c => machine === 'all' || c.side === machine || c.side === 'mixed').forEach(c => {
-      if (c.track !== track) { track = c.track; list.append(el('div', 'cmp-group', track)); }
-      const b = el('button'); b.type = 'button'; b.dataset.id = c.id; b.textContent = c.title;
-      b.append(el('small', '', c.stage + ' · ' + (c.side === 'mixed' ? 'laptop and desktop' : c.side === 'desktop' && c.task === 'legal' ? 'desktop and hosted API' : c.side)));
-      b.setAttribute('aria-current', current && current.id === c.id ? 'true' : 'false');
-      b.addEventListener('click', () => select(c.id, true));
-      list.append(b);
-    });
-  }
-
-  function glance(c) {
-    const g = el('div', 'glance'), rows = c.rows;
-    const add = (label, text, cls) => { const d = el('div', cls); d.append(el('b', '', label), document.createTextNode(text)); g.append(d); };
+  function renderFilters() {
+    const c = cur;
+    fillSelect($('f-task'), TASKS.filter(([t]) => comps.some(x => x.task === t)), c.task);
+    const sameTask = comps.filter(x => x.task === c.task);
+    const machines = [...new Map(sameTask.map(x => [x.side, machineOf(x)])).entries()];
+    choice('w-machine', 'f-machine', machines, c.side);
+    const sets = comps.filter(x => x.task === c.task && x.side === c.side).map(x => [x.id, x.stage + ' · ' + x.rows[0].cases.toLocaleString() + ' ' + x.items]);
+    choice('w-set', 'f-set', sets, c.id);
+    const lm = $('w-method').querySelector('label span');
     if (c.task === 'legal') {
-      const best = [...rows].sort((a, b) => b.nli - a.nli)[0];
-      add('Most ContractNLI correct', best.model + ' (' + best.nli_n + '/30)');
-      add('CUAD baseline', 'Answering "absent" every time scores 15/30. No configuration beat it.');
-      add('Most truncated', [...rows].sort((a, b) => b.truncated - a.truncated)[0].model);
+      lm.textContent = 'Show';
+      choice('w-method', 'f-method', [['nli', 'ContractNLI'], ['cuad', 'CUAD']], legalView);
+    } else {
+      lm.textContent = 'Method';
+      const ms = [...new Set(c.rows.map(r => r.method).filter(Boolean))];
+      if (method !== 'all' && !ms.includes(method)) method = 'all';
+      choice('w-method', 'f-method', ms.length > 1 ? [['all', 'All recorded methods'], ...ms.map(m => [m, m[0].toUpperCase() + m.slice(1)])] : [['all', ms[0] ? ms[0][0].toUpperCase() + ms[0].slice(1) : 'One method']], method);
+    }
+  }
+
+  function glance(c, rows) {
+    const g = el('div', 'glance-row');
+    const add = (h, t, cls) => { const d = el('div', cls); d.append(el('b', '', h), document.createTextNode(t)); g.append(d); };
+    if (c.task === 'legal') {
+      const best = [...c.rows].sort((a, b) => b.nli_n - a.nli_n)[0];
+      add('Most ContractNLI correct', best.model + ' · ' + best.nli_n + '/30');
+      add('CUAD', 'None beat answering "absent" every time (15/30)');
+      add('Most cut off', [...c.rows].sort((a, b) => b.truncated - a.truncated)[0].model);
       add('Recommended here', c.recommend, 'rec');
       return g;
     }
-    const sorted = [...rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
-    add(c.lower_is_better ? 'Lowest error' : 'Highest ' + (c.task === 'chart_qa' ? 'accuracy' : 'score'), label(sorted[0]) + ' · ' + fmtScore(c, sorted[0].score));
-    const withNum = rows.filter(r => Number.isFinite(num(r.numbers)));
-    if (withNum.length && c.task !== 'chart_table') { const n = withNum.sort((a, b) => num(b.numbers) - num(a.numbers))[0]; add('Most numbers recovered', label(n) + ' · ' + fmtPct(num(n.numbers))); }
-    else add('Numbers recovered', 'not measured in this comparison');
-    const withT = rows.filter(r => Number.isFinite(num(r.seconds)));
-    if (withT.length) { const f = withT.sort((a, b) => num(a.seconds) - num(b.seconds))[0]; add('Fastest per item', label(f) + ' · ' + fmtSec(num(f.seconds))); }
-    else add('Speed', 'not reported in this comparison');
-    const rec = rows.find(r => r.key === c.recommend);
-    add('Recommended here', rec ? label(rec) : 'no single choice: see what it means', 'rec');
+    const by = [...rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
+    add(c.lower_is_better ? 'Lowest error' : 'Highest score', label(by[0]) + ' · ' + fmtScore(c, by[0].score));
+    const wn = rows.filter(r => Number.isFinite(num(r.numbers)));
+    add('Most numbers recovered', wn.length && c.task !== 'chart_table' ? (n => label(n) + ' · ' + fmtPct(num(n.numbers)))(wn.sort((a, b) => num(b.numbers) - num(a.numbers))[0]) : 'not measured here');
+    const wt = rows.filter(r => Number.isFinite(num(r.seconds)));
+    add('Fastest per item', wt.length ? (f => label(f) + ' · ' + fmtSec(num(f.seconds)))(wt.sort((a, b) => num(a.seconds) - num(b.seconds))[0]) : 'not reported here');
+    const rec = c.rows.find(r => r.key === c.recommend);
+    add('Recommended here', rec ? label(rec) : 'no single choice', 'rec');
     return g;
   }
-  const label = r => r.method ? r.model + ', ' + r.method : r.model;
 
-  function bars(c) {
-    const box = el('div', 'bars');
+  function chart(c, rows) {
+    const box = $('cmp-chart'); box.replaceChildren();
     if (c.task === 'legal') {
-      const lg = el('p', 'legend'); lg.innerHTML = '<span><i style="background:var(--teal)"></i>CUAD</span><span><i style="background:var(--gray)"></i>ContractNLI</span><span><i style="border-left:2px dashed var(--warn);width:0"></i>CUAD always-"absent" baseline (15/30)</span>';
-      box.append(lg);
-      c.rows.forEach(r => {
-        [['CUAD', r.cuad, ''], ['ContractNLI', r.nli_n, 'alt']].forEach(([t, v, cls], i) => {
-          const row = el('div', 'bar'), tr = el('div', 'track'), f = el('div', 'fill ' + cls);
-          f.style.width = (v / 30 * 100) + '%'; tr.append(f);
-          if (t === 'CUAD') { const m = el('span', 'baseline-mark'); m.style.left = '50%'; m.title = 'Always-absent baseline: 15/30'; tr.append(m); }
-          row.append(el('div', '', i === 0 ? r.model + ' · CUAD' : 'ContractNLI'), tr, el('div', 'val', v + '/30'));
-          box.append(row);
-        });
+      const k = legalView === 'cuad' ? 'cuad' : 'nli_n';
+      [...rows].sort((a, b) => b[k] - a[k]).forEach(r => {
+        const row = el('div', 'chart-row' + (r.key === c.recommend ? ' rec' : '')), lab = el('div', 'chart-label', r.model), tr = el('div', 'bar-track'), f = el('div', 'bar-fill');
+        f.style.setProperty('--width', (r[k] / 30 * 100) + '%'); tr.append(f);
+        if (k === 'cuad') { const m = el('span', 'base-mark'); m.style.left = '50%'; m.title = 'Always answering "absent": 15/30'; tr.append(m); }
+        lab.append(el('small', '', r.truncated ? r.truncated + ' of 60 answers cut off' : 'no answers cut off'));
+        row.append(lab, tr, el('div', 'chart-value', r[k] + '/30')); box.append(row);
       });
-      return box;
+      return;
     }
-    const sorted = [...c.rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
+    const sorted = [...rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
     const max = c.lower_is_better ? Math.max(...sorted.map(r => r.score), 0.001) : 1;
     sorted.forEach(r => {
-      const row = el('div', 'bar'), tr = el('div', 'track'), f = el('div', 'fill' + (r.key === c.recommend ? '' : ' alt'));
-      f.style.width = Math.max(0.5, r.score / max * 100) + '%'; tr.append(f);
-      const name = el('div', '', label(r)); if (r.machine) name.append(el('small', '', ' · ' + r.machine));
-      row.append(name, tr, el('div', 'val', fmtScore(c, r.score)));
-      box.append(row);
+      const row = el('div', 'chart-row' + (r.key === c.recommend ? ' rec' : '')), lab = el('div', 'chart-label', r.model), tr = el('div', 'bar-track'), f = el('div', 'bar-fill' + (r.key === c.recommend ? '' : ' alt'));
+      lab.append(el('small', '', (r.method || '') + (r.machine ? ' · ' + r.machine : '') + (r.key === c.recommend ? ' · recommended' : '')));
+      f.style.setProperty('--width', Math.max(0.5, r.score / max * 100) + '%'); tr.append(f);
+      row.append(lab, tr, el('div', 'chart-value', fmtScore(c, r.score))); box.append(row);
     });
-    return box;
   }
 
-  function table(c) {
-    const wrap = el('div', 'table-scroll'), t = el('table'), head = el('tr'), body = el('tbody');
-    const cols = c.task === 'legal'
-      ? ['Configuration', 'CUAD correct /30', 'ContractNLI correct /30', 'Cut off (of 60)']
-      : ['Configuration', c.metric, c.items[0].toUpperCase() + c.items.slice(1) + ' tested', 'Processing failures', 'Reference numbers recovered', 'Median seconds per item'];
-    cols.forEach((h, i) => { const th = el('th', i ? 'num' : '', h); th.scope = 'col'; head.append(th); });
-    const thead = el('thead'); thead.append(head); t.append(thead);
-    const rows = c.task === 'legal' ? c.rows : [...c.rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
-    rows.forEach(r => {
-      const tr = el('tr', r.key === c.recommend ? 'recommended' : '');
-      const name = el('td', '', label(r)); if (r.machine) name.append(el('div', 'small', r.machine)); if (r.key === c.recommend) name.append(el('div', 'small', 'Recommended in this comparison'));
-      tr.append(name);
+  function table(c, rows) {
+    const head = $('cmp-head'), body = $('cmp-body'); head.replaceChildren(); body.replaceChildren();
+    const cols = c.task === 'legal' ? ['Configuration', 'CUAD correct /30', 'ContractNLI correct /30', 'Cut off (of 60)']
+      : ['Configuration', c.metric, c.items[0].toUpperCase() + c.items.slice(1) + ' tested', 'Processing failures', 'Reference numbers recovered', 'Median time per item'];
+    cols.forEach(h => { const th = el('th', '', h); th.scope = 'col'; head.append(th); });
+    const list = c.task === 'legal' ? rows : [...rows].sort((a, b) => c.lower_is_better ? a.score - b.score : b.score - a.score);
+    list.forEach(r => {
+      const tr = el('tr', r.key === c.recommend ? 'rec' : ''), td = el('td', '', r.model);
+      if (r.method) td.append(el('small', '', r.method));
+      if (r.machine) td.append(el('small', '', r.machine));
+      if (r.key === c.recommend) td.append(el('span', 'tag', 'Recommended'));
+      tr.append(td);
       const vals = c.task === 'legal' ? [r.cuad, r.nli_n, r.truncated]
-        : [fmtScore(c, r.score), r.cases, r.failed === null || r.failed === undefined ? NR : r.failed, fmtPct(num(r.numbers)), fmtSec(num(r.seconds))];
-      vals.forEach(v => tr.append(el('td', 'num', String(v))));
+        : [fmtScore(c, r.score), r.cases.toLocaleString(), r.failed === null || r.failed === undefined ? NR : r.failed, fmtPct(num(r.numbers)), fmtSec(num(r.seconds))];
+      vals.forEach(v => tr.append(el('td', '', String(v))));
       body.append(tr);
     });
-    t.append(body); wrap.append(t); return wrap;
   }
 
-  function renderPanel(c) {
-    const p = $('cmp-panel'); p.replaceChildren();
-    p.append(el('p', 'eyebrow', c.track));
-    p.append(el('h3', '', c.title));
-    const meta = el('div', 'meta');
-    meta.append(el('span', 'badge ' + (c.confirmatory ? 'good' : c.stage === 'Development' ? 'caution' : 'neutral'), c.stage), el('span', 'badge', c.hardware));
-    p.append(meta);
-    p.append(el('p', 'q', c.question));
-    p.append(el('p', 'def', c.stage_note));
-    p.append(glance(c));
-    const m = el('p', 'def'); m.append(el('b', '', c.metric + ': '), document.createTextNode(c.metric_note + (c.lower_is_better ? '' : ' Higher is better.')));
-    p.append(m, bars(c), table(c));
-    if (c.task !== 'legal') p.append(el('p', 'def', 'Failed or cut-off attempts score zero and stay in the averages. "Processing failures" counts attempts that returned no usable output; zero failures does not mean zero mistakes. Median seconds is the middle request time per item on the stated machine, excluding model loading. "Not reported" means the source did not record it, not zero.'));
-    const mean = el('div', 'callout'); mean.append(el('h4', '', 'What this means'), el('p', '', c.meaning)); p.append(mean);
-    const lim = el('p', 'def'); lim.append(el('b', '', 'Limits: '), document.createTextNode(c.limits)); p.append(lim);
-    if (c.sources && c.sources.length) {
-      const s = el('p', 'def'); s.append(el('b', '', 'Sources: '));
-      c.sources.forEach((src, i) => { const a = el('a', '', src.label); a.href = src.url; s.append(a); if (i < c.sources.length - 1) s.append(document.createTextNode(' · ')); });
-      p.append(s);
-    }
-    const btn = el('button', 'button ghost', 'Download this comparison (CSV)'); btn.type = 'button'; btn.addEventListener('click', () => csv(c)); p.append(btn);
+  function render(push) {
+    const c = cur;
+    renderFilters();
+    const rows = c.task === 'legal' || method === 'all' ? c.rows : c.rows.filter(r => r.method === method);
+    $('cmp-eyebrow').textContent = c.track.toUpperCase() + ' · ' + machineOf(c).toUpperCase();
+    $('cmp-title').textContent = c.title;
+    const pills = $('cmp-pills'); pills.replaceChildren(el('span', 'stage-pill' + (c.confirmatory ? ' conf' : ''), c.stage));
+    $('cmp-question').textContent = c.question;
+    $('cmp-stage').textContent = c.stage_note + ' ' + c.metric + ': ' + c.metric_note + (c.lower_is_better ? '' : ' Higher is better.');
+    const g = $('cmp-glance'); g.replaceChildren(glance(c, rows));
+    chart(c, rows); table(c, rows);
+    $('cmp-meaning').textContent = c.meaning;
+    const lim = $('cmp-limits'); lim.replaceChildren(el('b', '', 'Limits: '), document.createTextNode(c.limits + ' '));
+    if (c.task !== 'legal') lim.append(document.createTextNode('Failed or cut-off attempts score zero and stay in the averages. Zero processing failures does not mean zero mistakes. Median time is per request on the stated machine, excluding model loading. "Not reported" means the source did not record it. '));
+    (c.sources || []).forEach((s, i) => { if (i === 0) lim.append(el('b', '', 'Sources: ')); const a = el('a', '', s.label); a.href = s.url; lim.append(a); if (i < c.sources.length - 1) lim.append(document.createTextNode(' · ')); });
+    const hash = '#cmp=' + c.id + (method !== 'all' && c.task !== 'legal' ? '&method=' + encodeURIComponent(method) : '') + (c.task === 'legal' && legalView === 'cuad' ? '&show=cuad' : '');
+    if (push) history.pushState(null, '', hash); else if (location.hash !== hash && location.hash.startsWith('#cmp=')) history.replaceState(null, '', hash);
   }
 
-  function csv(c) {
-    const cols = c.task === 'legal' ? ['model', 'cuad', 'nli_n', 'truncated'] : ['model', 'method', 'score', 'cases', 'failed', 'numbers', 'seconds', 'machine'];
-    const q = v => '"' + String(v ?? '').replaceAll('"', '""') + '"';
-    const text = [['comparison', ...cols].map(q).join(','), ...c.rows.map(r => [c.id, ...cols.map(k => r[k])].map(q).join(','))].join('\r\n');
-    const a = el('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = c.id + '.csv'; a.click();
-  }
+  function go(id, push) { cur = comps.find(x => x.id === id) || comps[0]; render(push); }
 
-  function select(id, push) {
-    const c = comps.find(x => x.id === id) || comps[0];
-    current = c;
-    if (push) history.pushState(null, '', '#cmp=' + c.id);
-    renderList(); renderPanel(c);
-    const note = $('cmp-redirect');
-    if (note) note.textContent = '';
-  }
-
-  function onHash(scroll) {
-    const id = idFromHash();
-    if (!id) return false;
-    const known = comps.some(c => c.id === id);
-    select(known ? id : comps[0].id, false);
-    if (!known && $('cmp-redirect')) $('cmp-redirect').textContent = 'That link pointed to a view that no longer exists, so the closest available comparison is shown.';
-    if (location.hash.startsWith('#explorer?')) history.replaceState(null, '', '#cmp=' + current.id);
+  function fromHash(scroll) {
+    const h = decodeURIComponent(location.hash.slice(1));
+    let id = null, moved = false;
+    if (h.startsWith('cmp=')) { const p = new URLSearchParams(h); id = p.get('cmp'); method = p.get('method') || 'all'; legalView = p.get('show') === 'cuad' ? 'cuad' : 'nli'; }
+    else if (h.startsWith('explorer?')) { id = legacyId(h.split('?')[1]); moved = true; }
+    else return false;
+    const known = comps.some(x => x.id === id);
+    go(known ? id : 'tables-final', false);
+    $('cmp-redirect').textContent = moved || !known ? 'That link pointed to an older view, so the closest recorded comparison is shown.' : '';
+    if (moved || !known) history.replaceState(null, '', '#cmp=' + cur.id);
     if (scroll) $('explorer').scrollIntoView();
     return true;
   }
 
-  document.querySelectorAll('[data-machine]').forEach(b => b.addEventListener('click', () => {
-    machine = b.dataset.machine;
-    document.querySelectorAll('[data-machine]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-    if (current && machine !== 'all' && current.side !== machine && current.side !== 'mixed') {
-      const first = comps.find(c => c.side === machine); if (first) { select(first.id, true); return; }
-    }
-    renderList();
-  }));
+  function wire() {
+    $('f-task').addEventListener('change', e => { const first = comps.find(x => x.task === e.target.value && x.confirmatory) || comps.find(x => x.task === e.target.value); method = 'all'; go(first.id, true); });
+    $('f-machine').addEventListener('change', e => { const first = comps.find(x => x.task === cur.task && x.side === e.target.value); method = 'all'; go(first.id, true); });
+    $('f-set').addEventListener('change', e => { method = 'all'; go(e.target.value, true); });
+    $('f-method').addEventListener('change', e => { if (cur.task === 'legal') legalView = e.target.value; else method = e.target.value; render(true); });
+    $('f-reset').addEventListener('click', () => { method = 'all'; legalView = 'nli'; go('tables-final', true); });
+    $('cmp-csv').addEventListener('click', () => {
+      const c = cur, cols = c.task === 'legal' ? ['model', 'cuad', 'nli_n', 'truncated'] : ['model', 'method', 'machine', 'score', 'cases', 'failed', 'numbers', 'seconds'];
+      const q = v => '"' + String(v ?? '').replaceAll('"', '""') + '"';
+      const text = [['comparison', ...cols].map(q).join(','), ...c.rows.map(r => [c.id, ...cols.map(k => r[k])].map(q).join(','))].join('\r\n');
+      const a = el('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' })); a.download = c.id + '.csv'; a.click();
+    });
+    window.addEventListener('popstate', () => fromHash(false));
+    window.addEventListener('hashchange', () => fromHash(false));
+  }
 
   fetch('data/comparisons.json').then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(d => {
-    comps = d.comparisons;
-    if (!onHash(true)) select('tables-final', false);
-    window.addEventListener('hashchange', () => onHash(false));
-    window.addEventListener('popstate', () => onHash(false));
-  }).catch(() => {
-    $('cmp-panel').replaceChildren(el('p', '', 'The comparison data did not load. Open this page from the website (not a saved file), or use the reports listed under Resources.'));
-  });
+    comps = d.comparisons; wire();
+    if (!fromHash(true)) go('tables-final', false);
+  }).catch(() => { $('cmp-title').textContent = 'The comparison data did not load. Open this page from the website, or use the reports below.'; });
 })();

@@ -1,12 +1,14 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Implementation roadmap · Document Intelligence Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../site.css"></head>
-<body class="report"><a class="skip" href="#main">Skip to content</a><div class="wrap">
-<header class="site-header"><a class="brand" href="../index.html">TAYLER ERBE / DOCUMENT AI</a><nav aria-label="Site"><a href="../index.html">Decision brief</a><a href="../technical.html">Evidence</a><a href="../index.html#resources">Reports</a></nav></header>
-<main id="main" class="report-body">
-<p class="eyebrow">Report</p><h1>Implementation roadmap</h1>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142b36">
+<title>Implementation roadmap · Document Intelligence Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../site.css"></head>
+<body><a href="#main" class="skip">Skip to content</a>
+<header class="site-header"><a href="../index.html" class="brand" aria-label="Document Intelligence Lab home"><span class="brand-mark">DI<span>↗</span></span><span>Document<br><strong>Intelligence Lab</strong></span></a>
+<nav aria-label="Main navigation"><a href="../index.html">Decision brief</a><a href="../technical.html">Evidence</a><a href="../technical.html#explorer">Results explorer</a><a href="../index.html#resources">Reports</a></nav>
+<a class="repo-link" href="https://github.com/tayler-erbe/test-ocr-work">Repository <span aria-hidden="true">↗</span></a></header>
+<main id="main" class="report-wrap">
+<p class="eyebrow">REPORT</p><h1>Implementation roadmap</h1>
 <p class="report-status">Current. The next phase after the evaluation.</p>
-<p class="report-actions"><a class="button" href="../downloads/roadmap.pdf" download>Download PDF</a><a href="../index.html">Back to the decision brief</a></p>
+<p class="report-actions"><a class="button primary" href="../downloads/roadmap.pdf" download>Download PDF <span aria-hidden="true">↓</span></a><a class="text-link" href="../index.html">Back to the decision brief</a></p>
 <p>Model selection on public proxies is closed as of 27 October 2026. The next phase rebuilds the prototype using the routes in <a href="final-advisory.html">the final evaluation</a>. No new model bake-off or laptop feasibility sweep is scheduled.</p>
 <p>Read-only connector → MIME detection and packet/page inventory → immutable source store → native text or selected OCR/table/chart route → canonical page/region spans → retrieval → evidence-ID proposals → deterministic validation → reviewer decisions → approved export/search.</p>
 <p>This is the implementation target, not a claim that the prototype already provides it. Keep sources, machine proposals and human decisions separate.</p>
@@ -15,5 +17,5 @@
 <p>Financial validation must bind numbers to fields, rows/headers, signs, decimals, currencies, scales and units. Token presence alone is insufficient. Measure false positives and omissions. Provenance proves text was copied, not that it answers the question.</p>
 <p>Dates follow source access, schema agreement and reviewer availability. A ten-document integration check is not an acceptance set. Sample size follows field prevalence, critical error tolerance and document clustering. Public guidance excludes private labels, examples and pilot-derived statistics.</p>
 </main>
-<footer class="site-footer"><span>Public benchmarks only. No private documents, labels or model responses.</span><a href="https://github.com/tayler-erbe/test-ocr-work">Source and frozen protocols</a></footer>
-</div></body></html>
+<footer class="wrap"><div><strong>Document Intelligence Lab</strong><p>Tayler Erbe · Public benchmarks only. No private documents, labels or model responses.</p></div><a href="https://github.com/tayler-erbe/test-ocr-work">Source and frozen protocols ↗</a></footer>
+</body></html>
