@@ -2,7 +2,7 @@
 
 Instructions for the reviewing agent. Written 29 October 2026. Read this whole file before opening the site.
 
-Your job is to make the Document Intelligence Lab website the strongest possible public demonstration of one skill: choosing and justifying open-weight AI models for private document work under real budget and hardware limits. Review first and report. Do not edit anything until the owner approves your findings.
+Your job is to make the Applied AI Lab website the strongest possible public demonstration of one skill: choosing and justifying open-weight AI models for private document work under real budget and hardware limits. Review first and report. Do not edit anything until the owner approves your findings.
 
 ## 1. What the site must achieve
 

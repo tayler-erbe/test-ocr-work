@@ -296,9 +296,9 @@ def md_to_html(md, slug_links, src_dir=ROOT):
 def report_page(slug, title, body, status, pdf=True):
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142b36">
-<title>{html.escape(title)} · Document Intelligence Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../site.css"></head>
+<title>{html.escape(title)} · Applied AI Lab</title><link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../site.css"></head>
 <body><a href="#main" class="skip">Skip to content</a>
-<header class="site-header"><a href="../index.html" class="brand" aria-label="Document Intelligence Lab home"><span class="brand-mark">DI<span>↗</span></span><span>Document<br><strong>Intelligence Lab</strong></span></a>
+<header class="site-header"><a href="../index.html" class="brand" aria-label="Applied AI Lab home"><span class="brand-mark">AI<span>↗</span></span><span>Applied AI<br><strong>Lab</strong></span></a>
 <nav aria-label="Main navigation"><a href="../index.html">Decision brief</a><a href="../technical.html">Evidence</a><a href="../technical.html#explorer">Results explorer</a><a href="../index.html#resources">Reports</a></nav>
 <a class="repo-link" href="{REPO}">Repository <span aria-hidden="true">↗</span></a></header>
 <main id="main" class="report-wrap">
@@ -307,7 +307,7 @@ def report_page(slug, title, body, status, pdf=True):
 <p class="report-actions">{f'<a class="button primary" href="../downloads/{slug}.pdf" download>Download PDF <span aria-hidden="true">↓</span></a>' if pdf else ''}<a class="text-link" href="../index.html">Back to the decision brief</a></p>
 {body}
 </main>
-<footer class="wrap"><div><strong>Document Intelligence Lab</strong><p>Tayler Erbe · Public benchmarks only. No private documents, labels or model responses.</p></div><a href="{REPO}">Source and frozen protocols ↗</a></footer>
+<footer class="wrap"><div><strong>Applied AI Lab</strong><p>Tayler Erbe · Public benchmarks only. No private documents, labels or model responses.</p></div><a href="{REPO}">Source and frozen protocols ↗</a></footer>
 </body></html>
 """
 
